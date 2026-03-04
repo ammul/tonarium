@@ -6,20 +6,21 @@ const LABELS = ['.',  '0',  'i', '1', '2',  '3', '4',  '5', '6', '7',  '8', '9']
 const SHARPS = new Set(['A#', 'C#', 'D#', 'F#', 'G#'])
 
 const SCALES = [
-  { id: '12t',  label: '12T — Chromatic',         intervals: [0,1,2,3,4,5,6,7,8,9,10,11] },
-  { id: 'maj',  label: 'maj — Major (Ionian)',     intervals: [0,2,4,5,7,9,11] },
-  { id: 'min',  label: 'min — Minor (Aeolian)',    intervals: [0,2,3,5,7,8,10] },
-  { id: 'dor',  label: 'dor — Dorian',             intervals: [0,2,3,5,7,9,10] },
-  { id: 'phr',  label: 'phr — Phrygian',           intervals: [0,1,3,5,7,8,10] },
-  { id: 'lyd',  label: 'lyd — Lydian',             intervals: [0,2,4,6,7,9,11] },
-  { id: 'mix',  label: 'mix — Mixolydian',         intervals: [0,2,4,5,7,9,10] },
-  { id: 'loc',  label: 'loc — Locrian',            intervals: [0,1,3,5,6,8,10] },
-  { id: 'ma.p', label: 'ma.p — Major Pentatonic',  intervals: [0,2,4,7,9] },
-  { id: 'mi.p', label: 'mi.p — Minor Pentatonic',  intervals: [0,3,5,7,10] },
+  { id: '12t',  label: '12T — Chromatic',         intervals: [0,1,2,3,4,5,6,7,8,9,10,11], description: 'All 12 semitones. No inherent tonality — every key plays, nothing is highlighted. Useful for atonal passages or when you want full chromatic access.' },
+  { id: 'maj',  label: 'maj — Major (Ionian)',     intervals: [0,2,4,5,7,9,11],             description: 'The familiar "happy" scale. Bright, stable, and resolved. The default western scale — works for pop, folk, classical, and most upbeat music.' },
+  { id: 'min',  label: 'min — Minor (Aeolian)',    intervals: [0,2,3,5,7,8,10],             description: 'Natural minor. Dark, melancholic, and introspective. The most common minor scale — great for moody, emotional, or dramatic pieces.' },
+  { id: 'dor',  label: 'dor — Dorian',             intervals: [0,2,3,5,7,9,10],             description: 'Minor with a raised 6th. Slightly brighter and jazzier than natural minor — sounds soulful and funky. Think "Scarborough Fair" or modal jazz.' },
+  { id: 'phr',  label: 'phr — Phrygian',           intervals: [0,1,3,5,7,8,10],             description: 'Minor with a flattened 2nd. Very dark and tense, with a distinctly Spanish or flamenco flavour. Creates a brooding, exotic feel.' },
+  { id: 'lyd',  label: 'lyd — Lydian',             intervals: [0,2,4,6,7,9,11],             description: 'Major with a raised 4th. Dreamy, ethereal, and floating — the raised 4th gives it an otherworldly quality. Common in film scores and ambient music.' },
+  { id: 'mix',  label: 'mix — Mixolydian',         intervals: [0,2,4,5,7,9,10],             description: 'Major with a flattened 7th. Bright but slightly unresolved — sounds bluesy and rock-oriented. Think classic rock, Celtic, and blues-inflected pop.' },
+  { id: 'loc',  label: 'loc — Locrian',            intervals: [0,1,3,5,6,8,10],             description: 'The most dissonant mode — minor with a flattened 2nd and 5th. Extremely unstable and tense; rarely used as a tonic but effective for dark, unsettling textures.' },
+  { id: 'ma.p', label: 'ma.p — Major Pentatonic',  intervals: [0,2,4,7,9],                  description: 'Five-note major scale (no 4th or 7th). Open, consonant, and universally pleasing — nothing clashes. Common in folk, country, and East Asian music.' },
+  { id: 'mi.p', label: 'mi.p — Minor Pentatonic',  intervals: [0,3,5,7,10],                 description: 'Five-note minor scale. The backbone of blues, rock, and R&B. Every note works over almost any chord — great for expressive leads and improvisation.' },
 ]
 
 const selectedRoot = ref('A')
 const selectedScaleId = ref('maj')
+const showInfo = ref(false)
 
 const selectedScale = computed(() => SCALES.find(s => s.id === selectedScaleId.value))
 
@@ -89,9 +90,13 @@ const scaleNotes = computed(() =>
 
       <div class="control-group">
         <label>Scale</label>
-        <select v-model="selectedScaleId">
-          <option v-for="s in SCALES" :key="s.id" :value="s.id">{{ s.label }}</option>
-        </select>
+        <div class="scale-select-row">
+          <select v-model="selectedScaleId" @change="showInfo = false">
+            <option v-for="s in SCALES" :key="s.id" :value="s.id">{{ s.label }}</option>
+          </select>
+          <button class="info-btn" :class="{ active: showInfo }" @click="showInfo = !showInfo" aria-label="Scale info">i</button>
+        </div>
+        <p v-if="showInfo" class="scale-info">{{ selectedScale.description }}</p>
       </div>
     </div>
 
@@ -205,6 +210,53 @@ const scaleNotes = computed(() =>
   background: #c8a96e;
   border-color: #c8a96e;
   color: #1a1714;
+}
+
+.scale-select-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.info-btn {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  border: 1px solid #4a4030;
+  background: #1e1c18;
+  color: #7a6f60;
+  font-size: 0.8rem;
+  font-style: italic;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.info-btn:hover {
+  border-color: #c8a96e;
+  color: #e8dcc8;
+}
+
+.info-btn.active {
+  background: #3a2e10;
+  border-color: #c8a96e;
+  color: #c8a96e;
+}
+
+.scale-info {
+  margin-top: 0.6rem;
+  padding: 0.65rem 0.85rem;
+  background: #1e1c18;
+  border: 1px solid #4a4030;
+  border-left: 3px solid #c8a96e;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: #a09080;
+  line-height: 1.55;
+  width: 100%;
 }
 
 select {
