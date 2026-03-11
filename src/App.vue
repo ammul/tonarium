@@ -97,7 +97,7 @@ header {
 }
 
 h1 {
-  font-size: 1.8rem;
+  font-size: clamp(1.2rem, 5vw, 1.8rem);
   font-weight: 700;
   color: #c8a96e;
   letter-spacing: 0.08em;
@@ -115,6 +115,10 @@ h1 .dim {
   letter-spacing: 0.15em;
   text-transform: uppercase;
   margin-top: 0.2rem;
+}
+
+.title-block {
+  min-width: 0;
 }
 
 .header-controls {
