@@ -1,38 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { displayMode } from '../displayMode.js'
-
-const NOTES  = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
-const LABELS = ['.',  '0',  'i', '1', '2',  '3', '4',  '5', '6', '7',  '8', '9']
-const SHARPS = new Set(['A#', 'C#', 'D#', 'F#', 'G#'])
-
-// Guitar neck open string note indices: E2, A2, D3, G3, B3, E4
-const OPEN_STRINGS = [7, 0, 5, 10, 2, 7]
-const STRING_NAMES = ['E', 'A', 'D', 'G', 'B', 'e']
-const FRET_COUNT = 12
-
-const NOTE_TO_SEMI = [9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8]
-const SEMI_TO_NAME = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-
-const CHORD_TYPES = [
-  { intervals: [0, 7],           suffix: '5',      name: 'Power chord' },
-  { intervals: [0, 4, 7],        suffix: '',        name: 'Major' },
-  { intervals: [0, 3, 7],        suffix: 'm',       name: 'Minor' },
-  { intervals: [0, 3, 6],        suffix: '°',       name: 'Diminished' },
-  { intervals: [0, 4, 8],        suffix: '+',       name: 'Augmented' },
-  { intervals: [0, 2, 7],        suffix: 'sus2',    name: 'Sus2' },
-  { intervals: [0, 5, 7],        suffix: 'sus4',    name: 'Sus4' },
-  { intervals: [0, 4, 7, 9],     suffix: '6',       name: 'Major 6th' },
-  { intervals: [0, 3, 7, 9],     suffix: 'm6',      name: 'Minor 6th' },
-  { intervals: [0, 4, 7, 10],    suffix: '7',       name: 'Dominant 7th' },
-  { intervals: [0, 4, 7, 11],    suffix: 'maj7',    name: 'Major 7th' },
-  { intervals: [0, 3, 7, 10],    suffix: 'm7',      name: 'Minor 7th' },
-  { intervals: [0, 3, 6, 10],    suffix: 'm7♭5',   name: 'Half-diminished 7th' },
-  { intervals: [0, 3, 6, 9],     suffix: '°7',      name: 'Diminished 7th' },
-  { intervals: [0, 4, 7, 10, 2], suffix: '9',       name: 'Dominant 9th' },
-  { intervals: [0, 4, 7, 11, 2], suffix: 'maj9',    name: 'Major 9th' },
-  { intervals: [0, 3, 7, 10, 2], suffix: 'm9',      name: 'Minor 9th' },
-]
+import { NOTES, LABELS, SHARPS, NOTE_TO_SEMI, SEMI_TO_NAME, CHORD_DETECT_TYPES } from '../musicConstants.js'
+import { buildGuitarNeck } from '../musicUtils.js'
 
 function detectChord(noteIndices) {
   if (noteIndices.length < 2) return null
@@ -40,7 +10,7 @@ function detectChord(noteIndices) {
   const results = []
   for (const rootSemi of semis) {
     const intervals = semis.map(s => (s - rootSemi + 12) % 12).sort((a, b) => a - b)
-    for (const type of CHORD_TYPES) {
+    for (const type of CHORD_DETECT_TYPES) {
       if (
         type.intervals.length === intervals.length &&
         type.intervals.every((v, i) => v === intervals[i])
@@ -105,25 +75,12 @@ const noteButtons = computed(() =>
 )
 
 // Guitar mode: fretboard (high e at top)
-const guitarNeck = computed(() => {
-  const neck = []
-  for (let s = 5; s >= 0; s--) {
-    const cells = []
-    for (let f = 0; f <= FRET_COUNT; f++) {
-      const noteIdx = (OPEN_STRINGS[s] + f) % 12
-      cells.push({
-        noteIdx,
-        note: NOTES[noteIdx],
-        isSharp: SHARPS.has(NOTES[noteIdx]),
-        isSelected: selected.value.has(noteIdx),
-        fret: f,
-        isOpen: f === 0,
-      })
-    }
-    neck.push({ stringIdx: s, name: STRING_NAMES[s], cells })
-  }
-  return neck
-})
+const guitarNeck = computed(() =>
+  buildGuitarNeck(noteIdx => ({
+    isSharp:    SHARPS.has(NOTES[noteIdx]),
+    isSelected: selected.value.has(noteIdx),
+  }))
+)
 
 const selectedNames = computed(() =>
   [...selected.value].sort((a, b) => a - b).map(i => NOTES[i])

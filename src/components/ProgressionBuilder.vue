@@ -1,29 +1,8 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { displayMode } from '../displayMode.js'
-import GuitarChordDiagram from './GuitarChordDiagram.vue'
-
-const NOTES  = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
-const LABELS = ['.',  '0',  'i', '1', '2',  '3', '4',  '5', '6', '7',  '8', '9']
-const SHARPS = new Set(['A#', 'C#', 'D#', 'F#', 'G#'])
-
-const CHORD_TYPES = {
-  maj:  [0, 4, 7],
-  min:  [0, 3, 7],
-  dim:  [0, 3, 6],
-  aug:  [0, 4, 8],
-  dom7: [0, 4, 7, 10],
-  maj7: [0, 4, 7, 11],
-  min7: [0, 3, 7, 10],
-  sus4: [0, 5, 7],
-}
-
-const CHORD_SUFFIX = {
-  maj: '', min: 'm', dim: '°', aug: '+',
-  dom7: '7', maj7: 'maj7', min7: 'm7', sus4: 'sus4',
-}
-
-const FLAT_MAP = { 'Ab': 'G#', 'Bb': 'A#', 'Cb': 'B', 'Db': 'C#', 'Eb': 'D#', 'Fb': 'E', 'Gb': 'F#' }
+import { NOTES, LABELS, SHARPS, CHORD_TYPES, CHORD_SUFFIX, FLAT_MAP } from '../musicConstants.js'
+import { buildRows } from '../musicUtils.js'
+import ChordCardBody from './ChordCardBody.vue'
 
 const input = ref('D f#m E D')
 const activeChordIndex = ref(0)
@@ -65,39 +44,21 @@ const tokens = computed(() =>
 
 const parseErrors = computed(() => tokens.value.filter(t => !t.parsed).map(t => t.raw))
 
-function buildRows(activeSet, rootPad) {
-  const pads = NOTES.map((note, i) => ({
-    label: LABELS[i],
-    note,
-    isSharp: SHARPS.has(note),
-    isActive: activeSet.has(i),
-    isRoot: i === rootPad,
-  }))
-  return [
-    pads.slice(9, 12),
-    pads.slice(6, 9),
-    pads.slice(3, 6),
-    pads.slice(0, 3),
-  ]
-}
-
 const chordCards = computed(() =>
   tokens.value
     .filter(t => t.parsed)
     .map((t, idx) => {
       const { noteIndex, note, type } = t.parsed
-      const intervals = CHORD_TYPES[type]
-      const activeSet = new Set(intervals.map(i => (noteIndex + i) % 12))
-      const pressLabels = [...activeSet].sort((a, b) => a - b).map(i => LABELS[i])
-      const noteNames   = [...activeSet].sort((a, b) => a - b).map(i => NOTES[i])
+      const activeSet = new Set(CHORD_TYPES[type].map(i => (noteIndex + i) % 12))
+      const sorted    = [...activeSet].sort((a, b) => a - b)
       return {
         idx,
-        name: note + CHORD_SUFFIX[type],
+        name:         note + CHORD_SUFFIX[type],
         type,
         chordRootIdx: noteIndex,
-        rows: buildRows(activeSet, noteIndex),
-        pressLabels,
-        noteNames,
+        rows:         buildRows(activeSet, noteIndex),
+        pressLabels:  sorted.map(i => LABELS[i]),
+        noteNames:    sorted.map(i => NOTES[i]),
       }
     })
 )
@@ -157,51 +118,13 @@ function handleKey(e) {
         >
           <div class="chord-name">{{ card.name }}</div>
 
-          <!-- EP-1320 mode: mini pad grid -->
-          <template v-if="displayMode === 'ep1320'">
-            <div class="mini-grid">
-              <div class="mini-row" v-for="(row, ri) in card.rows" :key="ri">
-                <div
-                  v-for="pad in row"
-                  :key="pad.label"
-                  class="mini-pad"
-                  :class="{
-                    active: pad.isActive,
-                    root: pad.isRoot,
-                    sharp: pad.isSharp,
-                    inactive: !pad.isActive,
-                  }"
-                >
-                  <span class="mini-label">{{ pad.label }}</span>
-                  <span class="mini-note" v-if="pad.isActive">{{ pad.note }}</span>
-                </div>
-              </div>
-            </div>
-            <div class="press-labels">
-              <span class="press-hint">press</span>
-              <span v-for="lbl in card.pressLabels" :key="lbl" class="press-badge">{{ lbl }}</span>
-            </div>
-          </template>
-
-          <!-- Notes mode: note name badges -->
-          <template v-else-if="displayMode === 'notes'">
-            <div class="note-badges">
-              <span
-                v-for="n in card.noteNames"
-                :key="n"
-                class="note-badge"
-                :class="{ root: n === NOTES[card.chordRootIdx], sharp: SHARPS.has(n) }"
-              >{{ n }}</span>
-            </div>
-          </template>
-
-          <!-- Guitar mode: chord diagram -->
-          <template v-else>
-            <GuitarChordDiagram
-              :rootIndex="card.chordRootIdx"
-              :type="card.type"
-            />
-          </template>
+          <ChordCardBody
+            :rows="card.rows"
+            :pressLabels="card.pressLabels"
+            :noteNames="card.noteNames"
+            :chordRootIdx="card.chordRootIdx"
+            :chordType="card.type"
+          />
         </div>
       </div>
 
@@ -319,54 +242,6 @@ function handleKey(e) {
 .chord-name { font-size: 1.1rem; font-weight: 700; color: #c8a96e; line-height: 1; }
 .chord-card.active .chord-name { color: #f0c87a; }
 
-/* Mini grid */
-.mini-grid { display: flex; flex-direction: column; gap: 3px; margin: 0.25rem 0; }
-.mini-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
-
-.mini-pad {
-  width: 36px;
-  height: 36px;
-  border-radius: 4px;
-  border: 1px solid #2e2820;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  transition: background 0.12s;
-}
-
-.mini-pad.inactive { background: #1a1714; opacity: 0.3; }
-.mini-pad.active   { background: #2e2820; border-color: #6a5a30; }
-.mini-pad.root     { background: #3a2e10; border-color: #c8a96e; }
-
-.mini-label { font-size: 0.6rem; font-weight: 700; color: #4a4030; line-height: 1; }
-.mini-pad.active .mini-label { color: #8a7850; }
-.mini-pad.root   .mini-label { color: #c8a96e; }
-.mini-note { font-size: 0.62rem; font-weight: 700; line-height: 1; color: #c8a96e; }
-.mini-pad.root .mini-note { color: #f0c87a; }
-
-.press-labels { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; justify-content: center; }
-.press-hint { font-size: 0.65rem; color: #4a4030; margin-right: 2px; }
-.press-badge { background: #2e2820; border: 1px solid #4a4030; border-radius: 3px; padding: 1px 5px; font-size: 0.7rem; font-weight: 700; color: #c8a96e; }
-
-/* Notes mode badges */
-.note-badges { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 0.25rem 0; }
-
-.note-badge {
-  padding: 0.2rem 0.45rem;
-  border-radius: 4px;
-  background: #2e2820;
-  border: 1px solid #4a4030;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #c8a96e;
-}
-
-.note-badge.root { background: #3a2e10; border-color: #c8a96e; color: #f0c87a; }
-.note-badge.sharp { background: #1e1c18; color: #a08858; border-color: #3a3228; }
-.note-badge.root.sharp { background: #3a2e10; border-color: #c8a96e; color: #f0c87a; }
-
 /* Step dots */
 .step-dots { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.25rem; }
 
@@ -377,6 +252,5 @@ function handleKey(e) {
 @media (max-width: 600px) {
   .prog-builder { padding: 1.25rem 1rem; }
   .chord-card { flex: 1 1 calc(50% - 0.375rem); max-width: calc(50% - 0.375rem); }
-  .mini-pad { width: 30px; height: 30px; }
 }
 </style>

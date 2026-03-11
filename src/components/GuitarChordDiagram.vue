@@ -1,12 +1,9 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { OPEN_STRINGS } from '../musicConstants.js'
 
-// Standard tuning open string note indices (A=0 … G#=11)
-// Strings 0–5: E2, A2, D3, G3, B3, E4
-const OPEN_STRINGS = [7, 0, 5, 10, 2, 7]
-
-// Chord shapes: fret offsets from root position, -1 = muted
-// rootString: which string carries the root note
+// Chord shapes: fret offsets from root position on root string, -1 = muted
+// rootString: which string (0=low E … 5=high e) carries the root note
 const GUITAR_SHAPES = {
   maj: [
     { label: 'E-shape', rootString: 0, offsets: [0, 2, 2, 1, 0, 0] },
@@ -44,12 +41,11 @@ const GUITAR_SHAPES = {
 
 const props = defineProps({
   rootIndex: { type: Number, required: true },
-  type: { type: String, required: true },
+  type:      { type: String, required: true },
 })
 
 const voicingIndex = ref(0)
 
-// Reset voicing when chord changes
 watch([() => props.rootIndex, () => props.type], () => {
   voicingIndex.value = 0
 })
@@ -65,8 +61,9 @@ function nextVoicing() {
 }
 
 const voicing = computed(() => {
-  const shape = shapes.value[voicingIndex.value]
+  const shape    = shapes.value[voicingIndex.value]
   const openNote = OPEN_STRINGS[shape.rootString]
+  // +12 ensures positive result before modulo when rootIndex < openNote
   const rootFret = (props.rootIndex - openNote + 12) % 12
 
   const frets = shape.offsets.map(offset =>
@@ -76,11 +73,14 @@ const voicing = computed(() => {
   const pressedFrets = frets.filter(f => f > 0)
   const baseFret = pressedFrets.length > 0 ? Math.min(...pressedFrets) : 1
 
-  // Build 4 fret rows
   const rows = []
   for (let row = 0; row < 4; row++) {
     const fretNum = baseFret + row
-    const cells = frets.map(f => ({ hasDot: f === fretNum }))
+    const cells = frets.map((f, si) => ({
+      hasDot: f === fretNum,
+      // Mark as root if this fret plays the root note on this string
+      isRoot: f === fretNum && (OPEN_STRINGS[si] + f) % 12 === props.rootIndex,
+    }))
     rows.push(cells)
   }
 
@@ -91,34 +91,27 @@ const voicing = computed(() => {
 <template>
   <div class="guitar-chord">
     <div class="diagram-wrap">
-      <!-- base fret label -->
       <div v-if="voicing.baseFret > 1" class="base-fret-label">{{ voicing.baseFret }}fr</div>
 
       <div class="diagram">
-        <!-- mute / open markers above nut -->
         <div class="top-markers">
-          <span
-            v-for="(f, s) in voicing.frets"
-            :key="s"
-            class="top-marker"
-          >{{ f === -1 ? '✕' : f === 0 ? '○' : '' }}</span>
+          <span v-for="(f, s) in voicing.frets" :key="s" class="top-marker">
+            {{ f === -1 ? '✕' : f === 0 ? '○' : '' }}
+          </span>
         </div>
 
-        <!-- nut (thick if open position) -->
         <div class="nut" :class="{ open: voicing.baseFret === 1 }"></div>
 
-        <!-- fret rows -->
         <div class="fret-grid">
           <div v-for="(row, ri) in voicing.rows" :key="ri" class="fret-row">
             <div v-for="(cell, si) in row" :key="si" class="fret-cell">
-              <span v-if="cell.hasDot" class="finger-dot" :class="{ root: voicing.frets[si] === voicing.baseFret + ri && si === 0 || false }"></span>
+              <span v-if="cell.hasDot" class="finger-dot" :class="{ root: cell.isRoot }"></span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- voicing selector -->
     <div class="voicing-selector" v-if="voicingCount > 1">
       <button class="vcng-btn" @click="prevVoicing">‹</button>
       <span class="vcng-label">{{ voicing.label }}</span>
@@ -170,16 +163,8 @@ const voicing = computed(() => {
   line-height: 1;
 }
 
-.nut {
-  height: 2px;
-  background: #4a4030;
-  border-radius: 1px;
-}
-
-.nut.open {
-  background: #c8a96e;
-  height: 3px;
-}
+.nut      { height: 2px; background: #4a4030; border-radius: 1px; }
+.nut.open { height: 3px; background: #c8a96e; }
 
 .fret-grid {
   display: flex;
@@ -193,7 +178,6 @@ const voicing = computed(() => {
   grid-template-columns: repeat(6, 1fr);
   height: 14px;
   border-bottom: 1px solid #4a4030;
-  position: relative;
 }
 
 .fret-cell {
@@ -201,12 +185,9 @@ const voicing = computed(() => {
   align-items: center;
   justify-content: center;
   border-right: 1px solid #3a3228;
-  position: relative;
 }
 
-.fret-cell:last-child {
-  border-right: none;
-}
+.fret-cell:last-child { border-right: none; }
 
 .finger-dot {
   width: 8px;
@@ -214,7 +195,11 @@ const voicing = computed(() => {
   border-radius: 50%;
   background: #c8a96e;
   display: block;
-  z-index: 1;
+}
+
+.finger-dot.root {
+  background: #f0c87a;
+  box-shadow: 0 0 3px rgba(240, 200, 122, 0.5);
 }
 
 .voicing-selector {
@@ -240,10 +225,7 @@ const voicing = computed(() => {
   transition: border-color 0.12s, color 0.12s;
 }
 
-.vcng-btn:hover {
-  border-color: #c8a96e;
-  color: #c8a96e;
-}
+.vcng-btn:hover { border-color: #c8a96e; color: #c8a96e; }
 
 .vcng-label {
   font-size: 0.58rem;

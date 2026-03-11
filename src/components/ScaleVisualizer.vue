@@ -1,15 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { displayMode } from '../displayMode.js'
-
-const NOTES  = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
-const LABELS = ['.',  '0',  'i', '1', '2',  '3', '4',  '5', '6', '7',  '8', '9']
-const SHARPS = new Set(['A#', 'C#', 'D#', 'F#', 'G#'])
-
-// Guitar neck: open string note indices (E2, A2, D3, G3, B3, E4)
-const OPEN_STRINGS = [7, 0, 5, 10, 2, 7]
-const STRING_NAMES = ['E', 'A', 'D', 'G', 'B', 'e']
-const FRET_COUNT = 12
+import { NOTES, LABELS, SHARPS, OPEN_STRINGS, STRING_NAMES, FRET_COUNT } from '../musicConstants.js'
+import { buildGuitarNeck } from '../musicUtils.js'
 
 const SCALES = [
   { id: '12t',  label: '12T — Chromatic',         intervals: [0,1,2,3,4,5,6,7,8,9,10,11], description: 'All 12 semitones. No inherent tonality — every key plays, nothing is highlighted. Useful for atonal passages or when you want full chromatic access.' },
@@ -80,25 +73,12 @@ const chromaTiles = computed(() =>
 )
 
 // Guitar neck: 6 strings displayed high→low (e, B, G, D, A, E)
-const guitarNeck = computed(() => {
-  const neck = []
-  for (let s = 5; s >= 0; s--) {
-    const cells = []
-    for (let f = 0; f <= FRET_COUNT; f++) {
-      const noteIdx = (OPEN_STRINGS[s] + f) % 12
-      cells.push({
-        noteIdx,
-        note: NOTES[noteIdx],
-        isActive: activeIndices.value.has(noteIdx),
-        isRoot: noteIdx === rootIndex.value,
-        fret: f,
-        isOpen: f === 0,
-      })
-    }
-    neck.push({ stringIdx: s, name: STRING_NAMES[s], cells })
-  }
-  return neck
-})
+const guitarNeck = computed(() =>
+  buildGuitarNeck(noteIdx => ({
+    isActive: activeIndices.value.has(noteIdx),
+    isRoot:   noteIdx === rootIndex.value,
+  }))
+)
 </script>
 
 <template>

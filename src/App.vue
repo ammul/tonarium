@@ -27,7 +27,7 @@ watch(displayMode, (mode) => {
   }
 })
 
-const activeComponent = () => allTabs.find(t => t.id === activeTab.value)?.component
+const activeComponent = computed(() => allTabs.find(t => t.id === activeTab.value)?.component)
 </script>
 
 <template>
@@ -59,7 +59,7 @@ const activeComponent = () => allTabs.find(t => t.id === activeTab.value)?.compo
     </nav>
 
     <main>
-      <component :is="activeComponent()" />
+      <component :is="activeComponent" />
     </main>
   </div>
 </template>

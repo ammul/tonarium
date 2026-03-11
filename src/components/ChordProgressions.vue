@@ -1,27 +1,8 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { displayMode } from '../displayMode.js'
-import GuitarChordDiagram from './GuitarChordDiagram.vue'
-
-const NOTES  = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
-const LABELS = ['.',  '0',  'i', '1', '2',  '3', '4',  '5', '6', '7',  '8', '9']
-const SHARPS = new Set(['A#', 'C#', 'D#', 'F#', 'G#'])
-
-const CHORD_TYPES = {
-  maj:  [0, 4, 7],
-  min:  [0, 3, 7],
-  dim:  [0, 3, 6],
-  aug:  [0, 4, 8],
-  dom7: [0, 4, 7, 10],
-  maj7: [0, 4, 7, 11],
-  min7: [0, 3, 7, 10],
-  sus4: [0, 5, 7],
-}
-
-const CHORD_SUFFIX = {
-  maj: '', min: 'm', dim: '°', aug: '+',
-  dom7: '7', maj7: 'maj7', min7: 'm7', sus4: 'sus4',
-}
+import { NOTES, LABELS, SHARPS, CHORD_TYPES, CHORD_SUFFIX } from '../musicConstants.js'
+import { buildRows } from '../musicUtils.js'
+import ChordCardBody from './ChordCardBody.vue'
 
 const PROGRESSIONS = {
   major: [
@@ -288,47 +269,20 @@ watch(progressionId, () => { activeChordIndex.value = 0 })
 
 const rootIndex = computed(() => NOTES.indexOf(selectedRoot.value))
 
-function chordName(degree, type) {
-  const root = NOTES[(rootIndex.value + degree) % 12]
-  return root + CHORD_SUFFIX[type]
-}
-
-function chordPadIndices(degree, type) {
-  const root = (rootIndex.value + degree) % 12
-  return new Set(CHORD_TYPES[type].map(i => (root + i) % 12))
-}
-
-function buildRows(activeSet, rootPad) {
-  const pads = NOTES.map((note, i) => ({
-    label: LABELS[i],
-    note,
-    isSharp: SHARPS.has(note),
-    isActive: activeSet.has(i),
-    isRoot: i === rootPad,
-  }))
-  return [
-    pads.slice(9, 12),
-    pads.slice(6, 9),
-    pads.slice(3, 6),
-    pads.slice(0, 3),
-  ]
-}
-
 const chordCards = computed(() =>
   selectedProgression.value.chords.map((chord, idx) => {
     const chordRootIdx = (rootIndex.value + chord.degree) % 12
-    const padIndices   = chordPadIndices(chord.degree, chord.type)
-    const pressLabels  = [...padIndices].sort((a, b) => a - b).map(i => LABELS[i])
-    const noteNames    = [...padIndices].sort((a, b) => a - b).map(i => NOTES[i])
+    const padIndices   = new Set(CHORD_TYPES[chord.type].map(i => (chordRootIdx + i) % 12))
+    const sorted       = [...padIndices].sort((a, b) => a - b)
     return {
       idx,
       numeral:      chord.numeral,
-      name:         chordName(chord.degree, chord.type),
+      name:         NOTES[chordRootIdx] + CHORD_SUFFIX[chord.type],
       type:         chord.type,
       chordRootIdx,
       rows:         buildRows(padIndices, chordRootIdx),
-      pressLabels,
-      noteNames,
+      pressLabels:  sorted.map(i => LABELS[i]),
+      noteNames:    sorted.map(i => NOTES[i]),
     }
   })
 )
@@ -394,51 +348,13 @@ function handleKey(e) {
         <div class="chord-numeral">{{ card.numeral }}</div>
         <div class="chord-name">{{ card.name }}</div>
 
-        <!-- EP-1320 mode: mini pad grid -->
-        <template v-if="displayMode === 'ep1320'">
-          <div class="mini-grid">
-            <div class="mini-row" v-for="(row, ri) in card.rows" :key="ri">
-              <div
-                v-for="pad in row"
-                :key="pad.label"
-                class="mini-pad"
-                :class="{
-                  active: pad.isActive,
-                  root: pad.isRoot,
-                  sharp: pad.isSharp,
-                  inactive: !pad.isActive,
-                }"
-              >
-                <span class="mini-label">{{ pad.label }}</span>
-                <span class="mini-note" v-if="pad.isActive">{{ pad.note }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="press-labels">
-            <span class="press-hint">press</span>
-            <span v-for="lbl in card.pressLabels" :key="lbl" class="press-badge">{{ lbl }}</span>
-          </div>
-        </template>
-
-        <!-- Notes mode: note name badges -->
-        <template v-else-if="displayMode === 'notes'">
-          <div class="note-badges">
-            <span
-              v-for="n in card.noteNames"
-              :key="n"
-              class="note-badge"
-              :class="{ root: n === NOTES[card.chordRootIdx], sharp: SHARPS.has(n) }"
-            >{{ n }}</span>
-          </div>
-        </template>
-
-        <!-- Guitar mode: chord diagram -->
-        <template v-else>
-          <GuitarChordDiagram
-            :rootIndex="card.chordRootIdx"
-            :type="card.type"
-          />
-        </template>
+        <ChordCardBody
+          :rows="card.rows"
+          :pressLabels="card.pressLabels"
+          :noteNames="card.noteNames"
+          :chordRootIdx="card.chordRootIdx"
+          :chordType="card.type"
+        />
       </div>
     </div>
 
@@ -606,101 +522,6 @@ select:focus { border-color: #c8a96e; }
 
 .chord-card.active .chord-name { color: #f0c87a; }
 
-/* Mini grid (EP-1320 mode) */
-.mini-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  margin: 0.25rem 0;
-}
-
-.mini-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 3px;
-}
-
-.mini-pad {
-  width: 36px;
-  height: 36px;
-  border-radius: 4px;
-  border: 1px solid #2e2820;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  transition: background 0.12s;
-}
-
-.mini-pad.inactive { background: #1a1714; opacity: 0.3; }
-.mini-pad.active   { background: #2e2820; border-color: #6a5a30; }
-.mini-pad.root     { background: #3a2e10; border-color: #c8a96e; }
-
-.mini-label { font-size: 0.6rem; font-weight: 700; color: #4a4030; line-height: 1; }
-.mini-pad.active .mini-label { color: #8a7850; }
-.mini-pad.root   .mini-label { color: #c8a96e; }
-
-.mini-note { font-size: 0.62rem; font-weight: 700; line-height: 1; color: #c8a96e; }
-.mini-pad.root .mini-note { color: #f0c87a; }
-
-.press-labels {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.press-hint { font-size: 0.65rem; color: #4a4030; margin-right: 2px; }
-
-.press-badge {
-  background: #2e2820;
-  border: 1px solid #4a4030;
-  border-radius: 3px;
-  padding: 1px 5px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #c8a96e;
-}
-
-/* Notes mode badges */
-.note-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  justify-content: center;
-  margin: 0.25rem 0;
-}
-
-.note-badge {
-  padding: 0.2rem 0.45rem;
-  border-radius: 4px;
-  background: #2e2820;
-  border: 1px solid #4a4030;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #c8a96e;
-}
-
-.note-badge.root {
-  background: #3a2e10;
-  border-color: #c8a96e;
-  color: #f0c87a;
-}
-
-.note-badge.sharp {
-  background: #1e1c18;
-  color: #a08858;
-  border-color: #3a3228;
-}
-
-.note-badge.root.sharp {
-  background: #3a2e10;
-  border-color: #c8a96e;
-  color: #f0c87a;
-}
-
 /* Step dots */
 .step-dots {
   display: flex;
@@ -736,7 +557,5 @@ select:focus { border-color: #c8a96e; }
     flex: 1 1 calc(50% - 0.375rem);
     max-width: calc(50% - 0.375rem);
   }
-
-  .mini-pad { width: 30px; height: 30px; }
 }
 </style>

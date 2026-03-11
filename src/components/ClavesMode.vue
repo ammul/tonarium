@@ -1,27 +1,19 @@
 <script setup>
 import { ref, computed } from 'vue'
-
-const NOTES  = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
-const LABELS = ['.',  '0',  'i', '1', '2',  '3', '4',  '5', '6', '7',  '8', '9']
-const SHARPS = new Set(['A#', 'C#', 'D#', 'F#', 'G#'])
+import { NOTES, LABELS, SHARPS } from '../musicConstants.js'
 
 const octave = ref(4)
 
-// MIDI note numbers: A4 = 69
-function midiNote(index) {
-  const aMidi = 12 * (octave.value + 1) + 9 // A in octave n
-  return aMidi + index
-}
-
-const pads = computed(() =>
-  NOTES.map((note, i) => ({
+const pads = computed(() => {
+  const aMidi = 12 * (octave.value + 1) + 9 // A in selected octave (A4 = 69)
+  return NOTES.map((note, i) => ({
     number: i + 1,
     label: LABELS[i],
     note,
     isSharp: SHARPS.has(note),
-    midi: midiNote(i),
+    midi: aMidi + i,
   }))
-)
+})
 
 // Numpad layout (top→bottom): 7 8 9 / 4 5 6 / 1 2 3 / . 0 i
 // Notes ascend bottom→top: A on ., G# on 9
