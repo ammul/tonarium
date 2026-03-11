@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { displayMode } from '../displayMode.js'
 import { NOTES, LABELS, SHARPS, OPEN_STRINGS, STRING_NAMES, FRET_COUNT } from '../musicConstants.js'
 import { buildGuitarNeck } from '../musicUtils.js'
+import PianoOctave from './PianoOctave.vue'
 
 const SCALES = [
   { id: '12t',  label: '12T — Chromatic',         intervals: [0,1,2,3,4,5,6,7,8,9,10,11], description: 'All 12 semitones. No inherent tonality — every key plays, nothing is highlighted. Useful for atonal passages or when you want full chromatic access.' },
@@ -20,6 +21,7 @@ const SCALES = [
 const selectedRoot = ref('A')
 const selectedScaleId = ref('maj')
 const showInfo = ref(false)
+const pianoOctave = ref(4)
 
 const selectedScale = computed(() => SCALES.find(s => s.id === selectedScaleId.value))
 const rootIndex = computed(() => NOTES.indexOf(selectedRoot.value))
@@ -87,7 +89,8 @@ const guitarNeck = computed(() =>
       <h2>Scale Visualizer</h2>
       <p class="subtitle" v-if="displayMode === 'ep1320'">see which pads are active for any scale · matches EP‑1320 scale names</p>
       <p class="subtitle" v-else-if="displayMode === 'notes'">chromatic note strip — scale notes highlighted</p>
-      <p class="subtitle" v-else>guitar neck (standard tuning) — scale positions highlighted</p>
+      <p class="subtitle" v-else-if="displayMode === 'guitar'">guitar neck (standard tuning) — scale positions highlighted</p>
+      <p class="subtitle" v-else>piano keyboard — scale notes highlighted</p>
     </div>
 
     <div class="controls">
@@ -156,6 +159,15 @@ const guitarNeck = computed(() =>
           <span class="tile-degree" v-if="tile.isActive">{{ tile.isRoot ? '①' : tile.degree }}</span>
         </div>
       </div>
+    </template>
+
+    <!-- Piano mode -->
+    <template v-else-if="displayMode === 'piano'">
+      <PianoOctave
+        :activeIndices="activeIndices"
+        :rootIndex="rootIndex"
+        v-model:octave="pianoOctave"
+      />
     </template>
 
     <!-- Guitar mode: neck -->

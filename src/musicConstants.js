@@ -52,3 +52,14 @@ export const FRET_COUNT = 12
 // Semitone conversion: A-based index (0–11) ↔ C-based semitone (0–11)
 export const NOTE_TO_SEMI = [9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8]
 export const SEMI_TO_NAME = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
+// Piano keyboard layout (C-based display order, A-based note indices)
+export const PIANO_WHITE = [3, 5, 7, 8, 10, 0, 2] // C D E F G A B
+// after = number of white keys to the left (used to compute left% position)
+export const PIANO_BLACK = [
+  { noteIdx: 4,  after: 1 }, // C#
+  { noteIdx: 6,  after: 2 }, // D#
+  { noteIdx: 9,  after: 4 }, // F#
+  { noteIdx: 11, after: 5 }, // G#
+  { noteIdx: 1,  after: 6 }, // A#
+]

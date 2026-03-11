@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { displayMode } from '../displayMode.js'
 import { NOTES, LABELS, SHARPS, CHORD_TYPES, CHORD_SUFFIX } from '../musicConstants.js'
 import { buildRows } from '../musicUtils.js'
 import ChordCardBody from './ChordCardBody.vue'
@@ -337,24 +338,27 @@ function handleKey(e) {
 
     <p class="prog-description">{{ selectedProgression.description }}</p>
 
-    <div class="chord-row">
+    <div class="chord-row" :class="{ 'piano-mode': displayMode === 'piano' }">
       <div
         v-for="card in chordCards"
         :key="card.idx"
         class="chord-card"
-        :class="{ active: card.idx === activeChordIndex }"
+        :class="{ active: card.idx === activeChordIndex, 'piano-mode': displayMode === 'piano' }"
         @click="activeChordIndex = card.idx"
       >
-        <div class="chord-numeral">{{ card.numeral }}</div>
-        <div class="chord-name">{{ card.name }}</div>
-
-        <ChordCardBody
-          :rows="card.rows"
-          :pressLabels="card.pressLabels"
-          :noteNames="card.noteNames"
-          :chordRootIdx="card.chordRootIdx"
-          :chordType="card.type"
-        />
+        <div class="chord-info">
+          <div class="chord-numeral">{{ card.numeral }}</div>
+          <div class="chord-name">{{ card.name }}</div>
+        </div>
+        <div class="chord-body-wrap">
+          <ChordCardBody
+            :rows="card.rows"
+            :pressLabels="card.pressLabels"
+            :noteNames="card.noteNames"
+            :chordRootIdx="card.chordRootIdx"
+            :chordType="card.type"
+          />
+        </div>
       </div>
     </div>
 
@@ -483,6 +487,11 @@ select:focus { border-color: #c8a96e; }
   flex-wrap: wrap;
 }
 
+.chord-row.piano-mode {
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .chord-card {
   flex: 1 1 120px;
   max-width: 160px;
@@ -498,12 +507,38 @@ select:focus { border-color: #c8a96e; }
   gap: 0.4rem;
 }
 
+.chord-card.piano-mode {
+  flex-direction: row;
+  align-items: center;
+  max-width: 100%;
+  flex: 1 1 100%;
+  padding: 0.6rem 1rem;
+  gap: 1rem;
+}
+
 .chord-card:hover { background: #252219; border-color: #6a5a30; }
 
 .chord-card.active {
   border-color: #c8a96e;
   background: #2a2318;
   box-shadow: 0 0 0 1px #c8a96e44;
+}
+
+.chord-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 0.15rem;
+}
+
+.chord-card.piano-mode .chord-info {
+  width: 4.5rem;
+}
+
+.chord-body-wrap {
+  flex: 1;
+  min-width: 0;
 }
 
 .chord-numeral {

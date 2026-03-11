@@ -44,6 +44,7 @@ const activeComponent = computed(() => allTabs.find(t => t.id === activeTab.valu
             <option value="ep1320">EP-1320</option>
             <option value="notes">Notes</option>
             <option value="guitar">Guitar</option>
+          <option value="piano">Piano</option>
           </select>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { displayMode } from '../displayMode.js'
 import { NOTES, LABELS, SHARPS, NOTE_TO_SEMI, SEMI_TO_NAME, CHORD_DETECT_TYPES, FRET_COUNT } from '../musicConstants.js'
 import { buildGuitarNeck } from '../musicUtils.js'
+import PianoOctave from './PianoOctave.vue'
 
 function detectChord(noteIndices) {
   if (noteIndices.length < 2) return null
@@ -35,6 +36,7 @@ function detectChord(noteIndices) {
 }
 
 const selected = ref(new Set())
+const pianoOctave = ref(4)
 
 function toggleNote(noteIndex) {
   const next = new Set(selected.value)
@@ -96,7 +98,8 @@ const chord = computed(() => detectChord([...selected.value]))
       <h2>Chord Detector</h2>
       <p class="subtitle" v-if="displayMode === 'ep1320'">Tap the notes you're playing — the chord is identified instantly</p>
       <p class="subtitle" v-else-if="displayMode === 'notes'">Click note names to select — chord identified instantly</p>
-      <p class="subtitle" v-else>Click frets on the neck — chord identified instantly</p>
+      <p class="subtitle" v-else-if="displayMode === 'guitar'">Click frets on the neck — chord identified instantly</p>
+      <p class="subtitle" v-else>Click piano keys to select — chord identified instantly</p>
     </div>
 
     <!-- EP-1320 mode: pad grid -->
@@ -127,6 +130,15 @@ const chord = computed(() => detectChord([...selected.value]))
         {{ btn.note }}
       </button>
     </div>
+
+    <!-- Piano mode: clickable keyboard -->
+    <PianoOctave
+      v-else-if="displayMode === 'piano'"
+      :activeIndices="selected"
+      v-model:octave="pianoOctave"
+      :clickable="true"
+      @toggle="toggleNote"
+    />
 
     <!-- Guitar mode: fretboard -->
     <div v-else class="guitar-neck-wrap">

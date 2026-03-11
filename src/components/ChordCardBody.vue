@@ -1,15 +1,21 @@
 <script setup>
+import { computed } from 'vue'
 import { displayMode } from '../displayMode.js'
 import { NOTES, SHARPS } from '../musicConstants.js'
 import GuitarChordDiagram from './GuitarChordDiagram.vue'
+import PianoOctave from './PianoOctave.vue'
 
-defineProps({
+const props = defineProps({
   rows:         { type: Array,  required: true },
   pressLabels:  { type: Array,  required: true },
   noteNames:    { type: Array,  required: true },
   chordRootIdx: { type: Number, required: true },
   chordType:    { type: String, required: true },
 })
+
+const pianoActiveIndices = computed(() =>
+  new Set(props.noteNames.map(n => NOTES.indexOf(n)))
+)
 </script>
 
 <template>
@@ -52,8 +58,17 @@ defineProps({
   </template>
 
   <!-- Guitar mode: chord diagram -->
-  <template v-else>
+  <template v-else-if="displayMode === 'guitar'">
     <GuitarChordDiagram :rootIndex="chordRootIdx" :type="chordType" />
+  </template>
+
+  <!-- Piano mode: compact keyboard -->
+  <template v-else>
+    <PianoOctave
+      :activeIndices="pianoActiveIndices"
+      :rootIndex="chordRootIdx"
+      :showOctaveSelector="false"
+    />
   </template>
 </template>
 
