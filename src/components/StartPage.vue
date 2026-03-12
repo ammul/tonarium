@@ -19,6 +19,11 @@ const tools = [
     preview: ['I', 'V', 'vi', 'IV'],
   },
   {
+    id: 'jam',
+    label: 'Jam Mode',
+    description: 'Pick a key and scale — see exactly which notes are safe to play. Anchor notes (root, 3rd, 5th) are highlighted so you always know where to land.',
+  },
+  {
     id: 'scales',
     label: 'Scale Visualizer',
     description: 'See any scale across all 12 notes. Understand which notes belong to a given key at a glance.',

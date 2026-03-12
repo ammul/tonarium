@@ -4,7 +4,8 @@ A web app for people with a bad musical education. Helps you see what's going on
 
 ## Tools
 
-- **Chord Progressions** — browse classic progressions (I–V–vi–IV, ii–V–I, Canon in D, …) in any root key
+- **Chord Progressions** — browse classic progressions (I–V–vi–IV, ii–V–I, Canon in D, …) in any root key; each chord has a solo tip showing which scale to improvise with
+- **Jam Mode** — pick a key and scale to see safe notes highlighted; anchor notes (root, 3rd, 5th) are marked so you always know where to land
 - **Scale Visualizer** — see any scale across all 12 notes
 - **Chord Detector** — select some notes, find out what chord they make
 - **Progression Builder** — arrange your own chord sequence and see it mapped out

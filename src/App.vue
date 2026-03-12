@@ -8,10 +8,12 @@ import ScaleVisualizer from './components/ScaleVisualizer.vue'
 import ChordProgressions from './components/ChordProgressions.vue'
 import ChordDetector from './components/ChordDetector.vue'
 import ProgressionBuilder from './components/ProgressionBuilder.vue'
+import JamMode from './components/JamMode.vue'
 
 const allTabs = [
   { id: 'home',           label: 'Home',                component: StartPage },
   { id: 'claves',         label: 'Claves Mode',         component: ClavesMode,        ep1320Only: true },
+  { id: 'jam',            label: 'Jam Mode',            component: JamMode },
   { id: 'scales',         label: 'Scale Visualizer',    component: ScaleVisualizer },
   { id: 'chords',         label: 'Chord Progressions',  component: ChordProgressions },
   { id: 'chord-detector', label: 'Chord Detector',      component: ChordDetector },

@@ -250,9 +250,21 @@ const PROGRESSIONS = {
   ],
 }
 
+const SOLO_ADVICE = {
+  maj:  { scale: 'Major pentatonic', why: 'Open and resolved — all 5 notes sound great over a major chord.' },
+  min:  { scale: 'Minor pentatonic', why: 'Dark and expressive — every note fits naturally over a minor chord.' },
+  dom7: { scale: 'Minor pentatonic', why: 'The bluesy feel of the minor pentatonic adds perfect tension over a dominant 7th.' },
+  maj7: { scale: 'Major pentatonic', why: 'Smooth and bright — the major pentatonic floats beautifully over a maj7 chord.' },
+  min7: { scale: 'Minor pentatonic', why: 'The minor pentatonic is built for minor 7ths — soulful and natural.' },
+  dim:  { scale: 'Minor pentatonic', why: 'Stick to root and 5th — pentatonic avoids the worst clashes over a diminished chord.' },
+  aug:  { scale: 'Major pentatonic', why: 'Keep to the bright notes — avoid the 5th, which clashes with the augmented chord.' },
+  sus4: { scale: 'Major pentatonic', why: 'The open sound of pentatonic matches the unresolved feel of a sus4 chord.' },
+}
+
 const selectedRoot  = ref('A')
 const mode          = ref('major')
 const progressionId = ref('I-V-vi-IV')
+const showInfoIdx   = ref(null)
 
 const progressions = computed(() => PROGRESSIONS[mode.value])
 
@@ -342,6 +354,16 @@ const chordCards = computed(() =>
             :chordRootIdx="card.chordRootIdx"
             :chordType="card.type"
           />
+        </div>
+        <button
+          class="info-btn card-info-btn"
+          :class="{ active: showInfoIdx === card.idx }"
+          @click.stop="showInfoIdx = showInfoIdx === card.idx ? null : card.idx"
+          aria-label="Solo tip"
+        >i</button>
+        <div v-if="showInfoIdx === card.idx" class="solo-info">
+          <span class="solo-scale">{{ SOLO_ADVICE[card.type].scale }}</span>
+          — {{ SOLO_ADVICE[card.type].why }}
         </div>
       </div>
     </div>
@@ -472,24 +494,68 @@ select:focus { border-color: var(--accent); }
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.75rem 0.6rem;
-  cursor: pointer;
+  cursor: default;
   transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.4rem;
+  position: relative;
 }
 
 .chord-card.piano-mode {
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   max-width: 100%;
   flex: 1 1 100%;
-  padding: 0.6rem 1rem;
+  padding: 0.6rem 2.2rem 0.6rem 1rem;
   gap: 1rem;
 }
 
 .chord-card:hover { background: var(--hover); border-color: var(--accent-mid); }
+
+.card-info-btn {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: var(--input);
+  color: var(--text3);
+  font-size: 0.72rem;
+  font-style: italic;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-info-btn:hover  { border-color: var(--accent); color: var(--text); }
+.card-info-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+
+.solo-info {
+  font-size: 0.78rem;
+  color: var(--text2);
+  line-height: 1.5;
+  padding: 0.5rem 0.65rem;
+  background: var(--input);
+  border: 1px solid var(--border2);
+  border-left: 3px solid var(--accent);
+  border-radius: 5px;
+  flex-basis: 100%;
+}
+
+.solo-scale {
+  font-weight: 700;
+  color: var(--accent);
+}
 
 .chord-info {
   display: flex;
