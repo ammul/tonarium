@@ -95,12 +95,20 @@ function selectTab(id) {
 
 <style scoped>
 header {
-  margin-bottom: 1.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: var(--bg);
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
   header {
-    margin-bottom: 0.5rem;
+    padding: 0.35rem 1rem;
   }
   h1 {
     font-size: 1.1rem;
@@ -145,6 +153,12 @@ h1 {
   color: var(--text3);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+
+@media (max-width: 480px) {
+  .mode-label {
+    display: none;
+  }
 }
 
 .display-mode-control select {
@@ -209,6 +223,16 @@ h1 {
 
 .burger-btn:hover {
   border-color: var(--accent);
+}
+
+main {
+  padding-top: 4rem;
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  main {
+    padding-top: 2.5rem;
+  }
 }
 
 /* Overlay */
