@@ -4,7 +4,7 @@ import { displayMode } from '../displayMode.js'
 import { NOTES, LABELS, SHARPS, CHORD_TYPES, CHORD_SUFFIX } from '../musicConstants.js'
 import { buildRows } from '../musicUtils.js'
 import ChordCardBody from './ChordCardBody.vue'
-import { midiStatus, chordOn, chordOff } from '../midiManager.js'
+import { midiStatus, midiChannel, chordOn, chordOff } from '../midiManager.js'
 
 const PROGRESSIONS = {
   major: [
@@ -407,8 +407,19 @@ watch([progressionId, selectedRoot, mode], stopLoop)
           >{{ b }}</button>
         </div>
       </div>
+      <div class="midi-param">
+        <label>Lane</label>
+        <div class="beats-toggle">
+          <button
+            v-for="(lane, i) in ['A','B','C','D']"
+            :key="lane"
+            :class="{ active: midiChannel === i }"
+            @click="midiChannel = i"
+          >{{ lane }}</button>
+        </div>
+      </div>
       <button class="play-btn" :class="{ playing: loopPlaying }" @click="playLoop">
-        {{ _loopTimer !== null ? 'Stop' : 'Play' }}
+        {{ loopPlaying ? 'Stop' : 'Play' }}
       </button>
     </div>
 
