@@ -14,9 +14,14 @@ const tools = [
   {
     id: 'chords',
     label: 'Chord Progressions',
-    description: 'Browse classic progressions — I–V–vi–IV, ii–V–I, Canon in D and more — transposed to any root key and shown on pads, guitar, or piano.',
+    description: 'Browse classic progressions — I–V–vi–IV, ii–V–I, Canon in D and more — transposed to any root key. Connect via MIDI to preview chords or loop a progression straight to your synth.',
     featured: true,
     preview: ['I', 'V', 'vi', 'IV'],
+  },
+  {
+    id: 'claves',
+    label: 'Claves Mode',
+    description: 'Chromatic 4×3 pad layout matching the EP-1320. Connect via MIDI and tap pads to play notes directly on your synth — hold for sustain.',
   },
   {
     id: 'jam',
@@ -36,7 +41,7 @@ const tools = [
   {
     id: 'prog-builder',
     label: 'Progression Builder',
-    description: 'Arrange your own sequence of chords from scratch and see them laid out on your instrument of choice.',
+    description: 'Arrange your own chord sequence from scratch and see it laid out on your instrument of choice.',
   },
 ]
 </script>

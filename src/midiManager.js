@@ -3,6 +3,7 @@ import { ref } from 'vue'
 export const midiStatus = ref('idle')        // 'idle' | 'connected' | 'error' | 'unsupported'
 export const midiOutputs = ref([])           // MIDIOutput[]
 export const selectedOutputId = ref(null)
+export const midiChannel = ref(0)            // 0–3 = lanes A–D
 
 let _access = null
 
@@ -28,15 +29,15 @@ function _out() {
   return midiOutputs.value.find(o => o.id === selectedOutputId.value) ?? null
 }
 
-export function noteOn(midi, velocity = 100, channel = 0) {
-  _out()?.send([0x90 | channel, midi, velocity])
+export function noteOn(midi, velocity = 100) {
+  _out()?.send([0x90 | midiChannel.value, midi, velocity])
 }
-export function noteOff(midi, channel = 0) {
-  _out()?.send([0x80 | channel, midi, 0])
+export function noteOff(midi) {
+  _out()?.send([0x80 | midiChannel.value, midi, 0])
 }
-export function chordOn(midis, velocity = 90, channel = 0) {
-  midis.forEach(m => noteOn(m, velocity, channel))
+export function chordOn(midis, velocity = 90) {
+  midis.forEach(m => noteOn(m, velocity))
 }
-export function chordOff(midis, channel = 0) {
-  midis.forEach(m => noteOff(m, channel))
+export function chordOff(midis) {
+  midis.forEach(m => noteOff(m))
 }

@@ -4,12 +4,23 @@ A web app for people with a bad musical education. Helps you see what's going on
 
 ## Tools
 
-- **Chord Progressions** — browse classic progressions (I–V–vi–IV, ii–V–I, Canon in D, …) in any root key; each chord has a solo tip showing which scale to improvise with
+- **Chord Progressions** — browse classic progressions (I–V–vi–IV, ii–V–I, Canon in D, …) in any root key; tap a chord card to preview it via MIDI, or hit Play to loop the progression on your synth while you improvise
+- **Claves Mode** — chromatic 4×3 pad layout matching the EP-1320; tap/hold pads to play notes via MIDI *(EP-1320 display only)*
 - **Jam Mode** — pick a key and scale to see safe notes highlighted; anchor notes (root, 3rd, 5th) are marked so you always know where to land
 - **Scale Visualizer** — see any scale across all 12 notes
 - **Chord Detector** — select some notes, find out what chord they make
 - **Progression Builder** — arrange your own chord sequence and see it mapped out
-- **Claves Mode** — note-to-pad mapping for the EP-1320 layout *(EP-1320 display only)*
+
+## Web MIDI
+
+Connect a USB MIDI device (e.g. a TE EP-1320 via USB-C OTG) and click the **MIDI** button in the header. Once connected:
+
+- Select the output device if multiple are available
+- Pick a lane (A / B / C / D) — maps to MIDI channels 1–4
+- Claves Mode: tap pads to play notes, hold to sustain
+- Chord Progressions: tap a chord card to preview it; use Play/Stop to loop the full progression at a configurable BPM and beats-per-chord
+
+Requires Chrome or any browser with Web MIDI API support.
 
 ## Display Modes
 

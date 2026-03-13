@@ -4,7 +4,7 @@ import { displayMode } from '../displayMode.js'
 import { NOTES, LABELS, SHARPS, CHORD_TYPES, CHORD_SUFFIX } from '../musicConstants.js'
 import { buildRows } from '../musicUtils.js'
 import ChordCardBody from './ChordCardBody.vue'
-import { chordOn, chordOff } from '../midiManager.js'
+import { midiStatus, chordOn, chordOff } from '../midiManager.js'
 
 const PROGRESSIONS = {
   major: [
@@ -385,7 +385,7 @@ watch([progressionId, selectedRoot, mode], stopLoop)
 
     <p class="prog-description">{{ selectedProgression.description }}</p>
 
-    <div class="midi-playback">
+    <div v-if="midiStatus === 'connected'" class="midi-playback">
       <div class="midi-param">
         <label>Octave</label>
         <button @click="chordOctave = Math.max(2, chordOctave - 1)">−</button>
@@ -418,10 +418,10 @@ watch([progressionId, selectedRoot, mode], stopLoop)
         :key="card.idx"
         class="chord-card"
         :class="{ 'piano-mode': displayMode === 'piano', active: loopActiveIdx === card.idx }"
-        @pointerdown="previewChord(card)"
-        @pointerup="stopPreview(card)"
-        @pointerleave="stopPreview(card)"
-        @pointercancel="stopPreview(card)"
+        @pointerdown="midiStatus === 'connected' && previewChord(card)"
+        @pointerup="midiStatus === 'connected' && stopPreview(card)"
+        @pointerleave="midiStatus === 'connected' && stopPreview(card)"
+        @pointercancel="midiStatus === 'connected' && stopPreview(card)"
       >
         <div class="chord-info">
           <div class="chord-numeral">{{ card.numeral }}</div>

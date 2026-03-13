@@ -1,5 +1,8 @@
 <script setup>
-import { midiStatus, midiOutputs, selectedOutputId, initMidi } from '../midiManager.js'
+import { computed } from 'vue'
+import { midiStatus, midiOutputs, selectedOutputId, midiChannel, initMidi } from '../midiManager.js'
+
+const LANES = ['A', 'B', 'C', 'D']
 
 function truncate(name, max = 20) {
   return name.length > max ? name.slice(0, max - 1) + '…' : name
@@ -9,8 +12,6 @@ const selectedDevice = computed({
   get: () => selectedOutputId.value,
   set: (v) => { selectedOutputId.value = v },
 })
-
-import { computed } from 'vue'
 </script>
 
 <template>
@@ -28,6 +29,14 @@ import { computed } from 'vue'
         <option v-for="o in midiOutputs" :key="o.id" :value="o.id">{{ truncate(o.name) }}</option>
       </select>
       <span v-else class="midi-name muted">No device</span>
+      <div class="lane-picker">
+        <button
+          v-for="(lane, i) in LANES"
+          :key="lane"
+          :class="{ active: midiChannel === i }"
+          @click="midiChannel = i"
+        >{{ lane }}</button>
+      </div>
     </template>
 
     <template v-else-if="midiStatus === 'error'">
@@ -99,4 +108,34 @@ import { computed } from 'vue'
 }
 
 .midi-select:focus { border-color: var(--accent); }
+
+.lane-picker {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.lane-picker button {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text3);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.lane-picker button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lane-picker button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
 </style>
