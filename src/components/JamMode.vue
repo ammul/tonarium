@@ -1,8 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { displayMode } from '../displayMode.js'
-import { NOTES, LABELS, SHARPS, OPEN_STRINGS, STRING_NAMES, FRET_COUNT } from '../musicConstants.js'
+import { NOTES, LABELS, SHARPS, OPEN_STRINGS, STRING_NAMES, FRET_COUNT, NOTE_TO_SEMI } from '../musicConstants.js'
 import { buildGuitarNeck } from '../musicUtils.js'
+import { activeInputNotes } from '../midiManager.js'
 import PianoOctave from './PianoOctave.vue'
 
 const SCALES = [
@@ -74,6 +75,7 @@ const pads = computed(() =>
     number: i + 1,
     label:    LABELS[i],
     note,
+    noteIndex: i,
     isSharp:  SHARPS.has(note),
     isActive: activeIndices.value.has(i),
     isAnchor: anchorIndices.value.has(i),
@@ -91,12 +93,21 @@ const rows = computed(() => [
 const chromaTiles = computed(() =>
   NOTES.map((note, i) => ({
     note,
+    noteIndex: i,
     isSharp:  SHARPS.has(note),
     isActive: activeIndices.value.has(i),
     isAnchor: anchorIndices.value.has(i),
     isRoot:   i === rootIndex.value,
   }))
 )
+
+const pressedIndices = computed(() => {
+  const result = new Set()
+  for (const n of activeInputNotes.value) {
+    result.add(NOTE_TO_SEMI.indexOf(n % 12))
+  }
+  return result
+})
 
 const guitarNeck = computed(() =>
   buildGuitarNeck(noteIdx => ({
@@ -163,6 +174,7 @@ const scaleNotes = computed(() =>
               anchor:   pad.isAnchor && !pad.isRoot,
               root:     pad.isRoot,
               inactive: !pad.isActive,
+              pressed:  pressedIndices.has(pad.noteIndex),
             }"
           >
             <span class="pad-label">{{ pad.label }}</span>
@@ -184,6 +196,7 @@ const scaleNotes = computed(() =>
             anchor:   tile.isAnchor && !tile.isRoot,
             root:     tile.isRoot,
             inactive: !tile.isActive,
+            pressed:  pressedIndices.has(tile.noteIndex),
           }"
         >
           <span class="tile-note">{{ tile.note }}</span>
@@ -406,6 +419,7 @@ select:focus { border-color: var(--accent); }
 .pad.active   { background: var(--raised); border-color: var(--border2); }
 .pad.anchor   { background: var(--accent-bg); border-color: var(--accent-mid); }
 .pad.root     { background: var(--accent-bg); border-color: var(--accent); }
+.pad.pressed  { background: var(--accent-bg); border-color: var(--accent); opacity: 1; }
 
 .pad-label { font-size: 0.7rem; color: var(--text4); font-weight: 600; letter-spacing: 0.1em; }
 .pad-note  { font-size: 1.5rem; font-weight: 700; line-height: 1; }
@@ -414,6 +428,7 @@ select:focus { border-color: var(--accent); }
 .pad.active   .pad-note { color: var(--text2); }
 .pad.anchor   .pad-note { color: var(--accent); }
 .pad.root     .pad-note { color: var(--accent-hi); }
+.pad.pressed  .pad-note { color: var(--accent); }
 
 /* Notes mode */
 .chroma-strip {
@@ -438,6 +453,7 @@ select:focus { border-color: var(--accent); }
 .chroma-tile.active   { background: var(--raised); border-color: var(--border2); }
 .chroma-tile.anchor   { background: var(--accent-bg); border-color: var(--accent-mid); }
 .chroma-tile.root     { background: var(--accent-bg); border-color: var(--accent); }
+.chroma-tile.pressed  { background: var(--accent-bg); border-color: var(--accent); opacity: 1; }
 
 .tile-note { font-size: 1.1rem; font-weight: 700; line-height: 1; }
 
@@ -445,6 +461,7 @@ select:focus { border-color: var(--accent); }
 .chroma-tile.active   .tile-note { color: var(--text2); }
 .chroma-tile.anchor   .tile-note { color: var(--accent); }
 .chroma-tile.root     .tile-note { color: var(--accent-hi); }
+.chroma-tile.pressed  .tile-note { color: var(--accent); }
 
 /* Guitar neck */
 .guitar-neck-wrap {

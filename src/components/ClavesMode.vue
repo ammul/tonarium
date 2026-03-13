@@ -213,6 +213,11 @@ const rows = computed(() => [
   border-color: var(--border);
 }
 
+.pad.sharp.active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}
+
 .pad.sharp:hover {
   background: var(--border3);
 }
