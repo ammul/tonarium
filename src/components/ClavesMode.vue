@@ -1,19 +1,24 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { NOTES, LABELS, SHARPS } from '../musicConstants.js'
-import { noteOn, noteOff } from '../midiManager.js'
+import { NOTES, LABELS, SHARPS, NOTE_TO_SEMI } from '../musicConstants.js'
+import { noteOn, noteOff, activeInputNotes } from '../midiManager.js'
 
 const octave = ref(4)
+const rootIndex = ref(0) // index into NOTES (0 = A)
+
+const rootMidi = computed(() => 12 * (octave.value + 1) + NOTE_TO_SEMI[rootIndex.value])
 
 const pads = computed(() => {
-  const aMidi = 12 * (octave.value + 1) + 9 // A in selected octave (A4 = 69)
-  return NOTES.map((note, i) => ({
-    number: i + 1,
-    label: LABELS[i],
-    note,
-    isSharp: SHARPS.has(note),
-    midi: aMidi + i,
-  }))
+  return Array.from({ length: 12 }, (_, i) => {
+    const noteIdx = (rootIndex.value + i) % 12
+    return {
+      number: i + 1,
+      label: LABELS[noteIdx],
+      note: NOTES[noteIdx],
+      isSharp: SHARPS.has(NOTES[noteIdx]),
+      midi: rootMidi.value + i,
+    }
+  })
 })
 
 const activePads = ref(new Set())
@@ -45,11 +50,20 @@ const rows = computed(() => [
       <p class="subtitle">12-pad chromatic layout · one sound pitched across all pads</p>
     </div>
 
-    <div class="octave-control">
-      <label>Octave</label>
-      <button @click="octave = Math.max(0, octave - 1)">−</button>
-      <span class="octave-value">{{ octave }}</span>
-      <button @click="octave = Math.min(9, octave + 1)">+</button>
+    <div class="tune-controls">
+      <div class="octave-control">
+        <label>Octave</label>
+        <button @click="octave = Math.max(0, octave - 1)">−</button>
+        <span class="octave-value">{{ octave }}</span>
+        <button @click="octave = Math.min(9, octave + 1)">+</button>
+      </div>
+      <div class="octave-control">
+        <label>Root</label>
+        <button @click="rootIndex = (rootIndex + 11) % 12">−</button>
+        <span class="octave-value">{{ NOTES[rootIndex] }}</span>
+        <button @click="rootIndex = (rootIndex + 1) % 12">+</button>
+      </div>
+      <span class="root-midi">MIDI {{ rootMidi }}</span>
     </div>
 
     <div class="grid">
@@ -58,7 +72,7 @@ const rows = computed(() => [
           v-for="pad in row"
           :key="pad.number"
           class="pad"
-          :class="{ sharp: pad.isSharp, active: activePads.has(pad.midi) }"
+          :class="{ sharp: pad.isSharp, active: activePads.has(pad.midi) || activeInputNotes.has(pad.midi) }"
           @pointerdown.prevent="onDown(pad.midi)"
           @pointerup="onUp(pad.midi)"
           @pointerleave="onUp(pad.midi)"
@@ -99,13 +113,26 @@ const rows = computed(() => [
   color: var(--text3);
 }
 
+.tune-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
 .octave-control {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin: 1.5rem 0;
   font-size: 0.9rem;
   color: var(--text2);
+}
+
+.root-midi {
+  font-size: 0.78rem;
+  color: var(--text4);
+  letter-spacing: 0.05em;
 }
 
 .octave-control label {

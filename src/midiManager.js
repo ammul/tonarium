@@ -4,6 +4,7 @@ export const midiStatus = ref('idle')        // 'idle' | 'connected' | 'error' |
 export const midiOutputs = ref([])           // MIDIOutput[]
 export const selectedOutputId = ref(null)
 export const midiChannel = ref(0)            // 0–3 = lanes A–D
+export const activeInputNotes = ref(new Set())
 
 let _access = null
 
@@ -12,25 +13,40 @@ export function disconnectMidi() {
   _access = null
   midiOutputs.value = []
   selectedOutputId.value = null
+  activeInputNotes.value = new Set()
   midiStatus.value = 'idle'
 }
 
 export async function initMidi() {
   if (!navigator.requestMIDIAccess) { midiStatus.value = 'unsupported'; return }
   try {
-    _access = await navigator.requestMIDIAccess()
-    _refreshOutputs()
-    _access.onstatechange = _refreshOutputs
+    _access = await navigator.requestMIDIAccess({ sysex: false })
+    _refresh()
+    _access.onstatechange = _refresh
     midiStatus.value = 'connected'
   } catch {
     midiStatus.value = 'error'
   }
 }
 
-function _refreshOutputs() {
+function _onMessage(event) {
+  const [status, note, velocity] = event.data
+  const type = status & 0xf0
+  if (type === 0x90 && velocity > 0) {
+    activeInputNotes.value = new Set([...activeInputNotes.value, note])
+  } else if (type === 0x80 || (type === 0x90 && velocity === 0)) {
+    const s = new Set(activeInputNotes.value)
+    s.delete(note)
+    activeInputNotes.value = s
+  }
+}
+
+function _refresh() {
   midiOutputs.value = [..._access.outputs.values()]
   if (!midiOutputs.value.find(o => o.id === selectedOutputId.value))
     selectedOutputId.value = midiOutputs.value[0]?.id ?? null
+  for (const input of _access.inputs.values())
+    input.onmidimessage = _onMessage
 }
 
 function _out() {
