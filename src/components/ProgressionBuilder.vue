@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { displayMode } from '../displayMode.js'
-import { NOTES, LABELS, SHARPS, CHORD_TYPES, CHORD_SUFFIX, FLAT_MAP } from '../musicConstants.js'
+import { NOTES, LABELS, SHARPS, CHORD_TYPES, CHORD_SUFFIX, FLAT_MAP, NOTE_TO_SEMI } from '../musicConstants.js'
 import { buildRows } from '../musicUtils.js'
+import { startNote, stopNote } from '../audioEngine.js'
 import ChordCardBody from './ChordCardBody.vue'
 
 const input = ref('D f#m E D')
@@ -45,6 +46,24 @@ const tokens = computed(() =>
 )
 
 const parseErrors = computed(() => tokens.value.filter(t => !t.parsed).map(t => t.raw))
+
+const activeCardMidis = ref([])
+
+function onCardDown(card) {
+  for (const midi of activeCardMidis.value) stopNote(midi)
+  const midis = CHORD_TYPES[card.type].map(i => 60 + NOTE_TO_SEMI[card.chordRootIdx] + i)
+  activeCardMidis.value = midis
+  for (const midi of midis) startNote(midi)
+}
+
+function onCardUp() {
+  for (const midi of activeCardMidis.value) stopNote(midi)
+  activeCardMidis.value = []
+}
+
+onUnmounted(() => {
+  for (const midi of activeCardMidis.value) stopNote(midi)
+})
 
 const chordCards = computed(() =>
   tokens.value
@@ -100,6 +119,10 @@ const chordCards = computed(() =>
           :key="card.idx"
           class="chord-card"
           :class="{ 'piano-mode': displayMode === 'piano' }"
+          @pointerdown.prevent="onCardDown(card)"
+          @pointerup="onCardUp"
+          @pointerleave="onCardUp"
+          @pointercancel="onCardUp"
         >
           <div class="chord-info">
             <div class="chord-name">{{ card.name }}</div>
@@ -212,6 +235,8 @@ const chordCards = computed(() =>
   flex-direction: column;
   align-items: center;
   gap: 0.4rem;
+  user-select: none;
+  touch-action: none;
 }
 
 .chord-card.piano-mode {

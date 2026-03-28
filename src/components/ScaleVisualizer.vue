@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { displayMode } from '../displayMode.js'
-import { NOTES, LABELS, SHARPS, OPEN_STRINGS, STRING_NAMES, FRET_COUNT } from '../musicConstants.js'
+import { NOTES, LABELS, SHARPS, OPEN_STRINGS, STRING_NAMES, FRET_COUNT, NOTE_TO_SEMI } from '../musicConstants.js'
 import { buildGuitarNeck, sliceRows } from '../musicUtils.js'
+import { startNote, stopNote } from '../audioEngine.js'
 import PianoOctave from './PianoOctave.vue'
 import RootNotePicker from './RootNotePicker.vue'
 import ModeLayout from './ModeLayout.vue'
@@ -74,6 +75,58 @@ const guitarNeck = computed(() =>
     isRoot:   noteIdx === rootIndex.value,
   }))
 )
+
+const STRING_BASE_MIDI = [40, 45, 50, 55, 59, 64]
+const pressedMidi = ref(new Map())
+
+function padMidi(noteIndex) {
+  return 12 * 5 + NOTE_TO_SEMI[noteIndex]
+}
+
+function onPadDown(noteIndex) {
+  const midi = padMidi(noteIndex)
+  pressedMidi.value = new Map([...pressedMidi.value, [midi, true]])
+  startNote(midi)
+}
+
+function onPadUp(noteIndex) {
+  const midi = padMidi(noteIndex)
+  const m = new Map(pressedMidi.value)
+  m.delete(midi)
+  pressedMidi.value = m
+  stopNote(midi)
+}
+
+function onCellDown(stringIdx, fret) {
+  const midi = STRING_BASE_MIDI[stringIdx] + fret
+  pressedMidi.value = new Map([...pressedMidi.value, [midi, true]])
+  startNote(midi)
+}
+
+function onCellUp(stringIdx, fret) {
+  const midi = STRING_BASE_MIDI[stringIdx] + fret
+  const m = new Map(pressedMidi.value)
+  m.delete(midi)
+  pressedMidi.value = m
+  stopNote(midi)
+}
+
+function onPianoToggle(noteIdx) {
+  const midi = padMidi(noteIdx)
+  if (pressedMidi.value.has(midi)) {
+    const m = new Map(pressedMidi.value)
+    m.delete(midi)
+    pressedMidi.value = m
+    stopNote(midi)
+  } else {
+    pressedMidi.value = new Map([...pressedMidi.value, [midi, true]])
+    startNote(midi)
+  }
+}
+
+onUnmounted(() => {
+  for (const midi of pressedMidi.value.keys()) stopNote(midi)
+})
 </script>
 
 <template>
@@ -118,6 +171,10 @@ const guitarNeck = computed(() =>
                 sharp: pad.isSharp,
                 inactive: !pad.isActive,
               }"
+              @pointerdown.prevent="onPadDown(pad.number - 1)"
+              @pointerup="onPadUp(pad.number - 1)"
+              @pointerleave="onPadUp(pad.number - 1)"
+              @pointercancel="onPadUp(pad.number - 1)"
             >
               <span class="pad-label">{{ pad.label }}</span>
               <span class="pad-note">{{ pad.note }}</span>
@@ -130,7 +187,7 @@ const guitarNeck = computed(() =>
       <template #notes>
         <div class="chroma-strip">
           <div
-            v-for="tile in chromaTiles"
+            v-for="(tile, ti) in chromaTiles"
             :key="tile.note"
             class="chroma-tile"
             :class="{
@@ -139,6 +196,10 @@ const guitarNeck = computed(() =>
               sharp: tile.isSharp,
               inactive: !tile.isActive,
             }"
+            @pointerdown.prevent="onPadDown(ti)"
+            @pointerup="onPadUp(ti)"
+            @pointerleave="onPadUp(ti)"
+            @pointercancel="onPadUp(ti)"
           >
             <span class="tile-note">{{ tile.note }}</span>
             <span class="tile-degree" v-if="tile.isActive">{{ tile.isRoot ? '①' : tile.degree }}</span>
@@ -152,6 +213,8 @@ const guitarNeck = computed(() =>
           :rootIndex="rootIndex"
           v-model:octave="pianoOctave"
           :dimInactive="true"
+          :clickable="true"
+          @toggle="onPianoToggle"
         />
       </template>
 
@@ -169,6 +232,10 @@ const guitarNeck = computed(() =>
                   root: cell.isRoot,
                   open: cell.isOpen,
                 }"
+                @pointerdown.prevent="onCellDown(string.stringIdx, cell.fret)"
+                @pointerup="onCellUp(string.stringIdx, cell.fret)"
+                @pointerleave="onCellUp(string.stringIdx, cell.fret)"
+                @pointercancel="onCellUp(string.stringIdx, cell.fret)"
               >
                 <span v-if="cell.isActive" class="neck-dot" :class="{ root: cell.isRoot }"></span>
               </div>
@@ -311,6 +378,9 @@ select:focus { border-color: var(--accent); }
   border: 1px solid var(--border);
   aspect-ratio: 1;
   transition: background 0.15s, border-color 0.15s;
+  user-select: none;
+  touch-action: none;
+  cursor: pointer;
 }
 
 .pad.inactive { background: var(--bg); opacity: 0.35; }
@@ -346,6 +416,9 @@ select:focus { border-color: var(--accent); }
   border-radius: 8px;
   border: 1px solid var(--border);
   transition: background 0.15s, border-color 0.15s;
+  user-select: none;
+  touch-action: none;
+  cursor: pointer;
 }
 
 .chroma-tile.inactive { background: transparent; border-color: transparent; opacity: 0.4; }
@@ -397,6 +470,9 @@ select:focus { border-color: var(--accent); }
   justify-content: center;
   border-right: 1px solid var(--border3);
   position: relative;
+  user-select: none;
+  touch-action: none;
+  cursor: pointer;
 }
 
 .neck-cell.open {
