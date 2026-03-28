@@ -10,6 +10,7 @@ import ProgressionBuilder from './components/ProgressionBuilder.vue'
 import JamMode from './components/JamMode.vue'
 import LearnMode from './components/LearnMode.vue'
 import SettingsPage from './components/SettingsPage.vue'
+import DrumComputer from './components/DrumComputer.vue'
 
 const allTabs = [
   { id: 'home',           label: 'Home',                component: StartPage },
@@ -20,6 +21,7 @@ const allTabs = [
   { id: 'chords',         label: 'Chord Progressions',  component: ChordProgressions },
   { id: 'chord-detector', label: 'Chord Detector',      component: ChordDetector },
   { id: 'prog-builder',   label: 'Progression Builder', component: ProgressionBuilder },
+  { id: 'drums',          label: 'Drum Computer',       component: DrumComputer },
   { id: 'settings',       label: 'Settings',            component: SettingsPage },
 ]
 

@@ -1,30 +1,39 @@
 # Tonarium
 
-A web app for people with a bad musical education. Helps you see what's going on harmonically — scales, chords, progressions — laid out visually across the instrument of your choice.
+A web app for people with a bad musical education. Helps you see what's going on harmonically — scales, chords, progressions, and rhythm — laid out visually across the instrument of your choice.
 
 ## Tools
 
+- **Learn** — interactive lessons on intervals, scales, chord progressions, improvising, and building beats; each step is hands-on with audio playback
 - **Chord Progressions** — browse classic progressions (I–V–vi–IV, ii–V–I, Canon in D, …) in any root key; tap a chord card to preview it via MIDI, or hit Play to loop the progression on your synth while you improvise
-- **Claves Mode** — chromatic 4×3 pad layout matching the EP-1320; tap/hold pads to play notes via MIDI *(EP-1320 display only)*
-- **Jam Mode** — pick a key and scale to see safe notes highlighted; anchor notes (root, 3rd, 5th) are marked so you always know where to land
+- **Claves Mode** — chromatic 4×3 pad layout matching the EP-1320; tap/hold pads to play notes via MIDI or built-in audio *(EP-1320 display only)*
+- **Jam Mode** — pick a key and scale to see safe notes highlighted; anchor notes (root, 3rd, 5th) are marked; tap pads to hear notes and layer melodies over a running drum beat
+- **Drum Computer** — 8-instrument, 16-step sequencer (kick, snare, hi-hats, toms, crash); synthesised sounds, no samples; loop continues playing when you switch to other tools
 - **Scale Visualizer** — see any scale across all 12 notes
 - **Chord Detector** — select some notes, find out what chord they make
 - **Progression Builder** — arrange your own chord sequence and see it mapped out
+
+## Audio
+
+All sound is synthesised in the browser via the Web Audio API — no samples or downloads required. The sound style for note playback (Synth, Piano, Bell, Pluck) is configurable in Settings, and persists across sessions.
+
+The Drum Computer runs independently in the background: start a loop, switch to Jam Mode or any other tool, and the beat keeps going.
 
 ## Web MIDI
 
 Connect a USB MIDI device (e.g. a TE EP-1320 via USB-C OTG) and click the **MIDI** button in the header. Once connected:
 
 - Select the output device if multiple are available
-- Pick a lane (A / B / C / D) — maps to MIDI channels 1–4
 - Claves Mode: tap pads to play notes, hold to sustain
 - Chord Progressions: tap a chord card to preview it; use Play/Stop to loop the full progression at a configurable BPM and beats-per-chord
+
+When a MIDI device is connected, built-in audio is muted and notes are sent to the device instead.
 
 Requires Chrome or any browser with Web MIDI API support.
 
 ## Display Modes
 
-All tools adapt to four layouts, selectable via the Display dropdown:
+All tools adapt to four layouts, selectable via Settings:
 
 | Mode | Description |
 |------|-------------|

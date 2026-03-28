@@ -4,7 +4,7 @@ const emit = defineEmits(['navigate'])
 const learnCard = {
   id: 'learn',
   label: 'Learn',
-  description: 'Step-by-step lessons on music theory fundamentals — intervals, scales, chords, and how they fit together.',
+  description: 'Step-by-step lessons on intervals, scales, chords, and rhythm — including how to build a beat from scratch.',
   featured: true,
 }
 
@@ -23,7 +23,13 @@ const tools = [
   {
     id: 'jam',
     label: 'Jam Mode',
-    description: 'Pick a key and scale — see exactly which notes are safe to play. Anchor notes (root, 3rd, 5th) are highlighted so you always know where to land.',
+    description: 'Pick a key and scale — see exactly which notes are safe to play. Anchor notes (root, 3rd, 5th) are highlighted. Tap pads to hear the notes, then layer over a running drum beat.',
+  },
+  {
+    id: 'drums',
+    label: 'Drum Computer',
+    description: 'Build a drum loop from 8 instruments across 16 steps. The beat keeps running while you switch to other tools — set it going and improvise over it.',
+    preview: ['1', '2', '3', '4'],
   },
   {
     id: 'scales',
@@ -48,8 +54,8 @@ const tools = [
     <section class="hero">
       <p class="tagline">Music theory you can see and play.</p>
       <p class="sub">
-        Tonarium is a visual toolkit for understanding harmony — explore scales, chords,
-        and progressions across guitar, piano, or pad layout (ep1320 synthesizer).
+        Tonarium is a visual toolkit for understanding harmony and rhythm — explore scales, chords,
+        and progressions across guitar, piano, or pad layout, and build drum loops that keep running while you play.
       </p>
     </section>
 

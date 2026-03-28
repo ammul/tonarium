@@ -5,6 +5,7 @@ const emit = defineEmits(['close'])
 import { displayMode } from '../displayMode.js'
 import { colorMode } from '../colorMode.js'
 import { soundEnabled } from '../soundEnabled.js'
+import { soundStyle } from '../soundStyle.js'
 import { midiStatus, midiOutputs, selectedOutputId, initMidi, disconnectMidi } from '../midiManager.js'
 
 const DISPLAY_OPTIONS = [
@@ -54,6 +55,17 @@ const selectedDevice = computed({
       <div class="option-group">
         <button class="option-btn" :class="{ active: soundEnabled }" @click="soundEnabled = true">On</button>
         <button class="option-btn" :class="{ active: !soundEnabled }" @click="soundEnabled = false">Off</button>
+      </div>
+    </section>
+
+    <section class="settings-section" v-if="soundEnabled">
+      <h3>Button Sound Style</h3>
+      <p class="section-desc">Timbre used when tapping pads, keys, and tiles.</p>
+      <div class="option-group">
+        <button class="option-btn" :class="{ active: soundStyle === 'synth' }" @click="soundStyle = 'synth'">Synth</button>
+        <button class="option-btn" :class="{ active: soundStyle === 'piano' }" @click="soundStyle = 'piano'">Piano</button>
+        <button class="option-btn" :class="{ active: soundStyle === 'bell' }"  @click="soundStyle = 'bell'">Bell</button>
+        <button class="option-btn" :class="{ active: soundStyle === 'pluck' }" @click="soundStyle = 'pluck'">Pluck</button>
       </div>
     </section>
 

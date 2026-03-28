@@ -2,6 +2,8 @@
 import { ref, computed } from 'vue'
 import { playNote, playChord } from '../audioEngine.js'
 
+const emit = defineEmits(['navigate'])
+
 const CHROMATIC = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 const IS_SHARP  = new Set([1,3,6,8,10])
 
@@ -57,7 +59,44 @@ const IMPROV = [
   ]},
 ]
 
-const STEPS = ['Intervals', 'Scales', 'Progressions', 'Improvising']
+const BEAT_PATTERNS = [
+  {
+    name: 'Basic rock beat',
+    desc: 'Kick on beats 1 and 3, snare on 2 and 4, hi-hat on every 8th note. The foundation of rock, pop, and almost everything else.',
+    rows: [
+      { name: 'Kick',   steps: [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0] },
+      { name: 'Snare',  steps: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0] },
+      { name: 'Hi-Hat', steps: [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0] },
+    ],
+  },
+  {
+    name: 'Four-on-the-floor',
+    desc: 'Kick on every beat, open hi-hat on the offbeats. The backbone of house, techno, and dance music.',
+    rows: [
+      { name: 'Kick',   steps: [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0] },
+      { name: 'Snare',  steps: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0] },
+      { name: 'Hi-Hat', steps: [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1] },
+    ],
+  },
+  {
+    name: 'Syncopated kick',
+    desc: 'Kick displaced off the beat adds forward motion and groove. Snare still holds down 2 and 4 as the anchor.',
+    rows: [
+      { name: 'Kick',   steps: [1,0,0,1, 0,0,1,0, 1,0,0,0, 0,1,0,0] },
+      { name: 'Snare',  steps: [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0] },
+      { name: 'Hi-Hat', steps: [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1] },
+    ],
+  },
+]
+
+const BEAT_TIPS = [
+  { num: '1', text: 'The <strong>backbeat</strong> is everything. Snare on beats 2 and 4 is what makes music groove rather than march. Lock that in first.' },
+  { num: '2', text: '<strong>Beats 1, 5, 9, 13</strong> in the drum computer are the four quarter-note beats of one bar. Kick and snare live here.' },
+  { num: '3', text: '<strong>Hi-hats subdivide time.</strong> 8th notes (every other step) feel steady. 16th notes (every step) feel urgent. Offbeat 8ths feel bouncy.' },
+  { num: '4', text: '<strong>Leave space.</strong> A kick on every 16th step is noise, not a beat. What you don\'t play shapes the groove as much as what you do.' },
+]
+
+const STEPS = ['Intervals', 'Scales', 'Progressions', 'Improvising', 'Beats']
 const step  = ref(0)
 
 // ── Step 1: Intervals ────────────────────────────────────────────────────────
@@ -355,6 +394,49 @@ const activeDegrees = computed(() =>
       <div class="improv-cta">
         Try it in <strong>Jam Mode</strong> — pick a key and scale to see safe pads highlighted.
       </div>
+    </div>
+
+    <!-- ── Step 5: Beats ─────────────────────────────────────────────────── -->
+    <div v-if="step === 4" class="step-content">
+      <p class="step-intro">A good beat is built from three layers: <strong>kick</strong>, <strong>snare</strong>, and <strong>hi-hat</strong>. Each has a job. Together they create rhythm that makes people move.</p>
+
+      <div class="beat-patterns">
+        <div v-for="pattern in BEAT_PATTERNS" :key="pattern.name" class="beat-pattern">
+          <div class="bp-header">
+            <span class="bp-name">{{ pattern.name }}</span>
+            <span class="bp-desc">{{ pattern.desc }}</span>
+          </div>
+          <div class="bp-grid">
+            <div class="bp-beat-nums">
+              <div class="bp-inst-spacer"></div>
+              <div v-for="b in 4" :key="b" class="bp-beat-num">{{ b }}</div>
+            </div>
+            <div v-for="row in pattern.rows" :key="row.name" class="bp-row">
+              <div class="bp-inst">{{ row.name }}</div>
+              <div
+                v-for="(on, si) in row.steps"
+                :key="si"
+                class="bp-cell"
+                :class="{
+                  on:         on === 1,
+                  'beat-1':   si % 4 === 0,
+                }"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="beat-tips">
+        <div v-for="tip in BEAT_TIPS" :key="tip.num" class="tip">
+          <span class="tip-num">{{ tip.num }}</span>
+          <span v-html="tip.text"></span>
+        </div>
+      </div>
+
+      <button class="beat-cta" @click="emit('navigate', 'drums')">
+        Build your own beat in the Drum Computer &rarr;
+      </button>
     </div>
 
     <!-- Step footer -->
@@ -985,6 +1067,127 @@ const activeDegrees = computed(() =>
   font-size: 0.78rem;
   color: var(--text4);
   letter-spacing: 0.05em;
+}
+
+/* ── Beats ────────────────────────────────────────────────────────────────── */
+.beat-patterns {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.beat-pattern {
+  background: var(--raised);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.bp-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.bp-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.bp-desc {
+  font-size: 0.78rem;
+  color: var(--text3);
+  line-height: 1.45;
+}
+
+.bp-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.bp-beat-nums,
+.bp-row {
+  display: grid;
+  grid-template-columns: 4rem repeat(16, 1fr);
+  gap: 0.15rem;
+  min-width: 360px;
+}
+
+.bp-inst-spacer { }
+
+.bp-beat-num {
+  font-size: 0.6rem;
+  color: var(--accent-mid);
+  font-weight: 700;
+  text-align: center;
+  padding: 0.1rem 0;
+  grid-column: span 4;
+}
+
+.bp-inst {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text4);
+  display: flex;
+  align-items: center;
+}
+
+.bp-cell {
+  height: 1.5rem;
+  border-radius: 3px;
+  background: var(--input);
+  border: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.bp-cell.beat-1 {
+  border-left: 2px solid var(--border2);
+}
+
+.bp-cell.on {
+  background: var(--accent-bg);
+  border-color: var(--accent-mid);
+}
+
+.bp-cell.on.beat-1 {
+  border-left-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.beat-tips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.beat-cta {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--accent-mid);
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.beat-cta:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent);
 }
 
 /* ── Responsive ───────────────────────────────────────────────────────────── */

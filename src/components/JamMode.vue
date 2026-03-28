@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { displayMode } from '../displayMode.js'
 import { NOTES, LABELS, SHARPS, FRET_COUNT, NOTE_TO_SEMI } from '../musicConstants.js'
 import { buildGuitarNeck, sliceRows } from '../musicUtils.js'
 import { activeInputNotes } from '../midiManager.js'
+import { startNote, stopNote } from '../audioEngine.js'
 import PianoOctave from './PianoOctave.vue'
 import ScaleLegend from './ScaleLegend.vue'
 import RootNotePicker from './RootNotePicker.vue'
@@ -125,6 +126,60 @@ const scaleNotes = computed(() =>
     isRoot:   i === 0,
   }))
 )
+
+// MIDI base notes for each guitar string (stringIdx 0-5: E2 A2 D3 G3 B3 E4)
+const STRING_BASE_MIDI = [40, 45, 50, 55, 59, 64]
+
+const pressedMidi = ref(new Map())
+
+function padMidi(noteIndex, octave) {
+  return 12 * (octave + 1) + NOTE_TO_SEMI[noteIndex]
+}
+
+function onPadDown(noteIndex, octave) {
+  const midi = padMidi(noteIndex, octave)
+  pressedMidi.value = new Map([...pressedMidi.value, [midi, true]])
+  startNote(midi)
+}
+
+function onPadUp(noteIndex, octave) {
+  const midi = padMidi(noteIndex, octave)
+  const m = new Map(pressedMidi.value)
+  m.delete(midi)
+  pressedMidi.value = m
+  stopNote(midi)
+}
+
+function onCellDown(stringIdx, fret) {
+  const midi = STRING_BASE_MIDI[stringIdx] + fret
+  pressedMidi.value = new Map([...pressedMidi.value, [midi, true]])
+  startNote(midi)
+}
+
+function onCellUp(stringIdx, fret) {
+  const midi = STRING_BASE_MIDI[stringIdx] + fret
+  const m = new Map(pressedMidi.value)
+  m.delete(midi)
+  pressedMidi.value = m
+  stopNote(midi)
+}
+
+function onPianoToggle(noteIdx) {
+  const midi = padMidi(noteIdx, pianoOctave.value)
+  if (pressedMidi.value.has(midi)) {
+    const m = new Map(pressedMidi.value)
+    m.delete(midi)
+    pressedMidi.value = m
+    stopNote(midi)
+  } else {
+    pressedMidi.value = new Map([...pressedMidi.value, [midi, true]])
+    startNote(midi)
+  }
+}
+
+onUnmounted(() => {
+  for (const midi of pressedMidi.value.keys()) stopNote(midi)
+})
 </script>
 
 <template>
@@ -167,6 +222,10 @@ const scaleNotes = computed(() =>
                 inactive: !pad.isActive,
                 pressed:  pressedIndices.has(pad.noteIndex),
               }"
+              @pointerdown.prevent="onPadDown(pad.noteIndex, 4)"
+              @pointerup="onPadUp(pad.noteIndex, 4)"
+              @pointerleave="onPadUp(pad.noteIndex, 4)"
+              @pointercancel="onPadUp(pad.noteIndex, 4)"
             >
               <span class="pad-label">{{ pad.label }}</span>
               <span class="pad-note">{{ pad.note }}</span>
@@ -188,6 +247,10 @@ const scaleNotes = computed(() =>
               inactive: !tile.isActive,
               pressed:  pressedIndices.has(tile.noteIndex),
             }"
+            @pointerdown.prevent="onPadDown(tile.noteIndex, 4)"
+            @pointerup="onPadUp(tile.noteIndex, 4)"
+            @pointerleave="onPadUp(tile.noteIndex, 4)"
+            @pointercancel="onPadUp(tile.noteIndex, 4)"
           >
             <span class="tile-note">{{ tile.note }}</span>
           </div>
@@ -200,6 +263,8 @@ const scaleNotes = computed(() =>
           :rootIndex="rootIndex"
           v-model:octave="pianoOctave"
           :dimInactive="true"
+          :clickable="true"
+          @toggle="onPianoToggle"
         />
       </template>
 
@@ -217,6 +282,10 @@ const scaleNotes = computed(() =>
                   root:   cell.isRoot,
                   open:   cell.isOpen,
                 }"
+                @pointerdown.prevent="onCellDown(string.stringIdx, cell.fret)"
+                @pointerup="onCellUp(string.stringIdx, cell.fret)"
+                @pointerleave="onCellUp(string.stringIdx, cell.fret)"
+                @pointercancel="onCellUp(string.stringIdx, cell.fret)"
               >
                 <span
                   v-if="cell.isActive"
@@ -374,6 +443,9 @@ select:focus { border-color: var(--accent); }
   border: 1px solid var(--border);
   aspect-ratio: 1;
   transition: background 0.15s, border-color 0.15s;
+  user-select: none;
+  touch-action: none;
+  cursor: pointer;
 }
 
 .pad.inactive { background: var(--bg); opacity: 0.35; }
@@ -408,6 +480,9 @@ select:focus { border-color: var(--accent); }
   border-radius: 8px;
   border: 1px solid var(--border);
   transition: background 0.15s, border-color 0.15s;
+  user-select: none;
+  touch-action: none;
+  cursor: pointer;
 }
 
 .chroma-tile.inactive { background: transparent; border-color: transparent; opacity: 0.4; }
@@ -461,6 +536,9 @@ select:focus { border-color: var(--accent); }
   justify-content: center;
   border-right: 1px solid var(--border3);
   position: relative;
+  user-select: none;
+  touch-action: none;
+  cursor: pointer;
 }
 
 .neck-cell.open {
