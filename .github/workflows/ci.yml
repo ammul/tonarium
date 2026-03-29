@@ -1,8 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches: [main, refactor/tests-and-cleanup]
   pull_request:
     branches: [main]
 
