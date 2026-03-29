@@ -2,8 +2,11 @@
 
 ## Commands
 - `npm run dev` — start dev server
-- `npm run build` — Vite build (base path `/ep1320/`)
-- No test suite; verify by building (`vite build` must pass with 0 errors)
+- `npm run build` — Vite build (base path `/tonarium/`)
+- `npm test` — run unit and component tests (Vitest)
+- `npm run test:watch` — Vitest in watch mode
+- `npm run test:coverage` — coverage report
+- `npm run test:e2e` — Playwright e2e tests
 
 ## Architecture
 

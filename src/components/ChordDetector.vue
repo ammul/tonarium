@@ -1,41 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { displayMode } from '../displayMode.js'
-import { NOTES, LABELS, SHARPS, NOTE_TO_SEMI, SEMI_TO_NAME, CHORD_DETECT_TYPES, FRET_COUNT } from '../musicConstants.js'
+import { NOTES, LABELS, SHARPS, NOTE_TO_SEMI, FRET_COUNT } from '../musicConstants.js'
 import { playNote } from '../audioEngine.js'
 import { buildGuitarNeck, sliceRows } from '../musicUtils.js'
+import { detectChord } from '../chordDetect.js'
 import PianoOctave from './PianoOctave.vue'
 import ModeLayout from './ModeLayout.vue'
-
-function detectChord(noteIndices) {
-  if (noteIndices.length < 2) return null
-  const semis = [...new Set(noteIndices.map(i => NOTE_TO_SEMI[i]))].sort((a, b) => a - b)
-  const results = []
-  for (const rootSemi of semis) {
-    const intervals = semis.map(s => (s - rootSemi + 12) % 12).sort((a, b) => a - b)
-    for (const type of CHORD_DETECT_TYPES) {
-      if (
-        type.intervals.length === intervals.length &&
-        type.intervals.every((v, i) => v === intervals[i])
-      ) {
-        const rootName = SEMI_TO_NAME[rootSemi]
-        const lowestSemi = semis[0]
-        const isInversion = lowestSemi !== rootSemi
-        const bassName = SEMI_TO_NAME[lowestSemi]
-        results.push({
-          root: rootName,
-          suffix: type.suffix,
-          name: type.name,
-          inversion: isInversion ? `/${bassName}` : '',
-          display: `${rootName}${type.suffix}${isInversion ? `/${bassName}` : ''}`,
-        })
-      }
-    }
-  }
-  if (results.length === 0) return null
-  const rootPos = results.find(r => !r.inversion)
-  return rootPos ?? results[0]
-}
 
 const selected = ref(new Set())
 const pianoOctave = ref(4)
