@@ -43,21 +43,36 @@ const PROGS = [
   { name:'I – vi – IV – V',  degIdx:[0,5,3,4], feel:'50s doo-wop', songs:'Stand By Me · Blue Moon' },
 ]
 
-const IMPROV = [
-  { chord:'Major chord',   def:'Bright, resolved sound. Root + major 3rd (4 semitones) + 5th.', color:'#c8a96e', scales:[
-    { name:'Major pentatonic', desc:'always safe' },
-    { name:'Major scale',      desc:'full palette' },
-    { name:'Mixolydian',       desc:'bluesy edge' },
-  ]},
-  { chord:'Minor chord',   def:'Dark, emotional. Like major but with a minor 3rd (3 semitones) instead.', color:'#8a7a9e', scales:[
-    { name:'Minor pentatonic', desc:'easy, no clashes' },
-    { name:'Natural minor',    desc:'dark and expressive' },
-    { name:'Dorian',           desc:'soulful minor' },
-  ]},
-  { chord:'Dominant 7th',  def:'Tense, bluesy. A major chord with a flattened 7th added — wants to resolve.', color:'#9e7a5a', scales:[
-    { name:'Mixolydian',       desc:'natural match' },
-    { name:'Blues scale',      desc:'gritty tension' },
-  ]},
+const CHORD_TYPES = [
+  {
+    chord: 'Major chord',
+    def:   'Bright, resolved. Root + major 3rd (4 semitones) + 5th (7 semitones).',
+    itvs:  [0, 4, 7],
+    scales: [
+      { name:'Major pentatonic', desc:'always safe' },
+      { name:'Major scale',      desc:'full palette' },
+      { name:'Mixolydian',       desc:'bluesy edge' },
+    ],
+  },
+  {
+    chord: 'Minor chord',
+    def:   'Dark, emotional. Like major but the 3rd is flattened by one semitone (3 semitones).',
+    itvs:  [0, 3, 7],
+    scales: [
+      { name:'Minor pentatonic', desc:'easy, no clashes' },
+      { name:'Natural minor',    desc:'dark and expressive' },
+      { name:'Dorian',           desc:'soulful minor' },
+    ],
+  },
+  {
+    chord: 'Dominant 7th',
+    def:   'Tense, bluesy. A major chord with a flattened 7th (10 semitones) added — wants to resolve.',
+    itvs:  [0, 4, 7, 10],
+    scales: [
+      { name:'Mixolydian',   desc:'natural match' },
+      { name:'Blues scale',  desc:'gritty tension' },
+    ],
+  },
 ]
 
 const BEAT_PATTERNS = [
@@ -97,10 +112,24 @@ const BEAT_TIPS = [
   { num: '4', text: '<strong>Leave space.</strong> A kick on every 16th step is noise, not a beat. What you don\'t play shapes the groove as much as what you do.' },
 ]
 
-const STEPS = ['Intervals', 'Scales', 'Progressions', 'Improvising', 'Beats']
+const STEPS = ['Root Notes', 'Intervals', 'Scales', 'Progressions', 'Chords', 'Improvising', 'Beats']
 const step  = ref(0)
 
-// ── Step 1: Intervals ────────────────────────────────────────────────────────
+// ── Step 1: Root Notes ───────────────────────────────────────────────────────
+const rootNoteIdx = ref(null)
+
+function pickRootNote(i) {
+  rootNoteIdx.value = i
+  playNote(60 + i)
+}
+
+function playRootOctave() {
+  if (rootNoteIdx.value === null) return
+  playNote(60 + rootNoteIdx.value)
+  setTimeout(() => playNote(72 + rootNoteIdx.value, 0.8), 550)
+}
+
+// ── Step 2: Intervals ────────────────────────────────────────────────────────
 const fromIdx = ref(null)
 const toIdx   = ref(null)
 
@@ -189,10 +218,22 @@ function playScale() {
 }
 
 // ── Step 3: Progressions ─────────────────────────────────────────────────────
-const progRoot          = ref(0)
-const activeProg        = ref(null)
+const progRoot           = ref(0)
+const activeProg         = ref(null)
 const progActiveChordIdx = ref(null)
-let   _progTimers = []
+let   _progTimers        = []
+
+function pickProgRoot(i) {
+  _progTimers.forEach(clearTimeout)
+  _progTimers = []
+  stopAllNotes()
+  progRoot.value           = i
+  activeProg.value         = null
+  progActiveChordIdx.value = null
+}
+
+// ── Step 4: Chords ───────────────────────────────────────────────────────────
+const chordsRoot = ref(0)
 
 function chordLabel(rootC, di) {
   const semi = (rootC + MAJOR_SCALE[di]) % 12
@@ -270,7 +311,7 @@ function editBeat(pi) {
 }
 
 watch(step, (newStep, oldStep) => {
-  if (oldStep === 4 && drumIsPlaying.value) drumPause()
+  if (oldStep === 6 && drumIsPlaying.value) drumPause()
 })
 
 onUnmounted(() => {
@@ -295,8 +336,55 @@ onUnmounted(() => {
       </button>
     </div>
 
-    <!-- ── Step 1: Intervals ─────────────────────────────────────────────── -->
+    <!-- ── Step 1: Root Notes ────────────────────────────────────────────── -->
     <div v-if="step === 0" class="step-content">
+      <p class="step-intro">Every piece of music orbits a home note — the <strong>root</strong>. When a melody lands on it, it sounds resolved. When it moves away, it creates tension. Everything else — scales, chords, keys — is named and measured relative to this anchor.</p>
+
+      <div class="root-note-picker">
+        <div class="note-strip">
+          <button
+            v-for="(note, i) in CHROMATIC"
+            :key="i"
+            class="note-pill"
+            :class="{ sharp: IS_SHARP.has(i), from: rootNoteIdx === i }"
+            @pointerdown.prevent="pickRootNote(i)"
+          >{{ note }}</button>
+        </div>
+      </div>
+
+      <div class="root-result">
+        <template v-if="rootNoteIdx !== null">
+          <div class="rr-name">{{ CHROMATIC[rootNoteIdx] }}</div>
+          <div class="rr-label">your root note</div>
+          <button class="rr-octave-btn" @click="playRootOctave">Hear it one octave up</button>
+        </template>
+        <template v-else>
+          <div class="rr-hint">Tap any note to set your root</div>
+        </template>
+      </div>
+
+      <div class="root-facts">
+        <div class="rf-item">
+          <span class="rf-heading">12 notes</span>
+          <span class="rf-body">Western music uses 12 notes before the pattern repeats. The 7 natural notes (A B C D E F G) plus 5 sharps in between — the black keys on a piano.</span>
+        </div>
+        <div class="rf-item">
+          <span class="rf-heading">Octaves</span>
+          <span class="rf-body">Every note repeats at double the frequency — same name, higher pitch. C and the C above it sound related because the higher one vibrates exactly twice as fast.</span>
+        </div>
+        <div class="rf-item">
+          <span class="rf-heading">Keys</span>
+          <span class="rf-body">When someone says a song is in <em>C major</em>, C is the root. The root gives the key its name and is the note the music wants to return to.</span>
+        </div>
+      </div>
+
+      <div class="step-bridge">
+        Once you have a root, you can describe the <strong>distance</strong> to any other note. That distance is called an <strong>interval</strong>.
+      </div>
+    </div>
+
+    <!-- ── Step 2: Intervals ─────────────────────────────────────────────── -->
+    <div v-if="step === 1" class="step-content">
       <p class="step-intro">Tap any two notes - hear the sound and see the <strong>interval</strong> between them.</p>
 
       <div class="note-strip">
@@ -349,7 +437,7 @@ onUnmounted(() => {
     </div>
 
     <!-- ── Step 2: Scales ────────────────────────────────────────────────── -->
-    <div v-if="step === 1" class="step-content">
+    <div v-if="step === 2" class="step-content">
       <p class="step-intro">A <strong>scale</strong> is a fixed pattern of intervals repeating from a root. The Major scale uses the same intervals every time — that's why it always sounds the same no matter which root you pick. Pick a root, choose a scale, hear which notes light up.</p>
 
       <div class="picker-row">
@@ -406,7 +494,7 @@ onUnmounted(() => {
     </div>
 
     <!-- ── Step 3: Progressions ──────────────────────────────────────────── -->
-    <div v-if="step === 2" class="step-content">
+    <div v-if="step === 3" class="step-content">
       <p class="step-intro">Chords are labelled with <strong>Roman numerals</strong> based on the scale they come from — every chord in a key uses only notes from that key's scale. That's why they all sound good together. Tap any chord to hear it, or tap a progression to play it.</p>
 
       <div class="picker-row">
@@ -417,7 +505,7 @@ onUnmounted(() => {
             :key="i"
             class="note-pill"
             :class="{ sharp: IS_SHARP.has(i), from: progRoot === i }"
-            @pointerdown.prevent="stopAllNotes(); progRoot = i; activeProg = null; playNote(60 + i)"
+            @pointerdown.prevent="pickProgRoot(i)"
           >{{ note }}</button>
         </div>
       </div>
@@ -472,24 +560,62 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- ── Step 4: Improvising ───────────────────────────────────────────── -->
-    <div v-if="step === 3" class="step-content">
-      <p class="step-intro">Improvising is about choosing notes that sound <strong>intentional</strong>. The key: match your scale to the chord type.</p>
+    <!-- ── Step 4: Chords ───────────────────────────────────────────────── -->
+    <div v-if="step === 4" class="step-content">
+      <p class="step-intro">A <strong>chord</strong> is three or more notes played at once. Just three chord types are behind most of the music you know — they differ only by one note.</p>
 
-      <div class="improv-grid">
+      <div class="picker-row">
+        <span class="picker-label">Root</span>
+        <div class="note-strip small">
+          <button
+            v-for="(note, i) in CHROMATIC"
+            :key="i"
+            class="note-pill"
+            :class="{ sharp: IS_SHARP.has(i), from: chordsRoot === i }"
+            @pointerdown.prevent="chordsRoot = i"
+          >{{ note }}</button>
+        </div>
+      </div>
+
+      <div class="chord-type-list">
         <div
-          v-for="card in IMPROV"
-          :key="card.chord"
-          class="improv-card"
-          :style="{ '--card-color': card.color }"
+          v-for="ct in CHORD_TYPES"
+          :key="ct.chord"
+          class="chord-type-card"
         >
-          <div class="ic-chord">{{ card.chord }}</div>
-          <div class="ic-def">{{ card.def }}</div>
-          <div class="ic-scales">
-            <div v-for="sc in card.scales" :key="sc.name" class="ic-scale">
-              <span class="ic-name">{{ sc.name }}</span>
-              <span class="ic-desc">{{ sc.desc }}</span>
+          <div class="ctc-main">
+            <div class="ctc-text">
+              <span class="ctc-name">{{ ct.chord }}</span>
+              <span class="ctc-def">{{ ct.def }}</span>
             </div>
+            <button
+              class="ctc-play"
+              @pointerdown.prevent="playChord(ct.itvs.map(s => 60 + chordsRoot + s))"
+            >Hear it</button>
+          </div>
+          <div class="ctc-intervals">
+            <span
+              v-for="s in ct.itvs"
+              :key="s"
+              class="ctc-interval-pill"
+            >+{{ s }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Step 5: Improvising ───────────────────────────────────────────── -->
+    <div v-if="step === 5" class="step-content">
+      <p class="step-intro">Improvising is about choosing notes that sound <strong>intentional</strong>. The key: match your scale to the chord type you're playing over.</p>
+
+      <div class="improv-list">
+        <div v-for="ct in CHORD_TYPES" :key="ct.chord" class="improv-item">
+          <span class="improv-chord-name">{{ ct.chord }}</span>
+          <div class="improv-scales">
+            <span v-for="sc in ct.scales" :key="sc.name" class="improv-scale-pill">
+              <span class="isp-name">{{ sc.name }}</span>
+              <span class="isp-desc">{{ sc.desc }}</span>
+            </span>
           </div>
         </div>
       </div>
@@ -497,11 +623,11 @@ onUnmounted(() => {
       <div class="tips">
         <div class="tip">
           <span class="tip-num">1</span>
-          <span>Start with <strong>minor pentatonic</strong> - 5 notes, no clashes, works over almost anything minor.</span>
+          <span>Start with <strong>minor pentatonic</strong> — 5 notes, no clashes, works over almost anything minor.</span>
         </div>
         <div class="tip">
           <span class="tip-num">2</span>
-          <span>Land on <strong>chord tones</strong> (root, 3rd, 5th) - they resolve. Other notes work best as passing notes.</span>
+          <span>Land on <strong>chord tones</strong> (root, 3rd, 5th) — they resolve. Other notes work best as passing notes.</span>
         </div>
         <div class="tip">
           <span class="tip-num">3</span>
@@ -510,12 +636,12 @@ onUnmounted(() => {
       </div>
 
       <div class="improv-cta">
-        Try it in <strong>Jam Mode</strong> - pick a key and scale to see safe pads highlighted.
+        Try it in <strong>Jam Mode</strong> — pick a key and scale to see safe pads highlighted.
       </div>
     </div>
 
-    <!-- ── Step 5: Beats ─────────────────────────────────────────────────── -->
-    <div v-if="step === 4" class="step-content">
+    <!-- ── Step 6: Beats ─────────────────────────────────────────────────── -->
+    <div v-if="step === 6" class="step-content">
       <p class="step-intro">A good beat is built from three layers: <strong>kick</strong>, <strong>snare</strong>, and <strong>hi-hat</strong>. Each has a job. Together they create rhythm that makes people move.</p>
 
       <div class="beat-recipe">
@@ -731,6 +857,98 @@ onUnmounted(() => {
   border-color: var(--accent);
   color: var(--accent-hi);
   box-shadow: 0 0 6px var(--accent-glow);
+}
+
+/* ── Root Notes ───────────────────────────────────────────────────────────── */
+.root-note-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.root-result {
+  min-height: 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 1rem;
+  background: var(--raised);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+}
+
+.rr-name {
+  font-size: clamp(1.8rem, 8vw, 2.8rem);
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.rr-label {
+  font-size: 0.78rem;
+  color: var(--accent-mid);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.rr-octave-btn {
+  margin-top: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 5px;
+  border: 1px solid var(--accent-mid);
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.rr-octave-btn:hover { background: var(--accent-bg); border-color: var(--accent); }
+
+.rr-hint {
+  font-size: 1rem;
+  color: var(--text3);
+  font-weight: 600;
+}
+
+.root-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rf-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 0.9rem;
+  background: var(--raised);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+}
+
+.rf-heading {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.rf-body {
+  font-size: 0.82rem;
+  color: var(--text3);
+  line-height: 1.55;
+}
+
+.rf-body em {
+  color: var(--text2);
+  font-style: normal;
+  font-weight: 600;
 }
 
 /* ── Interval result ──────────────────────────────────────────────────────── */
@@ -1030,7 +1248,7 @@ onUnmounted(() => {
 .section-label {
   font-size: 0.7rem;
   font-weight: 700;
-  color: var(--text4);
+  color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   margin-bottom: -0.25rem;
@@ -1183,57 +1401,132 @@ onUnmounted(() => {
   letter-spacing: 0.02em;
 }
 
-/* ── Improv grid ──────────────────────────────────────────────────────────── */
-.improv-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+/* ── Chord types (step 4) ─────────────────────────────────────────────────── */
+.chord-type-list {
+  display: flex;
+  flex-direction: column;
   gap: 0.6rem;
 }
 
-.improv-card {
-  border-radius: 8px;
-  border: 1px solid var(--border2);
+.chord-type-card {
   background: var(--raised);
-  overflow: hidden;
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
-.ic-chord {
-  padding: 0.55rem 0.7rem 0.3rem;
-  font-size: 0.8rem;
+.ctc-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ctc-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.ctc-name {
+  font-size: 0.92rem;
   font-weight: 700;
-  color: var(--card-color);
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.ctc-def {
+  font-size: 0.82rem;
+  color: var(--text3);
+  line-height: 1.5;
+}
+
+.ctc-play {
+  padding: 0.3rem 0.8rem;
+  border-radius: 5px;
+  border: 1px solid var(--accent-mid);
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ctc-play:hover { background: var(--accent-bg); border-color: var(--accent); }
+
+.ctc-intervals {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.ctc-interval-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-mid);
+  background: var(--input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.15rem 0.45rem;
   letter-spacing: 0.03em;
 }
 
-.ic-def {
-  padding: 0 0.7rem 0.5rem;
-  font-size: 0.7rem;
-  color: var(--text4);
-  line-height: 1.45;
-  border-bottom: 1px solid var(--border);
-}
-
-.ic-scales {
-  padding: 0.5rem 0.7rem;
+/* ── Improv list (step 5) ─────────────────────────────────────────────────── */
+.improv-list {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.75rem;
 }
 
-.ic-scale {
+.improv-item {
+  background: var(--raised);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.improv-chord-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.improv-scales {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.improv-scale-pill {
   display: flex;
   flex-direction: column;
   gap: 0.05rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--input);
 }
 
-.ic-name {
+.isp-name {
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text2);
 }
 
-.ic-desc {
-  font-size: 0.7rem;
+.isp-desc {
+  font-size: 0.68rem;
   color: var(--text4);
 }
 
@@ -1562,10 +1855,6 @@ onUnmounted(() => {
     gap: 1rem;
   }
 
-  .improv-grid {
-    grid-template-columns: 1fr;
-  }
-
   .diatonic-row {
     gap: 0.3rem;
   }
@@ -1586,8 +1875,5 @@ onUnmounted(() => {
     display: none;
   }
 
-  .improv-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }
 </style>

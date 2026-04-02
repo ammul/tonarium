@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { displayMode } from './displayMode.js'
+import { isPlaying as drumIsPlaying, play as drumPlay, pause as drumPause } from './drumEngine.js'
 import StartPage from './components/StartPage.vue'
 import ScaleVisualizer from './components/ScaleVisualizer.vue'
 import ChordProgressions from './components/ChordProgressions.vue'
@@ -12,20 +13,25 @@ import SettingsPage from './components/SettingsPage.vue'
 import DrumComputer from './components/DrumComputer.vue'
 
 const allTabs = [
-  { id: 'home',           label: 'Home',                component: StartPage },
-  { id: 'learn',          label: 'Learn',               component: LearnMode },
-  { id: 'jam',            label: 'Jam Mode',            component: JamMode },
-  { id: 'scales',         label: 'Scale Visualizer',    component: ScaleVisualizer },
-  { id: 'chords',         label: 'Chord Progressions',  component: ChordProgressions },
-  { id: 'chord-detector', label: 'Chord Detector',      component: ChordDetector },
-  { id: 'prog-builder',   label: 'Progression Builder', component: ProgressionBuilder },
-  { id: 'drums',          label: 'Drum Computer',       component: DrumComputer },
-  { id: 'settings',       label: 'Settings',            component: SettingsPage },
+  { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: StartPage },
+  { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LearnMode },
+  { id: 'jam',            label: 'Jam Mode',            shortLabel: 'Jam',          component: JamMode },
+  { id: 'scales',         label: 'Scale Visualizer',    shortLabel: 'Scales',       component: ScaleVisualizer },
+  { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions },
+  { id: 'chord-detector', label: 'Chord Detector',      shortLabel: 'Detector',     component: ChordDetector },
+  { id: 'prog-builder',   label: 'Progression Builder', shortLabel: 'Builder',      component: ProgressionBuilder },
+  { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer },
+  { id: 'settings',       label: 'Settings',            shortLabel: 'Settings',     component: SettingsPage },
 ]
 
-const activeTab    = ref('home')
-const previousTab  = ref('home')
-const menuOpen     = ref(false)
+const activeTab      = ref('home')
+const previousTab    = ref('home')
+const menuOpen       = ref(false)
+const drumEverPlayed = ref(false)
+
+watch(drumIsPlaying, (playing) => {
+  if (playing) drumEverPlayed.value = true
+})
 
 const tabs = computed(() =>
   allTabs.filter(t => !t.padOnly || displayMode.value === 'pad')
@@ -45,11 +51,29 @@ function selectTab(id) {
   }
   activeTab.value = id
   menuOpen.value = false
+  history.pushState({ tab: id }, '')
 }
 
 function closeSettings() {
-  activeTab.value = previousTab.value
+  selectTab(previousTab.value)
 }
+
+function handlePopState(e) {
+  const tab = e.state?.tab
+  if (tab && allTabs.some(t => t.id === tab)) {
+    activeTab.value = tab
+    menuOpen.value = false
+  }
+}
+
+onMounted(() => {
+  history.replaceState({ tab: activeTab.value }, '')
+  window.addEventListener('popstate', handlePopState)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('popstate', handlePopState)
+})
 </script>
 
 <template>
@@ -60,6 +84,23 @@ function closeSettings() {
           <h1 @click="selectTab('home')" class="home-link">Tonarium</h1>
         </div>
         <div class="header-controls">
+          <div v-if="drumEverPlayed" class="drum-widget" :class="{ playing: drumIsPlaying }">
+            <span class="dw-dot"></span>
+            <span class="dw-label">Drums</span>
+            <button
+              class="dw-btn"
+              :aria-label="drumIsPlaying ? 'Pause drums' : 'Play drums'"
+              @click="drumIsPlaying ? drumPause() : drumPlay()"
+            >
+              <svg v-if="drumIsPlaying" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+                <rect x="1.5" y="1" width="3" height="8" rx="1"/>
+                <rect x="5.5" y="1" width="3" height="8" rx="1"/>
+              </svg>
+              <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+                <polygon points="2,1 9,5 2,9"/>
+              </svg>
+            </button>
+          </div>
           <button class="icon-btn" @click="activeTab === 'settings' ? closeSettings() : selectTab('settings')" :class="{ active: activeTab === 'settings' }" aria-label="Settings">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
@@ -72,6 +113,18 @@ function closeSettings() {
         </div>
       </div>
     </header>
+
+    <nav class="desktop-tabs" aria-label="Main navigation">
+      <div class="dt-inner">
+        <button
+          v-for="tab in tabs.filter(t => t.id !== 'settings')"
+          :key="tab.id"
+          class="dt-tab"
+          :class="{ active: activeTab === tab.id }"
+          @click="selectTab(tab.id)"
+        >{{ tab.shortLabel }}</button>
+      </div>
+    </nav>
 
     <div class="menu-overlay" :class="{ open: menuOpen }" @click="menuOpen = false"></div>
 
@@ -101,25 +154,26 @@ header {
   right: 0;
   z-index: 50;
   background: var(--bg);
-  padding: 0.75rem 1.5rem;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 0;
+}
+
+.header-row {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  header {
+  .header-row {
     padding: 0.35rem 1rem;
   }
   h1 {
     font-size: 1.1rem;
   }
-}
-
-.header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
 }
 
 h1 {
@@ -143,6 +197,83 @@ h1 {
   align-items: center;
   gap: 0.75rem;
   flex-shrink: 0;
+}
+
+/* Drum widget */
+.drum-widget {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0 0.5rem 0 0.55rem;
+  height: 36px;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  background: transparent;
+  transition: border-color 0.15s;
+}
+
+.drum-widget.playing {
+  border-color: var(--accent-mid);
+  background: var(--accent-bg);
+}
+
+.dw-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text4);
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.drum-widget.playing .dw-dot {
+  background: var(--accent);
+  animation: dw-pulse 1s ease-in-out infinite;
+}
+
+@keyframes dw-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+.dw-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text4);
+  transition: color 0.15s;
+}
+
+.drum-widget.playing .dw-label {
+  color: var(--accent);
+}
+
+.dw-btn {
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  flex-shrink: 0;
+  padding: 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.dw-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.drum-widget.playing .dw-btn {
+  color: var(--accent);
+  border-color: var(--accent-mid);
 }
 
 /* Settings / icon button */
@@ -196,10 +327,67 @@ main {
   padding-top: 4rem;
 }
 
+@media (min-width: 768px) {
+  main {
+    padding-top: 7rem;
+  }
+}
+
 @media (orientation: landscape) and (max-height: 500px) {
   main {
     padding-top: 2.5rem;
   }
+}
+
+/* ── Desktop tab bar ──────────────────────────────────────────────────────── */
+.desktop-tabs {
+  display: none;
+  position: fixed;
+  top: 3.75rem;
+  left: 0;
+  right: 0;
+  z-index: 49;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.dt-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.dt-inner::-webkit-scrollbar { display: none; }
+
+.dt-tab {
+  padding: 0.6rem 0.9rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text3);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.dt-tab:hover { color: var(--text2); }
+
+.dt-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+@media (min-width: 768px) {
+  .desktop-tabs { display: block; }
+  .burger-btn    { display: none; }
 }
 
 /* Overlay */
