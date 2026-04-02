@@ -38,342 +38,135 @@ function selectSoundStyle(style) {
 </script>
 
 <template>
-  <div class="settings-page">
+  <div class="card max-w-680 p-6 w-full" style="background: var(--surface)">
     <PageHeader title="Settings">
       <button class="close-btn" @click="emit('close')" aria-label="Close settings">&#x2715;</button>
     </PageHeader>
 
     <section class="settings-section">
-      <h3>Display</h3>
-      <p class="section-desc">Controls how chords and scales are shown across all tools.</p>
-      <div class="option-group">
+      <p class="text-accent text-bold text-tiny text-uppercase letter-spacing-wide mb-1">Display</p>
+      <p class="text-muted text-small mb-3">Controls how chords and scales are shown across all tools.</p>
+      <div class="flex-wrap gap-2">
         <button
           v-for="opt in DISPLAY_OPTIONS"
           :key="opt.value"
-          class="option-btn"
+          class="btn text-small"
           :class="{ active: displayMode === opt.value }"
           @click="displayMode = opt.value"
         >{{ opt.label }}</button>
       </div>
-      <p class="option-desc">{{ selectedDesc }}</p>
+      <p class="text-muted text-small mt-3" style="line-height: 1.5">{{ selectedDesc }}</p>
     </section>
 
     <section class="settings-section" v-if="displayMode === 'pad'">
-      <h3>Pad Layout</h3>
-      <p class="section-desc">Number of columns in the pad grid.</p>
-      <div class="option-group">
-        <button class="option-btn" :class="{ active: padSize === '4x3' }" @click="padSize = '4x3'">4x3 (12 pads)</button>
-        <button class="option-btn" :class="{ active: padSize === '4x4' }" @click="padSize = '4x4'">4x4 (16 pads)</button>
+      <p class="text-accent text-bold text-tiny text-uppercase letter-spacing-wide mb-1">Pad Layout</p>
+      <p class="text-muted text-small mb-3">Number of columns in the pad grid.</p>
+      <div class="flex-wrap gap-2">
+        <button class="btn text-small" :class="{ active: padSize === '4x3' }" @click="padSize = '4x3'">4x3 (12 pads)</button>
+        <button class="btn text-small" :class="{ active: padSize === '4x4' }" @click="padSize = '4x4'">4x4 (16 pads)</button>
       </div>
     </section>
 
     <section class="settings-section">
-      <h3>Audio</h3>
-      <p class="section-desc">Play sound when tapping notes, chords, and pads.</p>
-      <div class="option-group">
-        <button class="option-btn" :class="{ active: soundEnabled }" @click="soundEnabled = true">On</button>
-        <button class="option-btn" :class="{ active: !soundEnabled }" @click="soundEnabled = false">Off</button>
+      <p class="text-accent text-bold text-tiny text-uppercase letter-spacing-wide mb-1">Audio</p>
+      <p class="text-muted text-small mb-3">Play sound when tapping notes, chords, and pads.</p>
+      <div class="flex-wrap gap-2">
+        <button class="btn text-small" :class="{ active: soundEnabled }" @click="soundEnabled = true">On</button>
+        <button class="btn text-small" :class="{ active: !soundEnabled }" @click="soundEnabled = false">Off</button>
       </div>
     </section>
 
     <section class="settings-section" v-if="soundEnabled">
-      <h3>Button Sound Style</h3>
-      <p class="section-desc">Timbre used when tapping pads, keys, and tiles.</p>
-      <div class="option-group">
-        <button class="option-btn" :class="{ active: soundStyle === 'synth' }" @click="selectSoundStyle('synth')">Synth</button>
-        <button class="option-btn" :class="{ active: soundStyle === 'piano' }" @click="selectSoundStyle('piano')">Piano</button>
-        <button class="option-btn" :class="{ active: soundStyle === 'bell' }"  @click="selectSoundStyle('bell')">Bell</button>
-        <button class="option-btn" :class="{ active: soundStyle === 'pluck' }" @click="selectSoundStyle('pluck')">Pluck</button>
+      <p class="text-accent text-bold text-tiny text-uppercase letter-spacing-wide mb-1">Button Sound Style</p>
+      <p class="text-muted text-small mb-3">Timbre used when tapping pads, keys, and tiles.</p>
+      <div class="flex-wrap gap-2">
+        <button class="btn text-small" v-for="s in ['synth', 'piano', 'bell', 'pluck']" :key="s" :class="{ active: soundStyle === s }" @click="selectSoundStyle(s)">{{ s.charAt(0).toUpperCase() + s.slice(1) }}</button>
       </div>
     </section>
 
     <section class="settings-section">
-      <h3>Theme</h3>
-      <div class="option-group">
-        <button class="option-btn" :class="{ active: colorMode === 'dark' }"  @click="colorMode = 'dark'">Dark</button>
-        <button class="option-btn" :class="{ active: colorMode === 'light' }" @click="colorMode = 'light'">Light</button>
+      <p class="text-accent text-bold text-tiny text-uppercase letter-spacing-wide mb-1">Theme</p>
+      <div class="flex-wrap gap-2">
+        <button class="btn text-small" :class="{ active: colorMode === 'dark' }"  @click="colorMode = 'dark'">Dark</button>
+        <button class="btn text-small" :class="{ active: colorMode === 'light' }" @click="colorMode = 'light'">Light</button>
       </div>
     </section>
 
     <section class="settings-section">
-      <h3>Color Scheme</h3>
-      <div class="option-group">
-        <button class="option-btn" :class="{ active: colorScheme === 'none' }"     @click="colorScheme = 'none'">Neutral</button>
-        <button class="option-btn scheme-btn medieval" :class="{ active: colorScheme === 'medieval' }" @click="colorScheme = 'medieval'">Medieval</button>
-        <button class="option-btn scheme-btn ko2"      :class="{ active: colorScheme === 'ko2' }"      @click="colorScheme = 'ko2'">K.O. II</button>
-        <button class="option-btn scheme-btn riddim"   :class="{ active: colorScheme === 'riddim' }"   @click="colorScheme = 'riddim'">Riddim</button>
+      <p class="text-accent text-bold text-tiny text-uppercase letter-spacing-wide mb-1">Color Scheme</p>
+      <div class="flex-wrap gap-2">
+        <button class="btn text-small" :class="{ active: colorScheme === 'none' }" @click="colorScheme = 'none'">Neutral</button>
+        <button v-for="s in ['medieval', 'ko2', 'riddim']" :key="s" class="btn text-small flex items-center gap-2" :class="[s, { active: colorScheme === s }]" @click="colorScheme = s">
+          <span class="scheme-dot" :class="s"></span>
+          {{ s === 'ko2' ? 'K.O. II' : s.charAt(0).toUpperCase() + s.slice(1) }}
+        </button>
       </div>
     </section>
 
     <section class="settings-section" v-if="midiStatus !== 'unsupported'">
-      <h3>MIDI</h3>
-      <p class="section-desc">Connect to send chords and notes directly to any MIDI device.</p>
+      <p class="text-accent text-bold text-tiny text-uppercase letter-spacing-wide mb-1">MIDI</p>
+      <p class="text-muted text-small mb-3">Connect to send chords and notes directly to any MIDI device.</p>
 
-      <div class="midi-panel">
+      <div class="mt-1">
         <template v-if="midiStatus === 'idle'">
-          <button class="midi-connect-btn" @click="initMidi">Connect MIDI device</button>
+          <button class="btn text-small text-bold" @click="initMidi">Connect MIDI device</button>
         </template>
 
         <template v-else-if="midiStatus === 'connected'">
-          <div class="midi-connected-row">
+          <div class="flex items-center gap-3">
             <span class="midi-dot connected"></span>
-            <span class="midi-device-name">
-              <span v-if="midiOutputs.length === 1">{{ truncate(midiOutputs[0].name) }}</span>
-              <select v-else-if="midiOutputs.length > 1" v-model="selectedDevice" class="midi-select">
+            <div class="flex-1 min-w-0">
+              <span v-if="midiOutputs.length === 1" class="text-small text-muted">{{ truncate(midiOutputs[0].name) }}</span>
+              <select v-else-if="midiOutputs.length > 1" v-model="selectedDevice" class="select w-full" style="max-width: 220px">
                 <option v-for="o in midiOutputs" :key="o.id" :value="o.id">{{ truncate(o.name) }}</option>
               </select>
-            </span>
-            <button class="midi-disconnect-btn" @click="disconnectMidi">Disconnect</button>
+            </div>
+            <button class="btn text-tiny text-bold" @click="disconnectMidi">Disconnect</button>
           </div>
-          <div class="octave-row">
-            <span class="octave-label">Octave</span>
-            <button class="octave-btn" @click="octave = Math.max(0, octave - 1)">−</button>
-            <span class="octave-value">{{ octave }}</span>
-            <button class="octave-btn" @click="octave = Math.min(9, octave + 1)">+</button>
+          <div class="flex items-center gap-3 mt-4">
+            <span class="text-tiny text-bold text-dim text-uppercase letter-spacing-wide" style="min-width: 4rem">Octave</span>
+            <button class="btn p-0 flex items-center justify-center" style="width: 1.8rem; height: 1.8rem" @click="octave = Math.max(0, octave - 1)">−</button>
+            <span class="text-bold" style="min-width: 1.2rem; text-align: center">{{ octave }}</span>
+            <button class="btn p-0 flex items-center justify-center" style="width: 1.8rem; height: 1.8rem" @click="octave = Math.min(9, octave + 1)">+</button>
           </div>
         </template>
 
         <template v-else-if="midiStatus === 'error'">
-          <div class="midi-connected-row">
+          <div class="flex items-center gap-3">
             <span class="midi-dot error"></span>
-            <span class="midi-device-name muted">MIDI error</span>
-            <button class="midi-disconnect-btn" @click="disconnectMidi">Dismiss</button>
+            <span class="text-small text-dim flex-1">MIDI error</span>
+            <button class="btn text-tiny text-bold" @click="disconnectMidi">Dismiss</button>
           </div>
         </template>
       </div>
     </section>
-
   </div>
 </template>
 
 <style scoped>
-.settings-page {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 680px;
-  margin: 0 auto;
-}
-
 .close-btn {
-  background: transparent;
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  color: var(--text3);
-  font-size: 1rem;
-  line-height: 1;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  background: transparent; border: 1px solid var(--border2); border-radius: 6px;
+  color: var(--text3); font-size: 1rem; width: 30px; height: 30px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: border-color 0.12s, color 0.12s;
 }
-
 .close-btn:hover { border-color: var(--accent); color: var(--text); }
 
-.settings-section {
-  padding: 1.25rem 0;
-  border-top: 1px solid var(--border);
-}
+.settings-section { padding: 1.25rem 0; border-top: 1px solid var(--border); }
 
-.settings-section h3 {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.5rem;
-}
+.scheme-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.2); }
+.scheme-dot.medieval { background: #d4b84c; }
+.scheme-dot.ko2      { background: #e05c20; }
+.scheme-dot.riddim   { background: #28be70; }
 
-.section-desc {
-  font-size: 0.82rem;
-  color: var(--text3);
-  line-height: 1.5;
-  margin-bottom: 0.85rem;
-}
-
-.option-group {
-  display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-}
-
-.option-btn {
-  padding: 0.35rem 0.9rem;
-  border-radius: 6px;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  color: var(--text2);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-}
-
-.option-btn:hover  { border-color: var(--accent); color: var(--text); }
-.option-btn.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-
-.scheme-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.scheme-btn::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-}
-
-.scheme-btn.medieval::before { background: #d4b84c; }
-.scheme-btn.ko2::before      { background: #e05c20; }
-.scheme-btn.riddim::before   { background: #28be70; }
-
-.scheme-btn.active::before { opacity: 0.7; }
-
-.option-desc {
-  margin-top: 0.65rem;
-  font-size: 0.82rem;
-  color: var(--text3);
-  line-height: 1.5;
-}
-
-/* MIDI */
-.midi-panel {
-  margin-top: 0.25rem;
-}
-
-.midi-connect-btn {
-  padding: 0.45rem 1.1rem;
-  border-radius: 6px;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  color: var(--text2);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-}
-
-.midi-connect-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-.midi-connected-row {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.midi-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
+.midi-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .midi-dot.connected { background: var(--midi-ok); }
 .midi-dot.error     { background: var(--midi-err); }
 
-.midi-device-name {
-  font-size: 0.85rem;
-  color: var(--text2);
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.midi-device-name.muted { color: var(--text4); }
-
-.midi-select {
-  background: var(--input);
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  color: var(--text);
-  padding: 0.2rem 0.5rem;
-  font-size: 0.82rem;
-  cursor: pointer;
-  outline: none;
-  max-width: 220px;
-}
-
-.midi-select:focus { border-color: var(--accent); }
-
-.midi-disconnect-btn {
-  padding: 0.3rem 0.7rem;
-  border-radius: 5px;
-  border: 1px solid var(--border2);
-  background: transparent;
-  color: var(--text3);
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: border-color 0.12s, color 0.12s;
-}
-
-.midi-disconnect-btn:hover { border-color: var(--accent); color: var(--text); }
-
-.octave-row {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-top: 0.75rem;
-}
-
-.octave-label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  min-width: 4rem;
-}
-
-.octave-btn {
-  width: 1.8rem;
-  height: 1.8rem;
-  border: 1px solid var(--border2);
-  border-radius: 5px;
-  background: var(--input);
-  color: var(--accent);
-  font-size: 1rem;
-  cursor: pointer;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.12s, border-color 0.12s;
-}
-
-.octave-btn:hover { background: var(--accent-bg); border-color: var(--accent); }
-
-.octave-value {
-  min-width: 1.2rem;
-  text-align: center;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
 @media (max-width: 600px) {
-  .settings-page {
-    padding: 1.25rem 1rem;
-  }
+  .p-6 { padding: 1.25rem 1rem !important; }
 }
-
 @media (orientation: landscape) and (max-height: 500px) {
-  .settings-page {
-    padding: 0.75rem 1rem;
-  }
-
+  .p-6 { padding: 0.75rem 1rem !important; }
 }
 </style>

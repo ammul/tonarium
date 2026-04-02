@@ -118,31 +118,31 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 </script>
 
 <template>
-  <div class="jam-mode">
+  <div class="card w-full" style="background: var(--surface)">
     <PageHeader title="Jam Mode" :subtitle="subtitle" />
 
-    <div class="controls">
-      <div class="control-group">
-        <label>Key</label>
+    <div class="flex-col gap-4 my-6" style="margin: 1.5rem 0">
+      <div class="flex items-center gap-4 mobile-flex-col items-start">
+        <label class="text-accent text-bold text-tiny text-uppercase letter-spacing-wide" style="min-width: 5rem">Key</label>
         <RootNotePicker v-model="selectedRoot" />
       </div>
 
-      <div class="control-group">
-        <label>Scale</label>
-        <div class="scale-select-row">
-          <select v-model="selectedScaleId" @change="showInfo = false">
+      <div class="flex items-center gap-4 mobile-flex-col items-start">
+        <label class="text-accent text-bold text-tiny text-uppercase letter-spacing-wide" style="min-width: 5rem">Scale</label>
+        <div class="flex items-center gap-2 flex-wrap">
+          <select v-model="selectedScaleId" class="select" style="padding: 0.4rem 0.8rem; font-size: 0.9rem" @change="showInfo = false">
             <option v-for="s in SCALES" :key="s.id" :value="s.id">{{ s.label }}</option>
           </select>
-          <button class="info-btn" :class="{ active: showInfo }" @click="showInfo = !showInfo" aria-label="Scale info">i</button>
+          <button class="bubble" :class="{ active: showInfo }" style="font-style: italic; cursor: pointer" @click="showInfo = !showInfo" aria-label="Scale info">i</button>
         </div>
-        <p v-if="showInfo" class="scale-info">{{ selectedScale.description }}</p>
+        <p v-if="showInfo" class="card p-3 text-small text-muted w-full" style="border-left: 3px solid var(--accent)">{{ selectedScale.description }}</p>
       </div>
     </div>
 
     <ModeLayout>
       <template #pad>
-        <div class="grid">
-          <div class="row" v-for="(row, ri) in rows" :key="ri" :style="{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
+        <div class="flex-col gap-2 max-w-680" style="max-width: 420px; margin: 0 auto">
+          <div class="row" v-for="(row, ri) in rows" :key="ri" :style="{ display: 'grid', gap: '0.6rem', gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
             <div
               v-for="pad in row"
               :key="pad.number"
@@ -168,7 +168,7 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
       </template>
 
       <template #notes>
-        <div class="chroma-strip">
+        <div class="flex-wrap gap-2 mb-2">
           <div
             v-for="tile in chromaTiles"
             :key="tile.note"
@@ -202,19 +202,16 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
       </template>
 
       <template #guitar>
-        <div class="guitar-neck-wrap">
-          <div class="guitar-neck">
-            <div v-for="(string, si) in guitarNeck" :key="si" class="neck-row">
-              <div class="string-name">{{ string.name }}</div>
+        <div class="overflow-x-auto mb-2">
+          <div class="flex-col min-w-380" style="min-width: 380px">
+            <div v-for="(string, si) in guitarNeck" :key="si" class="flex items-center" style="border-bottom: 1px solid var(--border3)">
+              <div class="text-tiny text-dim text-bold text-right pr-2" style="width: 1.8rem; padding-right: 0.5rem">{{ string.name }}</div>
               <div
                 v-for="cell in string.cells"
                 :key="cell.fret"
-                class="neck-cell"
-                :class="{
-                  active: cell.isActive,
-                  root:   cell.isRoot,
-                  open:   cell.isOpen,
-                }"
+                class="flex-1 flex items-center justify-center relative pointer-events-auto cursor-pointer"
+                style="height: 2rem; border-right: 1px solid var(--border3)"
+                :style="cell.isOpen ? { borderRightWidth: '3px', borderRightColor: 'var(--border2)' } : {}"
                 @pointerdown.prevent="onCellDown(string.stringIdx, cell.fret)"
                 @pointerup="onCellUp(string.stringIdx, cell.fret)"
                 @pointerleave="onCellUp(string.stringIdx, cell.fret)"
@@ -227,9 +224,9 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
                 ></span>
               </div>
             </div>
-            <div class="fret-numbers">
-              <div class="string-name-spacer"></div>
-              <div v-for="f in FRET_COUNT + 1" :key="f" class="fret-num">
+            <div class="flex items-center mt-1">
+              <div style="width: 1.8rem"></div>
+              <div v-for="f in FRET_COUNT + 1" :key="f" class="flex-1 text-center text-tiny text-dim">
                 {{ f - 1 === 0 ? '' : f - 1 }}
               </div>
             </div>
@@ -240,133 +237,27 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 
     <ScaleLegend />
 
-    <div class="scale-notes">
-      <span class="scale-label">Notes</span>
+    <div class="flex items-center gap-2 mt-3 flex-wrap">
+      <span class="text-tiny text-dim text-bold text-uppercase letter-spacing-wide mr-1">Notes</span>
       <span
         v-for="n in scaleNotes"
         :key="n.note"
-        class="scale-note"
-        :class="{ root: n.isRoot, anchor: n.isAnchor && !n.isRoot }"
+        class="chip text-small text-bold"
+        :style="n.isRoot ? { background: 'var(--rust-bg)', borderColor: 'var(--rust)', color: 'var(--rust-hi)' } : (n.isAnchor ? { background: 'var(--accent-bg)', borderColor: 'var(--accent-mid)', color: 'var(--accent)' } : {})"
       >{{ n.note }}</span>
     </div>
   </div>
 </template>
 
 <style scoped>
-.jam-mode {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
-}
-
-.controls {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  margin: 1.5rem 0;
-}
-
-.control-group {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.control-group label {
-  font-weight: 600;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.8rem;
-  min-width: 5rem;
-}
-
-
-.scale-select-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.info-btn {
-  width: 1.6rem;
-  height: 1.6rem;
-  border-radius: 50%;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  color: var(--text3);
-  font-size: 0.8rem;
-  font-style: italic;
-  font-weight: 700;
-  cursor: pointer;
-  line-height: 1;
-  flex-shrink: 0;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-}
-
-.info-btn:hover  { border-color: var(--accent); color: var(--text); }
-.info-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
-
-.scale-info {
-  margin-top: 0.6rem;
-  padding: 0.65rem 0.85rem;
-  background: var(--input);
-  border: 1px solid var(--border2);
-  border-left: 3px solid var(--accent);
-  border-radius: 6px;
-  font-size: 0.82rem;
-  color: var(--text2);
-  line-height: 1.55;
-  width: 100%;
-}
-
-select {
-  background: var(--input);
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  color: var(--text);
-  padding: 0.4rem 0.8rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  outline: none;
-  max-width: 100%;
-}
-
-select:focus { border-color: var(--accent); }
-
-/* Pad grid */
-.grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  max-width: 420px;
-  margin: 0 auto;
-}
-
-.row {
-  display: grid;
-  gap: 0.6rem;
-}
+.bubble.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
 
 .pad {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.15rem;
-  padding: 0.75rem 0.5rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  aspect-ratio: 1;
-  transition: background 0.15s, border-color 0.15s;
-  user-select: none;
-  touch-action: none;
-  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.15rem; padding: 0.75rem 0.5rem; border-radius: 8px; border: 1px solid var(--border);
+  aspect-ratio: 1; transition: background 0.15s, border-color 0.15s;
+  user-select: none; touch-action: none; cursor: pointer;
 }
-
 .pad.inactive { background: var(--bg); opacity: 0.35; }
 .pad.active   { background: var(--raised); border-color: var(--border2); }
 .pad.anchor   { background: var(--accent-bg); border-color: var(--accent-mid); }
@@ -383,28 +274,11 @@ select:focus { border-color: var(--accent); }
 .pad.root     .pad-note { color: var(--rust-hi); }
 .pad.pressed  .pad-note { color: var(--accent); }
 
-/* Notes mode */
-.chroma-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
 .chroma-tile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.2rem;
-  height: 3.2rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  transition: background 0.15s, border-color 0.15s;
-  user-select: none;
-  touch-action: none;
-  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  width: 3.2rem; height: 3.2rem; border-radius: 8px; border: 1px solid var(--border);
+  transition: background 0.15s, border-color 0.15s; user-select: none; touch-action: none; cursor: pointer;
 }
-
 .chroma-tile.inactive { background: transparent; border-color: transparent; opacity: 0.4; }
 .chroma-tile.active   { background: var(--raised); border-color: var(--border2); }
 .chroma-tile.anchor   { background: var(--accent-bg); border-color: var(--accent-mid); }
@@ -412,179 +286,21 @@ select:focus { border-color: var(--accent); }
 .chroma-tile.pressed  { background: var(--accent-bg); border-color: var(--accent); opacity: 1; }
 
 .tile-note { font-size: 1.1rem; font-weight: 700; line-height: 1; }
-
 .chroma-tile.inactive .tile-note { color: var(--text5); }
 .chroma-tile.active   .tile-note { color: var(--text2); }
 .chroma-tile.anchor   .tile-note { color: var(--accent); }
 .chroma-tile.root     .tile-note { color: var(--rust-hi); }
 .chroma-tile.pressed  .tile-note { color: var(--accent); }
 
-/* Guitar neck */
-.guitar-neck-wrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin-bottom: 0.5rem;
-}
-
-.guitar-neck {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  min-width: 380px;
-}
-
-.neck-row {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid var(--border3);
-}
-
-.string-name {
-  width: 1.8rem;
-  font-size: 0.7rem;
-  color: var(--text4);
-  font-weight: 600;
-  text-align: right;
-  padding-right: 0.5rem;
-  flex-shrink: 0;
-}
-
-.neck-cell {
-  flex: 1;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-right: 1px solid var(--border3);
-  position: relative;
-  user-select: none;
-  touch-action: pan-x;
-  cursor: pointer;
-}
-
-.neck-cell.open {
-  border-right: 3px solid var(--border2);
-}
-
-.neck-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--text3);
-  display: block;
-}
-
-.neck-dot.anchor {
-  background: var(--accent-lo);
-}
-
-.neck-dot.root {
-  background: var(--dot-root);
-  box-shadow: 0 0 4px var(--rust-glow);
-}
-
-.fret-numbers {
-  display: flex;
-  align-items: center;
-  margin-top: 0.3rem;
-}
-
-.string-name-spacer {
-  width: 1.8rem;
-  flex-shrink: 0;
-}
-
-.fret-num {
-  flex: 1;
-  font-size: 0.6rem;
-  color: var(--text5);
-  text-align: center;
-}
-
-
-/* Scale notes strip */
-.scale-notes {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.scale-label {
-  font-size: 0.75rem;
-  color: var(--text4);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-right: 0.25rem;
-}
-
-.scale-note {
-  padding: 0.25rem 0.6rem;
-  border-radius: 4px;
-  background: var(--raised);
-  border: 1px solid var(--border2);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text2);
-}
-
-.scale-note.anchor {
-  background: var(--accent-bg);
-  border-color: var(--accent-mid);
-  color: var(--accent);
-}
-
-.scale-note.root {
-  background: var(--rust-bg);
-  border-color: var(--rust);
-  color: var(--rust-hi);
-}
+.neck-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--text3); display: block; }
+.neck-dot.anchor { background: var(--accent-lo); }
+.neck-dot.root { background: var(--dot-root); box-shadow: 0 0 4px var(--rust-glow); }
 
 @media (max-width: 600px) {
-  .jam-mode {
-    padding: 1.25rem 1rem;
-  }
-
-  .control-group {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .control-group label {
-    min-width: unset;
-  }
-
-  .pad-note {
-    font-size: 1.2rem;
-  }
+  .p-6 { padding: 1.25rem 1rem !important; }
+  .pad-note { font-size: 1.2rem; }
 }
-
 @media (orientation: landscape) and (max-height: 500px) {
-  .jam-mode {
-    padding: 0.75rem 1rem;
-  }
-
-  .controls {
-    margin: 0.5rem 0;
-    gap: 0.5rem;
-  }
-
-  .control-group {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: nowrap;
-  }
-
-  .control-group label {
-    min-width: unset;
-    white-space: nowrap;
-  }
-
-  .scale-notes {
-    margin-top: 0.5rem;
-  }
+  .p-6 { padding: 0.75rem 1rem !important; }
 }
 </style>
