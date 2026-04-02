@@ -34,14 +34,14 @@ beforeEach(() => {
   // Reset state
   bpm.value = 120
   isPlaying.value = false
-  pattern.value = Array.from({ length: 8 }, () => new Array(16).fill(false))
+  pattern.value = Array.from({ length: 9 }, () => new Array(16).fill(false))
 })
 
 describe('DrumComputer', () => {
-  it('renders 8 instrument rows', () => {
+  it('renders 9 instrument rows', () => {
     const wrapper = mount(DrumComputer)
     const rows = wrapper.findAll('.inst-row')
-    expect(rows).toHaveLength(8)
+    expect(rows).toHaveLength(9)
   })
 
   it('renders 16 step buttons per instrument row', () => {

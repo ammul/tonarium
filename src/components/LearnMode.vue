@@ -235,6 +235,51 @@ function pickProgRoot(i) {
 // ── Step 4: Chords ───────────────────────────────────────────────────────────
 const chordsRoot = ref(0)
 
+// ── Step 5: Improvising ──────────────────────────────────────────────────────
+const improvChordIdx = ref(0)
+
+const IMPROV_EXAMPLES = [
+  {
+    chordSemi: [0, 4, 7],
+    goodNotes: [
+      { semi: 2,  name: 'D',  why: 'Major 2nd — stepwise, bright' },
+      { semi: 9,  name: 'A',  why: 'Major 6th — warm, uplifting' },
+    ],
+    badNotes: [
+      { semi: 1,  name: 'C#', why: 'Minor 2nd — clashes immediately' },
+      { semi: 3,  name: 'Eb', why: 'Minor 3rd — fights the major sound' },
+    ],
+  },
+  {
+    chordSemi: [0, 3, 7],
+    goodNotes: [
+      { semi: 3,  name: 'Eb', why: 'Minor 3rd — chord tone, dark' },
+      { semi: 10, name: 'Bb', why: 'Minor 7th — Dorian/natural minor' },
+    ],
+    badNotes: [
+      { semi: 4,  name: 'E',  why: 'Major 3rd — fights the minor 3rd' },
+      { semi: 11, name: 'B',  why: 'Major 7th — ugly clash with Bb' },
+    ],
+  },
+  {
+    chordSemi: [0, 4, 7, 10],
+    goodNotes: [
+      { semi: 10, name: 'Bb', why: 'Minor 7th — the defining note' },
+      { semi: 5,  name: 'F',  why: 'Perfect 4th — Mixolydian home' },
+    ],
+    badNotes: [
+      { semi: 11, name: 'B',  why: 'Major 7th — contradicts the ♭7' },
+      { semi: 6,  name: 'F#', why: 'Tritone — maximum tension' },
+    ],
+  },
+]
+
+function playImprovExample(chordSemis, noteSemi) {
+  const root = 60
+  playChord(chordSemis.map(s => root + s), 2.5)
+  setTimeout(() => playNote(root + noteSemi, 2.0), 500)
+}
+
 function chordLabel(rootC, di) {
   const semi = (rootC + MAJOR_SCALE[di]) % 12
   const suf  = DIA_TYPES[di] === 'maj' ? '' : DIA_TYPES[di] === 'min' ? 'm' : '°'
@@ -281,10 +326,10 @@ const progActiveDeg = computed(() =>
 
 // ── Step 5: Beats ────────────────────────────────────────────────────────────
 const loadedPattern = ref(null)
-const BEAT_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 2 }
+const BEAT_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }
 
 function buildDrumPattern(pi) {
-  const newPattern = Array.from({ length: 8 }, () => new Array(16).fill(false))
+  const newPattern = Array.from({ length: 9 }, () => new Array(16).fill(false))
   for (const row of BEAT_PATTERNS[pi].rows) {
     const instIdx = BEAT_INST_MAP[row.name]
     if (instIdx !== undefined) newPattern[instIdx] = row.steps.map(s => s === 1)
@@ -632,6 +677,48 @@ onUnmounted(() => {
         <div class="tip">
           <span class="tip-num">3</span>
           <span><strong>Rhythm beats note choice.</strong> One confident two-note groove sounds better than a hundred random pitches.</span>
+        </div>
+      </div>
+
+      <div class="improv-examples">
+        <div class="ie-header">
+          <span class="ie-title">Hear the difference</span>
+          <span class="ie-subtitle">Chord plays first, then the note — all in C</span>
+        </div>
+        <div class="ie-chord-picker">
+          <button
+            v-for="(ct, i) in CHORD_TYPES"
+            :key="ct.chord"
+            class="ie-chord-btn"
+            :class="{ active: improvChordIdx === i }"
+            @click="improvChordIdx = i"
+          >{{ ct.chord }}</button>
+        </div>
+        <div class="ie-columns">
+          <div class="ie-col">
+            <div class="ie-col-label good">Works well</div>
+            <button
+              v-for="n in IMPROV_EXAMPLES[improvChordIdx].goodNotes"
+              :key="n.semi"
+              class="ie-note-btn good"
+              @pointerdown.prevent="playImprovExample(IMPROV_EXAMPLES[improvChordIdx].chordSemi, n.semi)"
+            >
+              <span class="ie-note-name">{{ n.name }}</span>
+              <span class="ie-note-why">{{ n.why }}</span>
+            </button>
+          </div>
+          <div class="ie-col">
+            <div class="ie-col-label bad">Clashes</div>
+            <button
+              v-for="n in IMPROV_EXAMPLES[improvChordIdx].badNotes"
+              :key="n.semi"
+              class="ie-note-btn bad"
+              @pointerdown.prevent="playImprovExample(IMPROV_EXAMPLES[improvChordIdx].chordSemi, n.semi)"
+            >
+              <span class="ie-note-name">{{ n.name }}</span>
+              <span class="ie-note-why">{{ n.why }}</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1562,6 +1649,117 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   margin-top: 0.1rem;
+}
+
+/* ── Improv examples ──────────────────────────────────────────────────────── */
+.improv-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.ie-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.ie-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text2);
+}
+
+.ie-subtitle {
+  font-size: 0.78rem;
+  color: var(--text4);
+}
+
+.ie-chord-picker {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.ie-chord-btn {
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text3);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.ie-chord-btn:hover  { border-color: var(--accent-mid); color: var(--text2); }
+.ie-chord-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+
+.ie-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.ie-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ie-col-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding-bottom: 0.25rem;
+}
+
+.ie-col-label.good { color: #7aad6e; }
+.ie-col-label.bad  { color: #c07070; }
+
+.ie-note-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 7px;
+  border: 1px solid var(--border2);
+  background: var(--input);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.ie-note-btn:hover { background: var(--surface); }
+
+.ie-note-btn.good { border-left: 3px solid #4e8a44; }
+.ie-note-btn.bad  { border-left: 3px solid #8a4444; }
+
+.ie-note-btn.good:hover { border-color: #7aad6e; border-left-color: #7aad6e; }
+.ie-note-btn.bad:hover  { border-color: #c07070; border-left-color: #c07070; }
+
+.ie-note-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ie-note-why {
+  font-size: 0.74rem;
+  color: var(--text4);
+  line-height: 1.3;
 }
 
 .improv-cta {

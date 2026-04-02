@@ -1,11 +1,11 @@
 import { ref } from 'vue'
 
 export const INSTRUMENTS = [
-  'Kick', 'Snare', 'Hi-Hat Closed', 'Hi-Hat Open',
+  'Kick', 'Snare', 'Clap', 'Hi-Hat Closed', 'Hi-Hat Open',
   'High Tom', 'Mid Tom', 'Floor Tom', 'Crash',
 ]
 
-export const pattern     = ref(Array.from({ length: 8 }, () => new Array(16).fill(false)))
+export const pattern     = ref(Array.from({ length: 9 }, () => new Array(16).fill(false)))
 export const bpm         = ref(120)
 export const isPlaying   = ref(false)
 export const currentStep = ref(0)
@@ -112,6 +112,26 @@ function playTom(ctx, when, freqStart, freqEnd, dur) {
   osc.stop(when + dur)
 }
 
+function playClap(ctx, when) {
+  for (let i = 0; i < 2; i++) {
+    const t      = when + i * 0.012
+    const noise  = ctx.createBufferSource()
+    noise.buffer = getNoiseBuffer(ctx)
+    const bpf    = ctx.createBiquadFilter()
+    bpf.type     = 'bandpass'
+    bpf.frequency.value = 1100
+    bpf.Q.value  = 0.7
+    const gain   = ctx.createGain()
+    gain.gain.setValueAtTime(0.65, t)
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07)
+    noise.connect(bpf)
+    bpf.connect(gain)
+    gain.connect(ctx.destination)
+    noise.start(t)
+    noise.stop(t + 0.08)
+  }
+}
+
 function playCrash(ctx, when) {
   const noise  = ctx.createBufferSource()
   noise.buffer = getNoiseBuffer(ctx)
@@ -132,6 +152,7 @@ function playCrash(ctx, when) {
 const PLAY_FNS = [
   playKick,
   playSnare,
+  playClap,
   playHiHatClosed,
   playHiHatOpen,
   (ctx, when) => playTom(ctx, when, 200, 80, 0.2),
@@ -152,7 +173,7 @@ function _tick() {
 
   while (_nextStepTime < ctx.currentTime + LOOKAHEAD) {
     const step = currentStep.value
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < INSTRUMENTS.length; i++) {
       if (pattern.value[i][step]) PLAY_FNS[i](ctx, _nextStepTime)
     }
     currentStep.value = (step + 1) % 16
@@ -178,7 +199,7 @@ export function pause() {
 }
 
 export function clearPattern() {
-  pattern.value = Array.from({ length: 8 }, () => new Array(16).fill(false))
+  pattern.value = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
 }
 
 export function toggleCell(inst, step) {

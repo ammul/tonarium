@@ -277,16 +277,16 @@ describe('Step 7: Beats', () => {
     expect(drumPattern.value[0][4]).toBe(false)  // no kick on beat 2
     expect(drumPattern.value[1][4]).toBe(true)   // snare beat 2
     expect(drumPattern.value[1][12]).toBe(true)  // snare beat 4
-    expect(drumPattern.value[2][0]).toBe(true)   // hi-hat on
-    expect(drumPattern.value[2][1]).toBe(false)  // hi-hat off
-    expect(drumPattern.value[2][2]).toBe(true)   // hi-hat on
+    expect(drumPattern.value[3][0]).toBe(true)   // hi-hat on
+    expect(drumPattern.value[3][1]).toBe(false)  // hi-hat off
+    expect(drumPattern.value[3][2]).toBe(true)   // hi-hat on
   })
 
-  it('rows 3–7 are all silent in built drum pattern', async () => {
+  it('rows 4–8 are all silent in built drum pattern', async () => {
     const wrapper = mount(LearnMode)
     await goToBeats(wrapper)
     await wrapper.findAll('.bp-play-btn')[0].trigger('click')
-    for (let r = 3; r < 8; r++) {
+    for (let r = 4; r < 9; r++) {
       expect(drumPattern.value[r].every(s => s === false)).toBe(true)
     }
   })
