@@ -11,6 +11,7 @@ import JamMode from './components/JamMode.vue'
 import LearnMode from './components/LearnMode.vue'
 import SettingsPage from './components/SettingsPage.vue'
 import DrumComputer from './components/DrumComputer.vue'
+import AboutPage from './components/AboutPage.vue'
 
 const allTabs = [
   { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: StartPage },
@@ -21,6 +22,7 @@ const allTabs = [
   { id: 'chord-detector', label: 'Chord Detector',      shortLabel: 'Detector',     component: ChordDetector },
   { id: 'prog-builder',   label: 'Progression Builder', shortLabel: 'Builder',      component: ProgressionBuilder },
   { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer },
+  { id: 'about',          label: 'About',               shortLabel: 'About',        component: AboutPage },
   { id: 'settings',       label: 'Settings',            shortLabel: 'Settings',     component: SettingsPage },
 ]
 
