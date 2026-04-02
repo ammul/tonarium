@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { playNote, playChord } from '../audioEngine.js'
+import { ref, computed, watch, onUnmounted } from 'vue'
+import { playNote, playChord, stopAllNotes } from '../audioEngine.js'
+import { pattern as drumPattern, play as drumPlay, pause as drumPause, isPlaying as drumIsPlaying } from '../drumEngine.js'
 
 const emit = defineEmits(['navigate'])
 
@@ -104,21 +105,35 @@ const fromIdx = ref(null)
 const toIdx   = ref(null)
 
 function pickNote(i) {
-  playNote(60 + i)
   if (fromIdx.value === null) {
     fromIdx.value = i
+    playNote(60 + i)
   } else if (toIdx.value === null && i !== fromIdx.value) {
     toIdx.value = i
+    playChord([60 + fromIdx.value, 60 + i])
   } else {
     fromIdx.value = i
     toIdx.value   = null
+    playNote(60 + i)
   }
 }
 
+const selectedRefSemi = ref(null)
+
+function pickRefInterval(semi) {
+  selectedRefSemi.value = selectedRefSemi.value === semi ? null : semi
+  if (selectedRefSemi.value !== null) playChord([60, 60 + semi])
+}
+
 const intervalInfo = computed(() => {
-  if (fromIdx.value === null || toIdx.value === null) return null
-  const semi = ((toIdx.value - fromIdx.value) + 12) % 12
-  return INTERVALS.find(iv => iv.semi === semi) ?? null
+  if (fromIdx.value !== null && toIdx.value !== null) {
+    const semi = ((toIdx.value - fromIdx.value) + 12) % 12
+    return INTERVALS.find(iv => iv.semi === semi) ?? null
+  }
+  if (selectedRefSemi.value !== null) {
+    return INTERVALS.find(iv => iv.semi === selectedRefSemi.value) ?? null
+  }
+  return null
 })
 
 // ── Step 2: Scales ───────────────────────────────────────────────────────────
@@ -129,17 +144,28 @@ const scaleNotes = computed(() =>
   SCALES[scaleIdx.value].steps.map(s => (scaleRoot.value + s) % 12)
 )
 
+const scaleFullName = computed(() =>
+  `${CHROMATIC[scaleRoot.value]} ${SCALES[scaleIdx.value].name}`
+)
+
+let _scaleTimers = []
+
 function pickScaleRoot(i) {
+  _scaleTimers.forEach(clearTimeout)
+  _scaleTimers = []
+  stopAllNotes()
   scaleRoot.value = i
   playNote(60 + i)
 }
 
 function playScale() {
+  _scaleTimers.forEach(clearTimeout)
+  _scaleTimers = []
   const { steps } = SCALES[scaleIdx.value]
   steps.forEach((s, i) =>
-    setTimeout(() => playNote(60 + scaleRoot.value + s, 0.5), i * 190)
+    _scaleTimers.push(setTimeout(() => playNote(60 + scaleRoot.value + s, 0.5), i * 280))
   )
-  setTimeout(() => playNote(72 + scaleRoot.value, 0.8), steps.length * 190)
+  _scaleTimers.push(setTimeout(() => playNote(72 + scaleRoot.value, 0.8), steps.length * 280))
 }
 
 // ── Step 3: Progressions ─────────────────────────────────────────────────────
@@ -177,6 +203,34 @@ function tapProg(pi) {
 const activeDegrees = computed(() =>
   activeProg.value === null ? new Set() : new Set(PROGS[activeProg.value].degIdx)
 )
+
+// ── Step 5: Beats ────────────────────────────────────────────────────────────
+const loadedPattern = ref(null)
+const BEAT_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 2 }
+
+function loadBeat(pi) {
+  if (drumIsPlaying.value) drumPause()
+  if (loadedPattern.value === pi) {
+    loadedPattern.value = null
+    return
+  }
+  const newPattern = Array.from({ length: 8 }, () => new Array(16).fill(false))
+  for (const row of BEAT_PATTERNS[pi].rows) {
+    const instIdx = BEAT_INST_MAP[row.name]
+    if (instIdx !== undefined) newPattern[instIdx] = row.steps.map(s => s === 1)
+  }
+  drumPattern.value = newPattern
+  loadedPattern.value = pi
+  drumPlay()
+}
+
+watch(step, (newStep, oldStep) => {
+  if (oldStep === 4 && drumIsPlaying.value) drumPause()
+})
+
+onUnmounted(() => {
+  if (drumIsPlaying.value) drumPause()
+})
 </script>
 
 <template>
@@ -219,7 +273,7 @@ const activeDegrees = computed(() =>
           <div class="iv-name">{{ intervalInfo.name }}</div>
           <div class="iv-semi">{{ intervalInfo.semi }} semitone{{ intervalInfo.semi !== 1 ? 's' : '' }}</div>
           <div class="iv-feel">{{ intervalInfo.feel }}</div>
-          <div class="iv-path">
+          <div v-if="fromIdx !== null && toIdx !== null" class="iv-path">
             {{ CHROMATIC[fromIdx] }} → {{ CHROMATIC[toIdx] }}
           </div>
         </template>
@@ -233,20 +287,25 @@ const activeDegrees = computed(() =>
       </div>
 
       <div class="iv-reference">
-        <div class="ref-label">All intervals from root</div>
+        <div class="ref-label">All intervals from root — tap to hear</div>
         <div class="ref-grid">
           <div v-for="iv in INTERVALS" :key="iv.semi" class="ref-item"
-            :class="{ highlight: intervalInfo && intervalInfo.semi === iv.semi }">
+            :class="{ highlight: intervalInfo && intervalInfo.semi === iv.semi }"
+            @click="pickRefInterval(iv.semi)">
             <span class="ref-semi">{{ iv.semi }}</span>
             <span class="ref-name">{{ iv.name }}</span>
           </div>
         </div>
       </div>
+
+      <div class="step-bridge">
+        Three intervals matter most: <strong>Minor 3rd</strong> (3 semitones), <strong>Major 3rd</strong> (4), and <strong>Perfect 5th</strong> (7). Stack a 3rd and a 5th above any root and you have a <strong>chord</strong>. Stack several chords in a row and you have a <strong>progression</strong>.
+      </div>
     </div>
 
     <!-- ── Step 2: Scales ────────────────────────────────────────────────── -->
     <div v-if="step === 1" class="step-content">
-      <p class="step-intro">A <strong>scale</strong> is a set of notes that all sound good together. Pick a root, choose a scale - hear which notes light up.</p>
+      <p class="step-intro">A <strong>scale</strong> is a fixed pattern of intervals repeating from a root. The Major scale uses the same intervals every time — that's why it always sounds the same no matter which root you pick. Pick a root, choose a scale, hear which notes light up.</p>
 
       <div class="picker-row">
         <span class="picker-label">Root</span>
@@ -289,6 +348,7 @@ const activeDegrees = computed(() =>
       </div>
 
       <div class="scale-meta">
+        <span class="scale-name">{{ scaleFullName }}</span>
         <span class="scale-feel">{{ SCALES[scaleIdx].feel }}</span>
         <button class="play-scale-btn" @click="playScale">Play scale</button>
       </div>
@@ -296,7 +356,7 @@ const activeDegrees = computed(() =>
 
     <!-- ── Step 3: Progressions ──────────────────────────────────────────── -->
     <div v-if="step === 2" class="step-content">
-      <p class="step-intro">Chords are labelled with <strong>Roman numerals</strong> based on the scale they come from. Tap any chord to hear it, or tap a progression to play it.</p>
+      <p class="step-intro">Chords are labelled with <strong>Roman numerals</strong> based on the scale they come from — every chord in a key uses only notes from that key's scale. That's why they all sound good together. Tap any chord to hear it, or tap a progression to play it.</p>
 
       <div class="picker-row">
         <span class="picker-label">Key</span>
@@ -306,7 +366,7 @@ const activeDegrees = computed(() =>
             :key="i"
             class="note-pill"
             :class="{ sharp: IS_SHARP.has(i), from: progRoot === i }"
-            @pointerdown.prevent="progRoot = i; activeProg = null; playNote(60 + i)"
+            @pointerdown.prevent="stopAllNotes(); progRoot = i; activeProg = null; playNote(60 + i)"
           >{{ note }}</button>
         </div>
       </div>
@@ -402,9 +462,16 @@ const activeDegrees = computed(() =>
       <p class="step-intro">A good beat is built from three layers: <strong>kick</strong>, <strong>snare</strong>, and <strong>hi-hat</strong>. Each has a job. Together they create rhythm that makes people move.</p>
 
       <div class="beat-patterns">
-        <div v-for="pattern in BEAT_PATTERNS" :key="pattern.name" class="beat-pattern">
+        <div v-for="(pattern, pi) in BEAT_PATTERNS" :key="pattern.name" class="beat-pattern">
           <div class="bp-header">
-            <span class="bp-name">{{ pattern.name }}</span>
+            <div class="bp-header-top">
+              <span class="bp-name">{{ pattern.name }}</span>
+              <button
+                class="bp-play-btn"
+                :class="{ active: loadedPattern === pi && drumIsPlaying }"
+                @click="loadBeat(pi)"
+              >{{ loadedPattern === pi && drumIsPlaying ? 'Stop' : 'Play' }}</button>
+            </div>
             <span class="bp-desc">{{ pattern.desc }}</span>
           </div>
           <div class="bp-grid">
@@ -669,7 +736,13 @@ const activeDegrees = computed(() =>
   border: 1px solid var(--border);
   background: var(--input);
   font-size: 0.75rem;
-  transition: border-color 0.15s;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ref-item:hover {
+  background: var(--raised);
+  border-color: var(--border2);
 }
 
 .ref-item.highlight {
@@ -690,6 +763,22 @@ const activeDegrees = computed(() =>
 
 .ref-item.highlight .ref-semi { color: var(--accent); }
 .ref-item.highlight .ref-name { color: var(--text2); }
+
+/* ── Step bridge ──────────────────────────────────────────────────────────── */
+.step-bridge {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--raised);
+  font-size: 0.84rem;
+  color: var(--text3);
+  line-height: 1.6;
+}
+
+.step-bridge strong {
+  color: var(--accent);
+  font-weight: 600;
+}
 
 /* ── Picker row ───────────────────────────────────────────────────────────── */
 .picker-row {
@@ -781,6 +870,13 @@ const activeDegrees = computed(() =>
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
+}
+
+.scale-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
 }
 
 .scale-feel {
@@ -1097,6 +1193,38 @@ const activeDegrees = computed(() =>
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+}
+
+.bp-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.bp-play-btn {
+  padding: 0.3rem 0.8rem;
+  border-radius: 5px;
+  border: 1px solid var(--accent-mid);
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.bp-play-btn:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}
+
+.bp-play-btn.active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent-hi);
 }
 
 .bp-name {
