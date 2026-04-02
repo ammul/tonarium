@@ -2,7 +2,7 @@ import { ref, watchEffect } from 'vue'
 
 const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('colorScheme') : null
 const VALID = ['none', 'medieval', 'ko2', 'riddim']
-export const colorScheme = ref(VALID.includes(stored) ? stored : 'medieval')
+export const colorScheme = ref(VALID.includes(stored) ? stored : 'none')
 
 watchEffect(() => {
   if (typeof document !== 'undefined') {

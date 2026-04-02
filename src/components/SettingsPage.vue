@@ -242,6 +242,7 @@ function selectSoundStyle(style) {
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .scheme-btn.medieval::before { background: #d4b84c; }
