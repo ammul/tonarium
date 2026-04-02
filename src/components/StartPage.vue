@@ -10,17 +10,6 @@ const learnCard = {
 
 const tools = [
   {
-    id: 'chords',
-    label: 'Chord Progressions',
-    description: 'Browse classic progressions (I-V-vi-IV, ii-V-I, Canon in D and more) transposed to any root key. Connect via MIDI to preview chords or loop a progression straight to your synth.',
-    preview: ['I', 'V', 'vi', 'IV'],
-  },
-  {
-    id: 'claves',
-    label: 'Claves Mode',
-    description: 'Chromatic pad grid. Connect via MIDI and tap pads to play notes directly on your synth - hold for sustain.',
-  },
-  {
     id: 'jam',
     label: 'Jam Mode',
     description: 'Pick a key and scale - see exactly which notes are safe to play. Anchor notes (root, 3rd, 5th) are highlighted. Tap pads to hear the notes, then layer over a running drum beat.',
@@ -29,12 +18,17 @@ const tools = [
     id: 'drums',
     label: 'Drum Computer',
     description: 'Build a drum loop from 8 instruments across 16 steps. The beat keeps running while you switch to other tools - set it going and improvise over it.',
-    preview: ['1', '2', '3', '4'],
   },
   {
     id: 'scales',
     label: 'Scale Visualizer',
     description: 'See any scale across all 12 notes. Understand which notes belong to a given key at a glance.',
+  },
+  {
+    id: 'chords',
+    label: 'Chord Progressions',
+    description: 'Browse classic progressions (I-V-vi-IV, ii-V-I, Canon in D and more) transposed to any root key. Connect via MIDI to preview chords or loop a progression straight to your synth.',
+    preview: ['I', 'V', 'vi', 'IV'],
   },
   {
     id: 'chord-detector',

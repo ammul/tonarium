@@ -42,90 +42,109 @@ export function startNote(midiNote) {
   let oscs
 
   if (style === 'bell') {
-    const osc = ctx.createOscillator()
-    osc.type = 'sine'
-    osc.frequency.value = freq
-    osc.connect(gainNode)
-
-    const h2 = ctx.createOscillator()
-    h2.type = 'sine'
-    h2.frequency.value = freq * 2
-    const h2g = ctx.createGain()
-    h2g.gain.value = 0.3
-    h2.connect(h2g)
-    h2g.connect(gainNode)
-
-    const h3 = ctx.createOscillator()
-    h3.type = 'sine'
-    h3.frequency.value = freq * 3
-    const h3g = ctx.createGain()
-    h3g.gain.value = 0.1
-    h3.connect(h3g)
-    h3g.connect(gainNode)
-
-    gainNode.gain.setValueAtTime(0, now)
-    gainNode.gain.linearRampToValueAtTime(0.5, now + 0.003)
-    gainNode.gain.exponentialRampToValueAtTime(0.18, now + 1.0)
-
-    osc.start(now); h2.start(now); h3.start(now)
-    oscs = [osc, h2, h3]
+    // Inharmonic metallic partials — characteristic of real bells
+    gainNode.gain.setValueAtTime(0.3, now)
+    const partials = [
+      { ratio: 1.0,   level: 0.55, decay: 4.0 },
+      { ratio: 2.756, level: 0.28, decay: 2.2 },
+      { ratio: 5.404, level: 0.14, decay: 1.1 },
+      { ratio: 8.0,   level: 0.05, decay: 0.5 },
+    ]
+    oscs = partials.map(p => {
+      const o = ctx.createOscillator()
+      o.type = 'sine'
+      o.frequency.value = freq * p.ratio
+      const g = ctx.createGain()
+      g.gain.setValueAtTime(p.level, now + 0.002)
+      g.gain.exponentialRampToValueAtTime(0.001, now + p.decay)
+      o.connect(g)
+      g.connect(gainNode)
+      o.start(now)
+      return o
+    })
 
   } else if (style === 'piano') {
-    const osc = ctx.createOscillator()
-    osc.type = 'sine'
-    osc.frequency.value = freq
-    osc.connect(gainNode)
-
-    const harm = ctx.createOscillator()
-    harm.type = 'sine'
-    harm.frequency.value = freq * 2
-    const harmGain = ctx.createGain()
-    harmGain.gain.value = 0.05
-    harm.connect(harmGain)
-    harmGain.connect(gainNode)
-
-    gainNode.gain.setValueAtTime(0, now)
-    gainNode.gain.linearRampToValueAtTime(0.35, now + 0.015)
-    gainNode.gain.exponentialRampToValueAtTime(0.10, now + 0.6)
-
-    osc.start(now); harm.start(now)
-    oscs = [osc, harm]
-
-  } else if (style === 'pluck') {
-    const osc = ctx.createOscillator()
-    osc.type = 'sawtooth'
-    osc.frequency.value = freq
-    osc.connect(gainNode)
-
-    gainNode.gain.setValueAtTime(0, now)
-    gainNode.gain.linearRampToValueAtTime(0.6, now + 0.005)
-    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.085)
-
-    osc.start(now)
-    osc.stop(now + 0.1)
-    oscs = [osc]
-
-  } else {
-    // 'synth' (default)
+    // Triangle fundamental + high harmonics that decay fast for a bright percussive attack
     const osc = ctx.createOscillator()
     osc.type = 'triangle'
     osc.frequency.value = freq
     osc.connect(gainNode)
 
-    const harm = ctx.createOscillator()
-    harm.type = 'sine'
-    harm.frequency.value = freq * 2
-    const harmGain = ctx.createGain()
-    harmGain.gain.value = 0.1
-    harm.connect(harmGain)
-    harmGain.connect(gainNode)
+    const h4 = ctx.createOscillator()
+    h4.type = 'sine'
+    h4.frequency.value = freq * 4
+    const h4g = ctx.createGain()
+    h4g.gain.setValueAtTime(0.22, now)
+    h4g.gain.exponentialRampToValueAtTime(0.001, now + 0.2)
+    h4.connect(h4g)
+    h4g.connect(gainNode)
+
+    const h9 = ctx.createOscillator()
+    h9.type = 'sine'
+    h9.frequency.value = freq * 9
+    const h9g = ctx.createGain()
+    h9g.gain.setValueAtTime(0.07, now)
+    h9g.gain.exponentialRampToValueAtTime(0.001, now + 0.07)
+    h9.connect(h9g)
+    h9g.connect(gainNode)
 
     gainNode.gain.setValueAtTime(0, now)
-    gainNode.gain.linearRampToValueAtTime(0.45, now + 0.008)
-    gainNode.gain.exponentialRampToValueAtTime(0.22, now + 0.15)
+    gainNode.gain.linearRampToValueAtTime(0.42, now + 0.007)
+    gainNode.gain.exponentialRampToValueAtTime(0.14, now + 0.6)
+    gainNode.gain.exponentialRampToValueAtTime(0.07, now + 2.5)
 
-    osc.start(now); harm.start(now)
-    oscs = [osc, harm]
+    osc.start(now); h4.start(now); h9.start(now)
+    oscs = [osc, h4, h9]
+
+  } else if (style === 'pluck') {
+    // Guitar/harp-like — bright pick transient, then warm decay over ~2s
+    const filter = ctx.createBiquadFilter()
+    filter.type = 'lowpass'
+    filter.frequency.setValueAtTime(freq * 14, now)
+    filter.frequency.exponentialRampToValueAtTime(freq * 2.5, now + 0.6)
+    filter.Q.value = 1
+    filter.connect(gainNode)
+
+    const osc = ctx.createOscillator()
+    osc.type = 'sawtooth'
+    osc.frequency.value = freq
+    osc.connect(filter)
+
+    gainNode.gain.setValueAtTime(0, now)
+    gainNode.gain.linearRampToValueAtTime(0.5, now + 0.003)
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.2)
+
+    osc.start(now)
+    osc.stop(now + 2.3)
+    oscs = [osc]
+
+  } else {
+    // 'synth' — detuned sawtooth pad through a lowpass filter
+    const filter = ctx.createBiquadFilter()
+    filter.type = 'lowpass'
+    filter.frequency.value = freq * 5
+    filter.Q.value = 2.5
+    filter.connect(gainNode)
+
+    const osc1 = ctx.createOscillator()
+    osc1.type = 'sawtooth'
+    osc1.frequency.value = freq
+    osc1.connect(filter)
+
+    const osc2 = ctx.createOscillator()
+    osc2.type = 'sawtooth'
+    osc2.frequency.value = freq * 1.004
+    const osc2g = ctx.createGain()
+    osc2g.gain.value = 0.65
+    osc2.connect(osc2g)
+    osc2g.connect(filter)
+
+    gainNode.gain.setValueAtTime(0, now)
+    gainNode.gain.linearRampToValueAtTime(0.28, now + 0.055)
+    gainNode.gain.setValueAtTime(0.28, now + 0.1)
+
+    osc1.start(now); osc2.start(now)
+    oscs = [osc1, osc2]
   }
 
   _active.set(midiNote, { gainNode, oscs, gen })

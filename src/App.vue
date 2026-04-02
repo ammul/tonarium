@@ -17,11 +17,11 @@ const allTabs = [
   { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: StartPage },
   { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LearnMode },
   { id: 'jam',            label: 'Jam Mode',            shortLabel: 'Jam',          component: JamMode },
+  { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer },
   { id: 'scales',         label: 'Scale Visualizer',    shortLabel: 'Scales',       component: ScaleVisualizer },
   { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions },
   { id: 'chord-detector', label: 'Chord Detector',      shortLabel: 'Detector',     component: ChordDetector },
   { id: 'prog-builder',   label: 'Progression Builder', shortLabel: 'Builder',      component: ProgressionBuilder },
-  { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer },
   { id: 'about',          label: 'About',               shortLabel: 'About',        component: AboutPage },
   { id: 'settings',       label: 'Settings',            shortLabel: 'Settings',     component: SettingsPage },
 ]
@@ -86,13 +86,13 @@ onUnmounted(() => {
           <h1 @click="selectTab('home')" class="home-link">Tonarium</h1>
         </div>
         <div class="header-controls">
-          <div v-if="drumEverPlayed" class="drum-widget" :class="{ playing: drumIsPlaying }">
+          <div v-if="drumEverPlayed" class="drum-widget" :class="{ playing: drumIsPlaying }" @click="selectTab('drums')">
             <span class="dw-dot"></span>
             <span class="dw-label">Drums</span>
             <button
               class="dw-btn"
               :aria-label="drumIsPlaying ? 'Pause drums' : 'Play drums'"
-              @click="drumIsPlaying ? drumPause() : drumPlay()"
+              @click.stop="drumIsPlaying ? drumPause() : drumPlay()"
             >
               <svg v-if="drumIsPlaying" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
                 <rect x="1.5" y="1" width="3" height="8" rx="1"/>
@@ -211,6 +211,7 @@ h1 {
   border: 1px solid var(--border2);
   border-radius: 6px;
   background: transparent;
+  cursor: pointer;
   transition: border-color 0.15s;
 }
 
@@ -417,7 +418,7 @@ main {
   z-index: 101;
   display: flex;
   flex-direction: column;
-  padding: 1.25rem 1rem;
+  padding: 2rem 1rem 1.25rem;
   transform: translateX(100%);
   transition: transform 0.22s ease;
 }
