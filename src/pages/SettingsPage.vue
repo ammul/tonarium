@@ -2,15 +2,16 @@
 import { computed } from 'vue'
 
 const emit = defineEmits(['close'])
-import { displayMode } from '../displayMode.js'
-import { playNote } from '../audioEngine.js'
-import { padSize } from '../padSize.js'
-import { colorMode } from '../colorMode.js'
-import { colorScheme } from '../colorScheme.js'
-import { soundEnabled } from '../soundEnabled.js'
-import { soundStyle } from '../soundStyle.js'
-import { midiStatus, midiOutputs, selectedOutputId, initMidi, disconnectMidi } from '../midiManager.js'
-import { octave } from '../octave.js'
+import { displayMode } from '../state/displayMode.js'
+import { playNote } from '../audio/audioEngine.js'
+import { padSize } from '../state/padSize.js'
+import { colorMode } from '../state/colorMode.js'
+import { colorScheme } from '../state/colorScheme.js'
+import { soundEnabled } from '../state/soundEnabled.js'
+import { soundStyle } from '../state/soundStyle.js'
+import { midiStatus, midiOutputs, selectedOutputId, initMidi, disconnectMidi } from '../audio/midiManager.js'
+import { octave } from '../state/octave.js'
+import PageHeader from '../components/PageHeader.vue'
 
 const DISPLAY_OPTIONS = [
   { value: 'pad',    label: 'Pad',    desc: 'Chromatic pad grid - pad numbers and note names visible. Layout (4x3 or 4x4) is configurable below.' },
@@ -38,10 +39,9 @@ function selectSoundStyle(style) {
 
 <template>
   <div class="settings-page">
-    <div class="settings-header">
-      <h2>Settings</h2>
+    <PageHeader title="Settings">
       <button class="close-btn" @click="emit('close')" aria-label="Close settings">&#x2715;</button>
-    </div>
+    </PageHeader>
 
     <section class="settings-section">
       <h3>Display</h3>
@@ -155,20 +155,6 @@ function selectSoundStyle(style) {
   width: 100%;
   max-width: 680px;
   margin: 0 auto;
-}
-
-.settings-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.75rem;
-}
-
-.settings-header h2 {
-  font-size: 1.4rem;
-  color: var(--accent);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
 .close-btn {
@@ -389,9 +375,5 @@ function selectSoundStyle(style) {
     padding: 0.75rem 1rem;
   }
 
-  .settings-header h2 {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-  }
 }
 </style>

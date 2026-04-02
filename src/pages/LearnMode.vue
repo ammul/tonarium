@@ -1,7 +1,12 @@
 <script setup>
 import { ref, computed, watch, onUnmounted } from 'vue'
-import { playNote, playChord, stopAllNotes } from '../audioEngine.js'
-import { pattern as drumPattern, play as drumPlay, pause as drumPause, isPlaying as drumIsPlaying, currentStep as drumCurrentStep } from '../drumEngine.js'
+import { playNote, playChord, stopAllNotes } from '../audio/audioEngine.js'
+import { pattern as drumPattern, play as drumPlay, pause as drumPause, isPlaying as drumIsPlaying, currentStep as drumCurrentStep } from '../audio/drumEngine.js'
+import NoteStrip from '../components/NoteStrip.vue'
+import PickerRow from '../components/PickerRow.vue'
+import PageHeader from '../components/PageHeader.vue'
+
+import { LEARN_SCALES as SCALES } from '../constants/scales.js'
 
 const emit = defineEmits(['navigate'])
 
@@ -20,15 +25,6 @@ const INTERVALS = [
   { semi: 9,  name: 'Major 6th',   feel: 'Warm, uplifting' },
   { semi: 10, name: 'Minor 7th',   feel: 'Bluesy, unresolved' },
   { semi: 11, name: 'Major 7th',   feel: 'Dreamy, tense' },
-]
-
-const SCALES = [
-  { name: 'Major',         steps: [0,2,4,5,7,9,11], feel: 'Bright and resolved' },
-  { name: 'Natural Minor', steps: [0,2,3,5,7,8,10], feel: 'Dark and emotional' },
-  { name: 'Minor Pent.',   steps: [0,3,5,7,10],      feel: '5 notes - easy to improvise over' },
-  { name: 'Major Pent.',   steps: [0,2,4,7,9],       feel: '5 notes - always sounds positive' },
-  { name: 'Dorian',        steps: [0,2,3,5,7,9,10],  feel: 'Soulful, funky minor' },
-  { name: 'Mixolydian',    steps: [0,2,4,5,7,9,10],  feel: 'Bluesy, rock feel' },
 ]
 
 const MAJOR_SCALE = [0,2,4,5,7,9,11]
@@ -112,8 +108,17 @@ const BEAT_TIPS = [
   { num: '4', text: '<strong>Leave space.</strong> A kick on every 16th step is noise, not a beat. What you don\'t play shapes the groove as much as what you do.' },
 ]
 
-const STEPS = ['Root Notes', 'Intervals', 'Scales', 'Progressions', 'Chords', 'Improvising', 'Beats']
-const step  = ref(0)
+const STEPS = [
+  { id: 'root-notes',   label: 'Root Notes'   },
+  { id: 'intervals',    label: 'Intervals'    },
+  { id: 'scales',       label: 'Scales'       },
+  { id: 'progressions', label: 'Progressions' },
+  { id: 'chords',       label: 'Chords'       },
+  { id: 'improvising',  label: 'Improvising'  },
+  { id: 'beats',        label: 'Beats'        },
+]
+const step      = ref(STEPS[0].id)
+const stepIndex = computed(() => STEPS.findIndex(s => s.id === step.value))
 
 // ── Step 1: Root Notes ───────────────────────────────────────────────────────
 const rootNoteIdx = ref(null)
@@ -356,7 +361,7 @@ function editBeat(pi) {
 }
 
 watch(step, (newStep, oldStep) => {
-  if (oldStep === 6 && drumIsPlaying.value) drumPause()
+  if (oldStep === 'beats' && drumIsPlaying.value) drumPause()
 })
 
 onUnmounted(() => {
@@ -371,30 +376,22 @@ onUnmounted(() => {
     <div class="step-nav">
       <button
         v-for="(s, i) in STEPS"
-        :key="i"
+        :key="s.id"
         class="step-btn"
-        :class="{ active: step === i, done: step > i }"
-        @click="step = i"
+        :class="{ active: step === s.id, done: i < stepIndex }"
+        @click="step = s.id"
       >
         <span class="step-num">{{ i + 1 }}</span>
-        <span class="step-label">{{ s }}</span>
+        <span class="step-label">{{ s.label }}</span>
       </button>
     </div>
 
     <!-- ── Step 1: Root Notes ────────────────────────────────────────────── -->
-    <div v-if="step === 0" class="step-content">
+    <div v-if="step === 'root-notes'" class="step-content">
       <p class="step-intro">Every piece of music orbits a home note — the <strong>root</strong>. When a melody lands on it, it sounds resolved. When it moves away, it creates tension. Everything else — scales, chords, keys — is named and measured relative to this anchor.</p>
 
       <div class="root-note-picker">
-        <div class="note-strip">
-          <button
-            v-for="(note, i) in CHROMATIC"
-            :key="i"
-            class="note-pill"
-            :class="{ sharp: IS_SHARP.has(i), from: rootNoteIdx === i }"
-            @pointerdown.prevent="pickRootNote(i)"
-          >{{ note }}</button>
-        </div>
+        <NoteStrip :from="rootNoteIdx" @pick="pickRootNote" />
       </div>
 
       <div class="root-result">
@@ -429,22 +426,10 @@ onUnmounted(() => {
     </div>
 
     <!-- ── Step 2: Intervals ─────────────────────────────────────────────── -->
-    <div v-if="step === 1" class="step-content">
+    <div v-if="step === 'intervals'" class="step-content">
       <p class="step-intro">Tap any two notes - hear the sound and see the <strong>interval</strong> between them.</p>
 
-      <div class="note-strip">
-        <button
-          v-for="(note, i) in CHROMATIC"
-          :key="i"
-          class="note-pill"
-          :class="{
-            sharp:  IS_SHARP.has(i),
-            from:   fromIdx === i,
-            to:     toIdx === i,
-          }"
-          @pointerdown.prevent="pickNote(i)"
-        >{{ note }}</button>
-      </div>
+      <NoteStrip :from="fromIdx" :to="toIdx" @pick="pickNote" />
 
       <div class="interval-result">
         <template v-if="intervalInfo">
@@ -481,25 +466,15 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- ── Step 2: Scales ────────────────────────────────────────────────── -->
-    <div v-if="step === 2" class="step-content">
+    <!-- ── Step 3: Scales ────────────────────────────────────────────────── -->
+    <div v-if="step === 'scales'" class="step-content">
       <p class="step-intro">A <strong>scale</strong> is a fixed pattern of intervals repeating from a root. The Major scale uses the same intervals every time — that's why it always sounds the same no matter which root you pick. Pick a root, choose a scale, hear which notes light up.</p>
 
-      <div class="picker-row">
-        <span class="picker-label">Root</span>
-        <div class="note-strip small">
-          <button
-            v-for="(note, i) in CHROMATIC"
-            :key="i"
-            class="note-pill"
-            :class="{ sharp: IS_SHARP.has(i), from: scaleRoot === i }"
-            @pointerdown.prevent="pickScaleRoot(i)"
-          >{{ note }}</button>
-        </div>
-      </div>
+      <PickerRow label="Root">
+        <NoteStrip small :from="scaleRoot" @pick="pickScaleRoot" />
+      </PickerRow>
 
-      <div class="picker-row">
-        <span class="picker-label">Scale</span>
+      <PickerRow label="Scale">
         <div class="scale-tabs">
           <button
             v-for="(sc, si) in SCALES"
@@ -509,7 +484,7 @@ onUnmounted(() => {
             @click="scaleIdx = si"
           >{{ sc.name }}</button>
         </div>
-      </div>
+      </PickerRow>
 
       <div class="scale-display-legend">
         <span class="sdl-item sdl-root">Root</span>
@@ -538,22 +513,13 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- ── Step 3: Progressions ──────────────────────────────────────────── -->
-    <div v-if="step === 3" class="step-content">
+    <!-- ── Step 4: Progressions ──────────────────────────────────────────── -->
+    <div v-if="step === 'progressions'" class="step-content">
       <p class="step-intro">Chords are labelled with <strong>Roman numerals</strong> based on the scale they come from — every chord in a key uses only notes from that key's scale. That's why they all sound good together. Tap any chord to hear it, or tap a progression to play it.</p>
 
-      <div class="picker-row">
-        <span class="picker-label">Key</span>
-        <div class="note-strip small">
-          <button
-            v-for="(note, i) in CHROMATIC"
-            :key="i"
-            class="note-pill"
-            :class="{ sharp: IS_SHARP.has(i), from: progRoot === i }"
-            @pointerdown.prevent="pickProgRoot(i)"
-          >{{ note }}</button>
-        </div>
-      </div>
+      <PickerRow label="Key">
+        <NoteStrip small :from="progRoot" @pick="pickProgRoot" />
+      </PickerRow>
 
       <div class="section-label">Chords in key</div>
 
@@ -605,22 +571,13 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- ── Step 4: Chords ───────────────────────────────────────────────── -->
-    <div v-if="step === 4" class="step-content">
+    <!-- ── Step 5: Chords ───────────────────────────────────────────────── -->
+    <div v-if="step === 'chords'" class="step-content">
       <p class="step-intro">A <strong>chord</strong> is three or more notes played at once. Just three chord types are behind most of the music you know — they differ only by one note.</p>
 
-      <div class="picker-row">
-        <span class="picker-label">Root</span>
-        <div class="note-strip small">
-          <button
-            v-for="(note, i) in CHROMATIC"
-            :key="i"
-            class="note-pill"
-            :class="{ sharp: IS_SHARP.has(i), from: chordsRoot === i }"
-            @pointerdown.prevent="chordsRoot = i"
-          >{{ note }}</button>
-        </div>
-      </div>
+      <PickerRow label="Root">
+        <NoteStrip small :from="chordsRoot" @pick="chordsRoot = $event" />
+      </PickerRow>
 
       <div class="chord-type-list">
         <div
@@ -649,8 +606,8 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- ── Step 5: Improvising ───────────────────────────────────────────── -->
-    <div v-if="step === 5" class="step-content">
+    <!-- ── Step 6: Improvising ───────────────────────────────────────────── -->
+    <div v-if="step === 'improvising'" class="step-content">
       <p class="step-intro">Improvising is about choosing notes that sound <strong>intentional</strong>. The key: match your scale to the chord type you're playing over.</p>
 
       <div class="improv-list">
@@ -727,8 +684,8 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- ── Step 6: Beats ─────────────────────────────────────────────────── -->
-    <div v-if="step === 6" class="step-content">
+    <!-- ── Step 7: Beats ─────────────────────────────────────────────────── -->
+    <div v-if="step === 'beats'" class="step-content">
       <p class="step-intro">A good beat is built from three layers: <strong>kick</strong>, <strong>snare</strong>, and <strong>hi-hat</strong>. Each has a job. Together they create rhythm that makes people move.</p>
 
       <div class="beat-recipe">
@@ -801,9 +758,9 @@ onUnmounted(() => {
 
     <!-- Step footer -->
     <div class="step-footer">
-      <button class="nav-btn" @click="step--" :disabled="step === 0">← Back</button>
-      <span class="step-counter">{{ step + 1 }} / {{ STEPS.length }}</span>
-      <button class="nav-btn" @click="step++" :disabled="step === STEPS.length - 1">Next →</button>
+      <button class="nav-btn" @click="step = STEPS[stepIndex - 1].id" :disabled="stepIndex === 0">← Back</button>
+      <span class="step-counter">{{ stepIndex + 1 }} / {{ STEPS.length }}</span>
+      <button class="nav-btn" @click="step = STEPS[stepIndex + 1].id" :disabled="stepIndex === STEPS.length - 1">Next →</button>
     </div>
 
   </div>
@@ -901,49 +858,6 @@ onUnmounted(() => {
 .step-intro strong {
   color: var(--accent);
   font-weight: 600;
-}
-
-/* ── Note strip ───────────────────────────────────────────────────────────── */
-.note-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.note-pill {
-  padding: 0.45rem 0.55rem;
-  min-width: 2.4rem;
-  border-radius: 6px;
-  border: 1px solid var(--border2);
-  background: var(--raised);
-  color: var(--accent);
-  font-size: 0.88rem;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  text-align: center;
-  user-select: none;
-  touch-action: none;
-  transition: background 0.1s, border-color 0.1s, transform 0.07s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.note-pill:hover { background: var(--border); }
-.note-pill:active { transform: scale(0.93); }
-.note-pill.sharp { background: var(--input); color: var(--accent-lo); font-size: 0.8rem; }
-.note-pill.sharp:hover { background: var(--border3); }
-
-.note-pill.from {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
-}
-
-.note-pill.to {
-  background: var(--selected);
-  border-color: var(--accent);
-  color: var(--accent-hi);
-  box-shadow: 0 0 6px var(--accent-glow);
 }
 
 /* ── Root Notes ───────────────────────────────────────────────────────────── */
@@ -1162,24 +1076,6 @@ onUnmounted(() => {
 .step-bridge strong {
   color: var(--accent);
   font-weight: 600;
-}
-
-/* ── Picker row ───────────────────────────────────────────────────────────── */
-.picker-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-}
-
-.picker-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  padding-top: 0.5rem;
-  flex-shrink: 0;
-  min-width: 2.5rem;
 }
 
 /* ── Scale tabs ───────────────────────────────────────────────────────────── */

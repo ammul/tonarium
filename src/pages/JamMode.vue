@@ -1,47 +1,45 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { displayMode } from '../displayMode.js'
-import { padSize } from '../padSize.js'
-import { NOTES, SHARPS, FRET_COUNT, NOTE_TO_SEMI } from '../musicConstants.js'
-import { buildGuitarNeck, sliceRows } from '../musicUtils.js'
+import { displayMode } from '../state/displayMode.js'
+import { padSize } from '../state/padSize.js'
+import { NOTES, SHARPS, FRET_COUNT, NOTE_TO_SEMI } from '../constants/musicConstants.js'
+import { JAM_SCALES as SCALES } from '../constants/scales.js'
+import { buildGuitarNeck, sliceRows } from '../utils/musicUtils.js'
+import { activeInputNotes, midiStatus } from '../audio/midiManager.js'
+import { octave } from '../state/octave.js'
 import { useNotePlayback } from '../composables/useNotePlayback.js'
-import PianoOctave from './PianoOctave.vue'
-import RootNotePicker from './RootNotePicker.vue'
-import ModeLayout from './ModeLayout.vue'
+import PianoOctave from '../components/PianoOctave.vue'
+import ScaleLegend from '../components/ScaleLegend.vue'
+import RootNotePicker from '../components/RootNotePicker.vue'
+import ModeLayout from '../components/ModeLayout.vue'
+import PageHeader from '../components/PageHeader.vue'
 
-const SCALES = [
-  { id: '12t',  label: '12T - Chromatic',         intervals: [0,1,2,3,4,5,6,7,8,9,10,11], description: 'All 12 semitones. No inherent tonality - every key plays, nothing is highlighted. Useful for atonal passages or when you want full chromatic access.' },
-  { id: 'maj',  label: 'maj - Major (Ionian)',     intervals: [0,2,4,5,7,9,11],             description: 'The familiar "happy" scale. Bright, stable, and resolved. The default western scale - works for pop, folk, classical, and most upbeat music.' },
-  { id: 'min',  label: 'min - Minor (Aeolian)',    intervals: [0,2,3,5,7,8,10],             description: 'Natural minor. Dark, melancholic, and introspective. The most common minor scale - great for moody, emotional, or dramatic pieces.' },
-  { id: 'dor',  label: 'dor - Dorian',             intervals: [0,2,3,5,7,9,10],             description: 'Minor with a raised 6th. Slightly brighter and jazzier than natural minor - sounds soulful and funky. Think "Scarborough Fair" or modal jazz.' },
-  { id: 'phr',  label: 'phr - Phrygian',           intervals: [0,1,3,5,7,8,10],             description: 'Minor with a flattened 2nd. Very dark and tense, with a distinctly Spanish or flamenco flavour. Creates a brooding, exotic feel.' },
-  { id: 'lyd',  label: 'lyd - Lydian',             intervals: [0,2,4,6,7,9,11],             description: 'Major with a raised 4th. Dreamy, ethereal, and floating - the raised 4th gives it an otherworldly quality. Common in film scores and ambient music.' },
-  { id: 'mix',  label: 'mix - Mixolydian',         intervals: [0,2,4,5,7,9,10],             description: 'Major with a flattened 7th. Bright but slightly unresolved - sounds bluesy and rock-oriented. Think classic rock, Celtic, and blues-inflected pop.' },
-  { id: 'loc',  label: 'loc - Locrian',            intervals: [0,1,3,5,6,8,10],             description: 'The most dissonant mode - minor with a flattened 2nd and 5th. Extremely unstable and tense; rarely used as a tonic but effective for dark, unsettling textures.' },
-  { id: 'ma.p', label: 'ma.p - Major Pentatonic',  intervals: [0,2,4,7,9],                  description: 'Five-note major scale (no 4th or 7th). Open, consonant, and universally pleasing - nothing clashes. Common in folk, country, and East Asian music.' },
-  { id: 'mi.p', label: 'mi.p - Minor Pentatonic',  intervals: [0,3,5,7,10],                 description: 'Five-note minor scale. The backbone of blues, rock, and R&B. Every note works over almost any chord - great for expressive leads and improvisation.' },
-]
+// Semitone offsets from root considered "anchor" notes (root, minor 3rd, major 3rd, 5th)
+const ANCHOR_OFFSETS = new Set([0, 3, 4, 7])
 
-const selectedRoot = ref('A')
-const selectedScaleId = ref('maj')
-const showInfo = ref(false)
-const pianoOctave = ref(4)
+const selectedRoot   = ref('A')
+const selectedScaleId = ref('mi.p')
+const showInfo       = ref(false)
+const pianoOctave    = ref(4)
+
+const SUBTITLE = { pad: 'lit pads', notes: 'highlighted notes', guitar: 'highlighted frets', piano: 'highlighted keys' }
+const subtitle = computed(() => `pick a key and scale - ${SUBTITLE[displayMode.value] ?? 'highlighted items'} are safe to play`)
 
 const selectedScale = computed(() => SCALES.find(s => s.id === selectedScaleId.value))
-const rootIndex = computed(() => NOTES.indexOf(selectedRoot.value))
+const rootIndex     = computed(() => NOTES.indexOf(selectedRoot.value))
 
 const activeIndices = computed(() => {
   const root = rootIndex.value
   return new Set(selectedScale.value.intervals.map(i => (root + i) % 12))
 })
 
-const degreeMap = computed(() => {
+const anchorIndices = computed(() => {
   const root = rootIndex.value
-  const map = {}
-  selectedScale.value.intervals.forEach((interval, i) => {
-    map[(root + interval) % 12] = i + 1
-  })
-  return map
+  return new Set(
+    selectedScale.value.intervals
+      .filter(i => ANCHOR_OFFSETS.has(i))
+      .map(i => (root + i) % 12)
+  )
 })
 
 const cols = computed(() => padSize.value === '4x4' ? 4 : 3)
@@ -49,66 +47,83 @@ const cols = computed(() => padSize.value === '4x4' ? 4 : 3)
 const pads = computed(() =>
   Array.from({ length: 4 * cols.value }, (_, i) => {
     const noteIndex = i % 12
+    const octaveOffset = Math.floor(i / 12)
     return {
       number:      i + 1,
       label:       String(i + 1),
       note:        NOTES[noteIndex],
       noteIndex,
-      octaveOffset: Math.floor(i / 12),
+      octaveOffset,
       isSharp:     SHARPS.has(NOTES[noteIndex]),
       isActive:    activeIndices.value.has(noteIndex),
+      isAnchor:    anchorIndices.value.has(noteIndex),
       isRoot:      noteIndex === rootIndex.value,
-      degree:      degreeMap.value[noteIndex] ?? null,
+      midi:        12 * (octave.value + 1 + octaveOffset) + NOTE_TO_SEMI[noteIndex],
     }
   })
 )
 
 const rows = computed(() => sliceRows(pads.value, cols.value))
 
-// Notes mode: all 12 chromatic notes as tiles
 const chromaTiles = computed(() =>
   NOTES.map((note, i) => ({
     note,
-    isSharp: SHARPS.has(note),
+    noteIndex: i,
+    isSharp:  SHARPS.has(note),
     isActive: activeIndices.value.has(i),
-    isRoot: i === rootIndex.value,
-    degree: degreeMap.value[i] ?? null,
+    isAnchor: anchorIndices.value.has(i),
+    isRoot:   i === rootIndex.value,
   }))
 )
 
-// Guitar neck: 6 strings displayed high→low (e, B, G, D, A, E)
+const pressedIndices = computed(() => {
+  const result = new Set()
+  for (const n of activeInputNotes.value) {
+    result.add(NOTE_TO_SEMI.indexOf(n % 12))
+  }
+  return result
+})
+
 const guitarNeck = computed(() =>
   buildGuitarNeck(noteIdx => ({
     isActive: activeIndices.value.has(noteIdx),
+    isAnchor: anchorIndices.value.has(noteIdx),
     isRoot:   noteIdx === rootIndex.value,
   }))
 )
 
+const scaleNotes = computed(() =>
+  selectedScale.value.intervals.map(i => ({
+    note:     NOTES[(rootIndex.value + i) % 12],
+    isAnchor: ANCHOR_OFFSETS.has(i),
+    isRoot:   i === 0,
+  }))
+)
+
+// MIDI base notes for each guitar string (stringIdx 0-5: E2 A2 D3 G3 B3 E4)
 const STRING_BASE_MIDI = [40, 45, 50, 55, 59, 64]
 const { pressDown, pressUp, pressToggle } = useNotePlayback()
 
-function onPadDown(noteIndex, octaveOffset = 0) { pressDown(12 * (5 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
-function onPadUp(noteIndex, octaveOffset = 0)   { pressUp(12 * (5 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
+function padMidi(noteIndex, octave) {
+  return 12 * (octave + 1) + NOTE_TO_SEMI[noteIndex]
+}
+
+function onPadDown(noteIndex, octaveOffset = 0) { pressDown(12 * (octave.value + 1 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
+function onPadUp(noteIndex, octaveOffset = 0)   { pressUp(12 * (octave.value + 1 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
 
 function onCellDown(stringIdx, fret) { pressDown(STRING_BASE_MIDI[stringIdx] + fret) }
 function onCellUp(stringIdx, fret)   { pressUp(STRING_BASE_MIDI[stringIdx] + fret) }
 
-function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx)) }
+function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value)) }
 </script>
 
 <template>
-  <div class="scale-viz">
-    <div class="scale-viz-header">
-      <h2>Scale Visualizer</h2>
-      <p class="subtitle" v-if="displayMode === 'pad'">see which pads are active for any scale</p>
-      <p class="subtitle" v-else-if="displayMode === 'notes'">chromatic note strip - scale notes highlighted</p>
-      <p class="subtitle" v-else-if="displayMode === 'guitar'">guitar neck (standard tuning) - scale positions highlighted</p>
-      <p class="subtitle" v-else>piano keyboard - scale notes highlighted</p>
-    </div>
+  <div class="jam-mode">
+    <PageHeader title="Jam Mode" :subtitle="subtitle" />
 
     <div class="controls">
       <div class="control-group">
-        <label>Root note</label>
+        <label>Key</label>
         <RootNotePicker v-model="selectedRoot" />
       </div>
 
@@ -133,10 +148,11 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx)) }
               :key="pad.number"
               class="pad"
               :class="{
-                active: pad.isActive,
-                root: pad.isRoot,
-                sharp: pad.isSharp,
+                active:   pad.isActive && !pad.isAnchor && !pad.isRoot,
+                anchor:   pad.isAnchor && !pad.isRoot,
+                root:     pad.isRoot,
                 inactive: !pad.isActive,
+                pressed:  pressedIndices.has(pad.noteIndex),
               }"
               @pointerdown.prevent="onPadDown(pad.noteIndex, pad.octaveOffset)"
               @pointerup="onPadUp(pad.noteIndex, pad.octaveOffset)"
@@ -145,7 +161,7 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx)) }
             >
               <span class="pad-label">{{ pad.label }}</span>
               <span class="pad-note">{{ pad.note }}</span>
-              <span class="pad-degree" v-if="pad.isActive">{{ pad.isRoot ? '①' : pad.degree }}</span>
+              <span v-if="midiStatus === 'connected'" class="pad-midi">{{ pad.midi }}</span>
             </div>
           </div>
         </div>
@@ -154,22 +170,22 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx)) }
       <template #notes>
         <div class="chroma-strip">
           <div
-            v-for="(tile, ti) in chromaTiles"
+            v-for="tile in chromaTiles"
             :key="tile.note"
             class="chroma-tile"
             :class="{
-              active: tile.isActive,
-              root: tile.isRoot,
-              sharp: tile.isSharp,
+              active:   tile.isActive && !tile.isAnchor && !tile.isRoot,
+              anchor:   tile.isAnchor && !tile.isRoot,
+              root:     tile.isRoot,
               inactive: !tile.isActive,
+              pressed:  pressedIndices.has(tile.noteIndex),
             }"
-            @pointerdown.prevent="onPadDown(ti)"
-            @pointerup="onPadUp(ti)"
-            @pointerleave="onPadUp(ti)"
-            @pointercancel="onPadUp(ti)"
+            @pointerdown.prevent="onPadDown(tile.noteIndex)"
+            @pointerup="onPadUp(tile.noteIndex)"
+            @pointerleave="onPadUp(tile.noteIndex)"
+            @pointercancel="onPadUp(tile.noteIndex)"
           >
             <span class="tile-note">{{ tile.note }}</span>
-            <span class="tile-degree" v-if="tile.isActive">{{ tile.isRoot ? '①' : tile.degree }}</span>
           </div>
         </div>
       </template>
@@ -196,15 +212,19 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx)) }
                 class="neck-cell"
                 :class="{
                   active: cell.isActive,
-                  root: cell.isRoot,
-                  open: cell.isOpen,
+                  root:   cell.isRoot,
+                  open:   cell.isOpen,
                 }"
                 @pointerdown.prevent="onCellDown(string.stringIdx, cell.fret)"
                 @pointerup="onCellUp(string.stringIdx, cell.fret)"
                 @pointerleave="onCellUp(string.stringIdx, cell.fret)"
                 @pointercancel="onCellUp(string.stringIdx, cell.fret)"
               >
-                <span v-if="cell.isActive" class="neck-dot" :class="{ root: cell.isRoot }"></span>
+                <span
+                  v-if="cell.isActive"
+                  class="neck-dot"
+                  :class="{ root: cell.isRoot, anchor: cell.isAnchor && !cell.isRoot }"
+                ></span>
               </div>
             </div>
             <div class="fret-numbers">
@@ -218,28 +238,26 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx)) }
       </template>
     </ModeLayout>
 
+    <ScaleLegend />
+
+    <div class="scale-notes">
+      <span class="scale-label">Notes</span>
+      <span
+        v-for="n in scaleNotes"
+        :key="n.note"
+        class="scale-note"
+        :class="{ root: n.isRoot, anchor: n.isAnchor && !n.isRoot }"
+      >{{ n.note }}</span>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.scale-viz {
+.jam-mode {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
-}
-
-.scale-viz-header h2 {
-  font-size: 1.4rem;
-  color: var(--accent);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.subtitle {
-  margin-top: 0.3rem;
-  font-size: 0.85rem;
-  color: var(--text3);
 }
 
 .controls {
@@ -350,20 +368,22 @@ select:focus { border-color: var(--accent); }
 }
 
 .pad.inactive { background: var(--bg); opacity: 0.35; }
-.pad.active   { background: var(--raised); border-color: var(--accent-mid); }
+.pad.active   { background: var(--raised); border-color: var(--border2); }
+.pad.anchor   { background: var(--accent-bg); border-color: var(--accent-mid); }
 .pad.root     { background: var(--rust-bg); border-color: var(--rust); }
+.pad.pressed  { background: var(--accent-bg); border-color: var(--accent); opacity: 1; }
 
-.pad-label  { font-size: 0.7rem; color: var(--text4); font-weight: 600; letter-spacing: 0.1em; }
-.pad-note   { font-size: 1.5rem; font-weight: 700; line-height: 1; }
+.pad-label { font-size: 0.7rem; color: var(--text4); font-weight: 600; letter-spacing: 0.1em; }
+.pad-note  { font-size: 1.5rem; font-weight: 700; line-height: 1; }
+.pad-midi  { font-size: 0.6rem; color: var(--text5); letter-spacing: 0.03em; }
 
 .pad.inactive .pad-note { color: var(--text5); }
-.pad.active .pad-note   { color: var(--accent); }
-.pad.root .pad-note     { color: var(--rust-hi); }
+.pad.active   .pad-note { color: var(--text2); }
+.pad.anchor   .pad-note { color: var(--accent); }
+.pad.root     .pad-note { color: var(--rust-hi); }
+.pad.pressed  .pad-note { color: var(--accent); }
 
-.pad-degree           { font-size: 0.72rem; color: var(--accent-dim); }
-.pad.root .pad-degree { color: var(--rust); }
-
-/* Notes mode chromatic strip */
+/* Notes mode */
 .chroma-strip {
   display: flex;
   flex-wrap: wrap;
@@ -373,10 +393,8 @@ select:focus { border-color: var(--accent); }
 
 .chroma-tile {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.2rem;
   width: 3.2rem;
   height: 3.2rem;
   border-radius: 8px;
@@ -388,16 +406,18 @@ select:focus { border-color: var(--accent); }
 }
 
 .chroma-tile.inactive { background: transparent; border-color: transparent; opacity: 0.4; }
-.chroma-tile.active   { background: var(--raised); border-color: var(--accent-mid); }
+.chroma-tile.active   { background: var(--raised); border-color: var(--border2); }
+.chroma-tile.anchor   { background: var(--accent-bg); border-color: var(--accent-mid); }
 .chroma-tile.root     { background: var(--rust-bg); border-color: var(--rust); }
+.chroma-tile.pressed  { background: var(--accent-bg); border-color: var(--accent); opacity: 1; }
 
 .tile-note { font-size: 1.1rem; font-weight: 700; line-height: 1; }
-.chroma-tile.inactive .tile-note { color: var(--text5); }
-.chroma-tile.active .tile-note   { color: var(--accent); }
-.chroma-tile.root .tile-note     { color: var(--rust-hi); }
 
-.tile-degree           { font-size: 0.65rem; color: var(--accent-dim); }
-.chroma-tile.root .tile-degree { color: var(--rust); }
+.chroma-tile.inactive .tile-note { color: var(--text5); }
+.chroma-tile.active   .tile-note { color: var(--text2); }
+.chroma-tile.anchor   .tile-note { color: var(--accent); }
+.chroma-tile.root     .tile-note { color: var(--rust-hi); }
+.chroma-tile.pressed  .tile-note { color: var(--accent); }
 
 /* Guitar neck */
 .guitar-neck-wrap {
@@ -450,13 +470,17 @@ select:focus { border-color: var(--accent); }
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: var(--dot-scale);
+  background: var(--text3);
   display: block;
+}
+
+.neck-dot.anchor {
+  background: var(--accent-lo);
 }
 
 .neck-dot.root {
   background: var(--dot-root);
-  box-shadow: 0 0 5px var(--rust-glow);
+  box-shadow: 0 0 4px var(--rust-glow);
 }
 
 .fret-numbers {
@@ -478,8 +502,47 @@ select:focus { border-color: var(--accent); }
 }
 
 
+/* Scale notes strip */
+.scale-notes {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.scale-label {
+  font-size: 0.75rem;
+  color: var(--text4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 0.25rem;
+}
+
+.scale-note {
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  background: var(--raised);
+  border: 1px solid var(--border2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.scale-note.anchor {
+  background: var(--accent-bg);
+  border-color: var(--accent-mid);
+  color: var(--accent);
+}
+
+.scale-note.root {
+  background: var(--rust-bg);
+  border-color: var(--rust);
+  color: var(--rust-hi);
+}
+
 @media (max-width: 600px) {
-  .scale-viz {
+  .jam-mode {
     padding: 1.25rem 1rem;
   }
 
@@ -499,16 +562,8 @@ select:focus { border-color: var(--accent); }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .scale-viz {
+  .jam-mode {
     padding: 0.75rem 1rem;
-  }
-
-  .scale-viz-header h2 {
-    font-size: 1.1rem;
-  }
-
-  .subtitle {
-    display: none;
   }
 
   .controls {
@@ -528,5 +583,8 @@ select:focus { border-color: var(--accent); }
     white-space: nowrap;
   }
 
+  .scale-notes {
+    margin-top: 0.5rem;
+  }
 }
 </style>
