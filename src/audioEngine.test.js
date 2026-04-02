@@ -47,6 +47,18 @@ const MockAudioContext = vi.fn(function () {
         connect: vi.fn(),
       }
     }),
+    createBiquadFilter: vi.fn(function () {
+      return {
+        type: '',
+        frequency: {
+          value: 0,
+          setValueAtTime: vi.fn(),
+          exponentialRampToValueAtTime: vi.fn(),
+        },
+        Q: { value: 0 },
+        connect: vi.fn(),
+      }
+    }),
   }
   return capturedCtx
 })
@@ -119,11 +131,11 @@ describe('startNote', () => {
 })
 
 describe('sound styles', () => {
-  it('synth uses triangle oscillator', () => {
+  it('synth uses sawtooth oscillator', () => {
     soundStyle.value = 'synth'
     startNote(60)
     const oscs = ctx().createOscillator.mock.results.map(r => r.value)
-    expect(oscs.some(o => o.type === 'triangle')).toBe(true)
+    expect(oscs.some(o => o.type === 'sawtooth')).toBe(true)
   })
 
   it('piano uses sine oscillator', () => {
@@ -147,10 +159,10 @@ describe('sound styles', () => {
     expect(oscs.some(o => o.type === 'sawtooth')).toBe(true)
   })
 
-  it('bell creates 3 oscillators (fundamental + 2 harmonics)', () => {
+  it('bell creates 4 oscillators (fundamental + 3 harmonics)', () => {
     soundStyle.value = 'bell'
     startNote(60)
-    expect(ctx().createOscillator).toHaveBeenCalledTimes(3)
+    expect(ctx().createOscillator).toHaveBeenCalledTimes(4)
   })
 
   it('synth creates 2 oscillators (fundamental + harmonic)', () => {
