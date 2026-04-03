@@ -8,6 +8,7 @@ import { useNotePlayback } from '@/composables/useNotePlayback.js'
 import PianoOctave from '@/components/PianoOctave.vue'
 import RootNotePicker from '@/components/RootNotePicker.vue'
 import ModeLayout from '@/components/ModeLayout.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
 
 const SCALES = [
   { id: '12t',  label: '12T - Chromatic',         intervals: [0,1,2,3,4,5,6,7,8,9,10,11], description: 'All 12 semitones. No inherent tonality - every key plays, nothing is highlighted. Useful for atonal passages or when you want full chromatic access.' },
@@ -94,17 +95,18 @@ function onCellDown(stringIdx, fret) { pressDown(STRING_BASE_MIDI[stringIdx] + f
 function onCellUp(stringIdx, fret)   { pressUp(STRING_BASE_MIDI[stringIdx] + fret) }
 
 function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx)) }
+
+const subtitle = computed(() => {
+  if (displayMode.value === 'pad') return 'see which pads are active for any scale'
+  if (displayMode.value === 'notes') return 'chromatic note strip - scale notes highlighted'
+  if (displayMode.value === 'guitar') return 'guitar neck (standard tuning) - scale positions highlighted'
+  return 'piano keyboard - scale notes highlighted'
+})
 </script>
 
 <template>
   <div class="scale-viz">
-    <div class="scale-viz-header">
-      <h2>Scale Visualizer</h2>
-      <p class="subtitle" v-if="displayMode === 'pad'">see which pads are active for any scale</p>
-      <p class="subtitle" v-else-if="displayMode === 'notes'">chromatic note strip - scale notes highlighted</p>
-      <p class="subtitle" v-else-if="displayMode === 'guitar'">guitar neck (standard tuning) - scale positions highlighted</p>
-      <p class="subtitle" v-else>piano keyboard - scale notes highlighted</p>
-    </div>
+    <PageHeader title="Scale Visualizer" :subtitle="subtitle" />
 
     <div class="controls">
       <div class="control-group">
@@ -227,19 +229,6 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx)) }
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
-}
-
-.scale-viz-header h2 {
-  font-size: 1.4rem;
-  color: var(--accent);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.subtitle {
-  margin-top: 0.3rem;
-  font-size: 0.85rem;
-  color: var(--text3);
 }
 
 .controls {
@@ -501,14 +490,6 @@ select:focus { border-color: var(--accent); }
 @media (orientation: landscape) and (max-height: 500px) {
   .scale-viz {
     padding: 0.75rem 1rem;
-  }
-
-  .scale-viz-header h2 {
-    font-size: 1.1rem;
-  }
-
-  .subtitle {
-    display: none;
   }
 
   .controls {

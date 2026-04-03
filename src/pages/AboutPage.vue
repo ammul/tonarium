@@ -1,11 +1,10 @@
 <script setup>
+import PageHeader from '@/components/ui/PageHeader.vue'
 </script>
 
 <template>
   <div class="about-page">
-    <div class="about-header">
-      <h2>About</h2>
-    </div>
+    <PageHeader title="About" />
 
     <section class="about-section">
       <p class="byline">Built by <a href="https://github.com/ammul" target="_blank" rel="noopener">ammul</a> - lazy music fan.</p>
@@ -29,17 +28,6 @@
   border-radius: 12px;
   padding: 2rem;
   max-width: 480px;
-}
-
-.about-header {
-  margin-bottom: 1.75rem;
-}
-
-.about-header h2 {
-  font-size: 1.4rem;
-  color: var(--accent);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
 .about-section {
@@ -92,11 +80,6 @@
 @media (orientation: landscape) and (max-height: 500px) {
   .about-page {
     padding: 0.75rem 1rem;
-  }
-
-  .about-header h2 {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
   }
 }
 </style>

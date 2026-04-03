@@ -11,6 +11,7 @@ import PianoOctave from '@/components/PianoOctave.vue'
 import ScaleLegend from '@/components/ScaleLegend.vue'
 import RootNotePicker from '@/components/RootNotePicker.vue'
 import ModeLayout from '@/components/ModeLayout.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
 
 const SCALES = [
   {
@@ -162,10 +163,7 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 
 <template>
   <div class="jam-mode">
-    <div class="jam-header">
-      <h2>Jam Mode</h2>
-      <p class="subtitle">{{ subtitle }}</p>
-    </div>
+    <PageHeader title="Jam Mode" :subtitle="subtitle" />
 
     <div class="controls">
       <div class="control-group">
@@ -304,19 +302,6 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
-}
-
-.jam-header h2 {
-  font-size: 1.4rem;
-  color: var(--accent);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.subtitle {
-  margin-top: 0.3rem;
-  font-size: 0.85rem;
-  color: var(--text3);
 }
 
 .controls {
@@ -623,14 +608,6 @@ select:focus { border-color: var(--accent); }
 @media (orientation: landscape) and (max-height: 500px) {
   .jam-mode {
     padding: 0.75rem 1rem;
-  }
-
-  .jam-header h2 {
-    font-size: 1.1rem;
-  }
-
-  .subtitle {
-    display: none;
   }
 
   .controls {

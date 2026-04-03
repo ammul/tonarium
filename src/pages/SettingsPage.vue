@@ -11,6 +11,7 @@ import { soundEnabled } from '@/state/soundEnabled.js'
 import { soundStyle } from '@/state/soundStyle.js'
 import { midiStatus, midiOutputs, selectedOutputId, initMidi, disconnectMidi } from '@/audio/midiManager.js'
 import { octave } from '@/state/octave.js'
+import PageHeader from '@/components/ui/PageHeader.vue'
 
 const DISPLAY_OPTIONS = [
   { value: 'pad',    label: 'Pad',    desc: 'Chromatic pad grid - pad numbers and note names visible. Layout (4x3 or 4x4) is configurable below.' },
@@ -38,10 +39,11 @@ function selectSoundStyle(style) {
 
 <template>
   <div class="settings-page">
-    <div class="settings-header">
-      <h2>Settings</h2>
-      <button class="close-btn" @click="emit('close')" aria-label="Close settings">&#x2715;</button>
-    </div>
+    <PageHeader title="Settings">
+      <template #actions>
+        <button class="btn btn-icon close-btn" @click="emit('close')" aria-label="Close settings">&#x2715;</button>
+      </template>
+    </PageHeader>
 
     <section class="settings-section">
       <h3>Display</h3>
@@ -155,20 +157,6 @@ function selectSoundStyle(style) {
   width: 100%;
   max-width: 680px;
   margin: 0 auto;
-}
-
-.settings-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.75rem;
-}
-
-.settings-header h2 {
-  font-size: 1.4rem;
-  color: var(--accent);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
 .close-btn {
@@ -387,11 +375,6 @@ function selectSoundStyle(style) {
 @media (orientation: landscape) and (max-height: 500px) {
   .settings-page {
     padding: 0.75rem 1rem;
-  }
-
-  .settings-header h2 {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
   }
 }
 </style>
