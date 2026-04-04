@@ -1279,11 +1279,13 @@ src/components/learn/LearnStepNav.test.js
 37. ✅ LearnMode.vue delegates steps 1-4 via v-if; migrated tests to child files
 38. ✅ **TEST:** `npm test` — 244 tests pass
 
-### Week 6: Constants Extraction + Polish
-35. Extract scales.js, intervals.js, progressions.js from components
-36. Extract components from ChordProgressions, JamMode (optional)
-37. Final cleanup: remove dead CSS, unused imports
-38. **TEST:** `npm test` && `npm run build` — all pass
+### ✅ Phase 7 DONE — LearnMode Steps 5-7 + Finalization (268 tests pass)
+39. ✅ Create `LearnChords.vue` + `LearnChords.test.js` (4 tests)
+40. ✅ Create `LearnImprovising.vue` + `LearnImprovising.test.js` (6 tests)
+41. ✅ Create `LearnBeats.vue` + `LearnBeats.test.js` (8 tests — migrated from LearnMode.test.js)
+42. ✅ Create `LearnStepFooter.vue` + `LearnStepFooter.test.js` (7 tests)
+43. ✅ Finalize `LearnMode.vue` as 64-line orchestrator (was 2,077 lines)
+44. ✅ **TEST:** `npm test` — 268 tests pass
 
 ---
 
