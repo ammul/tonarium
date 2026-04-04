@@ -2,18 +2,10 @@
 import { ref, computed } from 'vue'
 import { playNote, stopAllNotes } from '@/audio/audioEngine.js'
 import NoteStripPicker from '@/components/ui/NoteStripPicker.vue'
+import { LEARN_SCALES as SCALES } from '@/constants/scales.js'
 
 const CHROMATIC = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 const IS_SHARP  = new Set([1,3,6,8,10])
-
-const SCALES = [
-  { name: 'Major',         steps: [0,2,4,5,7,9,11], feel: 'Bright and resolved' },
-  { name: 'Natural Minor', steps: [0,2,3,5,7,8,10], feel: 'Dark and emotional' },
-  { name: 'Minor Pent.',   steps: [0,3,5,7,10],      feel: '5 notes - easy to improvise over' },
-  { name: 'Major Pent.',   steps: [0,2,4,7,9],       feel: '5 notes - always sounds positive' },
-  { name: 'Dorian',        steps: [0,2,3,5,7,9,10],  feel: 'Soulful, funky minor' },
-  { name: 'Mixolydian',    steps: [0,2,4,5,7,9,10],  feel: 'Bluesy, rock feel' },
-]
 
 const scaleRoot        = ref(0)
 const scaleIdx         = ref(0)

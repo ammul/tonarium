@@ -2,19 +2,13 @@
 import { ref, computed } from 'vue'
 import { playChord, stopAllNotes } from '@/audio/audioEngine.js'
 import NoteStripPicker from '@/components/ui/NoteStripPicker.vue'
+import { LEARN_PROGS as PROGS } from '@/constants/progressions.js'
 
 const CHROMATIC  = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 const MAJOR_SCALE = [0,2,4,5,7,9,11]
 const DIA_TYPES   = ['maj','min','min','maj','maj','min','dim']
 const ROMAN       = ['I','ii','iii','IV','V','vi','vii°']
 const CHORD_ITVS  = { maj:[0,4,7], min:[0,3,7], dim:[0,3,6] }
-
-const PROGS = [
-  { name:'I – V – vi – IV',  degIdx:[0,4,5,3], feel:'Pop anthem',  songs:'Let It Be · No Woman No Cry' },
-  { name:'I – IV – V',       degIdx:[0,3,4],   feel:'Blues / rock', songs:'Johnny B. Goode · Wild Thing' },
-  { name:'ii – V – I',       degIdx:[1,4,0],   feel:'Jazz',         songs:'Autumn Leaves · most standards' },
-  { name:'I – vi – IV – V',  degIdx:[0,5,3,4], feel:'50s doo-wop', songs:'Stand By Me · Blue Moon' },
-]
 
 const progRoot           = ref(0)
 const activeProg         = ref(null)

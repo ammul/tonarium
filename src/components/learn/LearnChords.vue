@@ -2,24 +2,7 @@
 import { ref } from 'vue'
 import { playChord } from '@/audio/audioEngine.js'
 import NoteStripPicker from '@/components/ui/NoteStripPicker.vue'
-
-const CHORD_TYPES = [
-  {
-    chord: 'Major chord',
-    def:   'Bright, resolved. Root + major 3rd (4 semitones) + 5th (7 semitones).',
-    itvs:  [0, 4, 7],
-  },
-  {
-    chord: 'Minor chord',
-    def:   'Dark, emotional. Like major but the 3rd is flattened by one semitone (3 semitones).',
-    itvs:  [0, 3, 7],
-  },
-  {
-    chord: 'Dominant 7th',
-    def:   'Tense, bluesy. A major chord with a flattened 7th (10 semitones) added — wants to resolve.',
-    itvs:  [0, 4, 7, 10],
-  },
-]
+import { CHORD_TYPES } from '@/constants/chordTypes.js'
 
 const chordsRoot = ref(0)
 </script>

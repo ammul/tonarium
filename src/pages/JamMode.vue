@@ -12,51 +12,7 @@ import ScaleLegend from '@/components/music/ScaleLegend.vue'
 import RootNotePicker from '@/components/music/RootNotePicker.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
-
-const SCALES = [
-  {
-    id: 'mi.p',
-    label: 'mi.p - Minor Pentatonic',
-    intervals: [0, 3, 5, 7, 10],
-    description: 'The most forgiving scale for improv. 5 notes, zero clashes - every one works over almost any minor chord or progression. Start here if you\'re new to soloing.',
-  },
-  {
-    id: 'ma.p',
-    label: 'ma.p - Major Pentatonic',
-    intervals: [0, 2, 4, 7, 9],
-    description: '5 open, consonant notes that sound good over almost any major chord. Bright and uplifting - nothing feels out of place. Great for country, pop, and folk melodies.',
-  },
-  {
-    id: 'min',
-    label: 'min - Minor (Natural)',
-    intervals: [0, 2, 3, 5, 7, 8, 10],
-    description: 'Minor pentatonic with 2 extra notes, adding more colour and expression. Dark and emotional. A couple of notes need more care - avoid landing on the 2nd or 6th for too long.',
-  },
-  {
-    id: 'maj',
-    label: 'maj - Major (Ionian)',
-    intervals: [0, 2, 4, 5, 7, 9, 11],
-    description: 'Major pentatonic with 2 extra notes, giving more melodic options. Bright and resolved. The 4th can sound slightly tense if held - use it as a passing note.',
-  },
-  {
-    id: 'dor',
-    label: 'dor - Dorian',
-    intervals: [0, 2, 3, 5, 7, 9, 10],
-    description: 'Minor but slightly brighter - a raised 6th gives it a soulful, funky edge. Works well over minor chord jams. Think Santana, Oye Como Va, or modal jazz leads.',
-  },
-  {
-    id: 'mix',
-    label: 'mix - Mixolydian',
-    intervals: [0, 2, 4, 5, 7, 9, 10],
-    description: 'Major with a bluesy, unresolved edge - the flat 7th adds a rock and roll feel. Works perfectly over dominant 7th chords or a classic rock jam.',
-  },
-  {
-    id: 'chr',
-    label: 'chr - Chromatic',
-    intervals: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-    description: 'All 12 notes - no filtering. Every note is available. Useful for playing chromatically or sending any MIDI note to a connected device.',
-  },
-]
+import { JAM_SCALES as SCALES } from '@/constants/scales.js'
 
 // Semitone offsets from root considered "anchor" notes (root, minor 3rd, major 3rd, 5th)
 const ANCHOR_OFFSETS = new Set([0, 3, 4, 7])
