@@ -1,49 +1,15 @@
 <script setup>
-import { ref, computed, watch, onUnmounted } from 'vue'
-import { playNote, playChord, stopAllNotes } from '@/audio/audioEngine.js'
+import { ref, watch, onUnmounted } from 'vue'
+import { playNote, playChord } from '@/audio/audioEngine.js'
 import { pattern as drumPattern, play as drumPlay, pause as drumPause, isPlaying as drumIsPlaying, currentStep as drumCurrentStep } from '@/audio/drumEngine.js'
 import NoteStripPicker from '@/components/ui/NoteStripPicker.vue'
-import { NOTE_TO_SEMI } from '@/constants/musicConstants.js'
+import LearnStepNav from '@/components/learn/LearnStepNav.vue'
+import LearnRootNotes from '@/components/learn/LearnRootNotes.vue'
+import LearnIntervals from '@/components/learn/LearnIntervals.vue'
+import LearnScales from '@/components/learn/LearnScales.vue'
+import LearnProgressions from '@/components/learn/LearnProgressions.vue'
 
 const emit = defineEmits(['navigate'])
-
-const CHROMATIC = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
-const IS_SHARP  = new Set([1,3,6,8,10])
-
-const INTERVALS = [
-  { semi: 1,  name: 'Minor 2nd',   feel: 'Tense, dissonant' },
-  { semi: 2,  name: 'Major 2nd',   feel: 'Stepwise, melodic' },
-  { semi: 3,  name: 'Minor 3rd',   feel: 'Dark, minor feel' },
-  { semi: 4,  name: 'Major 3rd',   feel: 'Bright, major feel' },
-  { semi: 5,  name: 'Perfect 4th', feel: 'Open, stable' },
-  { semi: 6,  name: 'Tritone',     feel: 'Unstable, dramatic' },
-  { semi: 7,  name: 'Perfect 5th', feel: 'Strong, powerful' },
-  { semi: 8,  name: 'Minor 6th',   feel: 'Bittersweet' },
-  { semi: 9,  name: 'Major 6th',   feel: 'Warm, uplifting' },
-  { semi: 10, name: 'Minor 7th',   feel: 'Bluesy, unresolved' },
-  { semi: 11, name: 'Major 7th',   feel: 'Dreamy, tense' },
-]
-
-const SCALES = [
-  { name: 'Major',         steps: [0,2,4,5,7,9,11], feel: 'Bright and resolved' },
-  { name: 'Natural Minor', steps: [0,2,3,5,7,8,10], feel: 'Dark and emotional' },
-  { name: 'Minor Pent.',   steps: [0,3,5,7,10],      feel: '5 notes - easy to improvise over' },
-  { name: 'Major Pent.',   steps: [0,2,4,7,9],       feel: '5 notes - always sounds positive' },
-  { name: 'Dorian',        steps: [0,2,3,5,7,9,10],  feel: 'Soulful, funky minor' },
-  { name: 'Mixolydian',    steps: [0,2,4,5,7,9,10],  feel: 'Bluesy, rock feel' },
-]
-
-const MAJOR_SCALE = [0,2,4,5,7,9,11]
-const DIA_TYPES   = ['maj','min','min','maj','maj','min','dim']
-const ROMAN       = ['I','ii','iii','IV','V','vi','vii°']
-const CHORD_ITVS  = { maj:[0,4,7], min:[0,3,7], dim:[0,3,6] }
-
-const PROGS = [
-  { name:'I – V – vi – IV',  degIdx:[0,4,5,3], feel:'Pop anthem',  songs:'Let It Be · No Woman No Cry' },
-  { name:'I – IV – V',       degIdx:[0,3,4],   feel:'Blues / rock', songs:'Johnny B. Goode · Wild Thing' },
-  { name:'ii – V – I',       degIdx:[1,4,0],   feel:'Jazz',         songs:'Autumn Leaves · most standards' },
-  { name:'I – vi – IV – V',  degIdx:[0,5,3,4], feel:'50s doo-wop', songs:'Stand By Me · Blue Moon' },
-]
 
 const CHORD_TYPES = [
   {
@@ -117,123 +83,6 @@ const BEAT_TIPS = [
 const STEPS = ['Root Notes', 'Intervals', 'Scales', 'Progressions', 'Chords', 'Improvising', 'Beats']
 const step  = ref(0)
 
-// ── Step 1: Root Notes ───────────────────────────────────────────────────────
-const rootNoteIdx = ref(null)
-
-function pickRootNote(i) {
-  rootNoteIdx.value = i
-  playNote(60 + NOTE_TO_SEMI[i])
-}
-
-function playRootOctave() {
-  if (rootNoteIdx.value === null) return
-  playNote(60 + NOTE_TO_SEMI[rootNoteIdx.value])
-  setTimeout(() => playNote(72 + NOTE_TO_SEMI[rootNoteIdx.value], 0.8), 550)
-}
-
-// ── Step 2: Intervals ────────────────────────────────────────────────────────
-const fromIdx = ref(null)
-const toIdx   = ref(null)
-
-function pickNote(i) {
-  if (fromIdx.value === null) {
-    fromIdx.value = i
-    playNote(60 + NOTE_TO_SEMI[i])
-  } else if (toIdx.value === null && i !== fromIdx.value) {
-    toIdx.value = i
-    playChord([60 + NOTE_TO_SEMI[fromIdx.value], 60 + NOTE_TO_SEMI[i]])
-  } else {
-    fromIdx.value = i
-    toIdx.value   = null
-    playNote(60 + NOTE_TO_SEMI[i])
-  }
-}
-
-const selectedRefSemi = ref(null)
-
-function pickRefInterval(semi) {
-  if (selectedRefSemi.value === semi) {
-    selectedRefSemi.value = null
-    fromIdx.value = null
-    toIdx.value = null
-  } else {
-    selectedRefSemi.value = semi
-    fromIdx.value = 0
-    toIdx.value = semi
-    playChord([60, 60 + semi])
-  }
-}
-
-const intervalInfo = computed(() => {
-  if (fromIdx.value !== null && toIdx.value !== null) {
-    const semi = ((toIdx.value - fromIdx.value) + 12) % 12
-    return INTERVALS.find(iv => iv.semi === semi) ?? null
-  }
-  if (selectedRefSemi.value !== null) {
-    return INTERVALS.find(iv => iv.semi === selectedRefSemi.value) ?? null
-  }
-  return null
-})
-
-// ── Step 2: Scales ───────────────────────────────────────────────────────────
-const scaleRoot        = ref(0)
-const scaleIdx         = ref(0)
-const scalePlayingNote = ref(null)
-
-const scaleNotes = computed(() =>
-  SCALES[scaleIdx.value].steps.map(s => (scaleRoot.value + s) % 12)
-)
-
-const scaleFullName = computed(() =>
-  `${CHROMATIC[scaleRoot.value]} ${SCALES[scaleIdx.value].name}`
-)
-
-let _scaleTimers = []
-
-function pickScaleRoot(i) {
-  _scaleTimers.forEach(clearTimeout)
-  _scaleTimers = []
-  stopAllNotes()
-  scalePlayingNote.value = null
-  scaleRoot.value = i
-}
-
-function playScale() {
-  _scaleTimers.forEach(clearTimeout)
-  _scaleTimers = []
-  scalePlayingNote.value = null
-  const { steps } = SCALES[scaleIdx.value]
-  steps.forEach((s, i) => {
-    const noteIdx = (scaleRoot.value + s) % 12
-    _scaleTimers.push(setTimeout(() => {
-      scalePlayingNote.value = noteIdx
-      playNote(60 + scaleRoot.value + s, 0.5)
-    }, i * 280))
-  })
-  _scaleTimers.push(setTimeout(() => {
-    scalePlayingNote.value = scaleRoot.value
-    playNote(72 + scaleRoot.value, 0.8)
-  }, steps.length * 280))
-  _scaleTimers.push(setTimeout(() => {
-    scalePlayingNote.value = null
-  }, (steps.length + 1) * 280))
-}
-
-// ── Step 3: Progressions ─────────────────────────────────────────────────────
-const progRoot           = ref(0)
-const activeProg         = ref(null)
-const progActiveChordIdx = ref(null)
-let   _progTimers        = []
-
-function pickProgRoot(i) {
-  _progTimers.forEach(clearTimeout)
-  _progTimers = []
-  stopAllNotes()
-  progRoot.value           = i
-  activeProg.value         = null
-  progActiveChordIdx.value = null
-}
-
 // ── Step 4: Chords ───────────────────────────────────────────────────────────
 const chordsRoot = ref(0)
 
@@ -282,50 +131,6 @@ function playImprovExample(chordSemis, noteSemi) {
   setTimeout(() => playNote(root + noteSemi, 2.0), 500)
 }
 
-function chordLabel(rootC, di) {
-  const semi = (rootC + MAJOR_SCALE[di]) % 12
-  const suf  = DIA_TYPES[di] === 'maj' ? '' : DIA_TYPES[di] === 'min' ? 'm' : '°'
-  return CHROMATIC[semi] + suf
-}
-
-function chordMidis(rootC, di) {
-  const semi = (rootC + MAJOR_SCALE[di]) % 12
-  return CHORD_ITVS[DIA_TYPES[di]].map(i => 60 + semi + i)
-}
-
-function tapDiatonic(di) {
-  playChord(chordMidis(progRoot.value, di))
-}
-
-function tapProg(pi) {
-  _progTimers.forEach(clearTimeout)
-  _progTimers = []
-  progActiveChordIdx.value = null
-  activeProg.value = activeProg.value === pi ? null : pi
-  if (activeProg.value === null) return
-  PROGS[pi].degIdx.forEach((deg, i) => {
-    _progTimers.push(
-      setTimeout(() => {
-        progActiveChordIdx.value = i
-        playChord(chordMidis(progRoot.value, deg), 0.9)
-      }, i * 900)
-    )
-  })
-  _progTimers.push(
-    setTimeout(() => { progActiveChordIdx.value = null }, PROGS[pi].degIdx.length * 900)
-  )
-}
-
-const activeDegrees = computed(() =>
-  activeProg.value === null ? new Set() : new Set(PROGS[activeProg.value].degIdx)
-)
-
-const progActiveDeg = computed(() =>
-  activeProg.value !== null && progActiveChordIdx.value !== null
-    ? PROGS[activeProg.value].degIdx[progActiveChordIdx.value]
-    : null
-)
-
 // ── Step 5: Beats ────────────────────────────────────────────────────────────
 const loadedPattern = ref(null)
 const BEAT_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }
@@ -370,221 +175,19 @@ onUnmounted(() => {
   <div class="learn-mode">
 
     <!-- Step navigation -->
-    <div class="step-nav">
-      <button
-        v-for="(s, i) in STEPS"
-        :key="i"
-        class="step-btn"
-        :class="{ active: step === i, done: step > i }"
-        @click="step = i"
-      >
-        <span class="step-num">{{ i + 1 }}</span>
-        <span class="step-label">{{ s }}</span>
-      </button>
-    </div>
+    <LearnStepNav :steps="STEPS" :model-value="step" @update:model-value="step = $event" />
 
     <!-- ── Step 1: Root Notes ────────────────────────────────────────────── -->
-    <div v-if="step === 0" class="step-content">
-      <p class="step-intro">Every piece of music orbits a home note — the <strong>root</strong>. When a melody lands on it, it sounds resolved. When it moves away, it creates tension. Everything else — scales, chords, keys — is named and measured relative to this anchor.</p>
-
-      <div class="root-note-picker">
-        <NoteStripPicker
-          :from-index="rootNoteIdx"
-          @note-down="pickRootNote"
-        />
-      </div>
-
-      <div class="root-result">
-        <template v-if="rootNoteIdx !== null">
-          <div class="rr-name">{{ CHROMATIC[rootNoteIdx] }}</div>
-          <div class="rr-label">your root note</div>
-          <button class="rr-octave-btn" @click="playRootOctave">Hear it one octave up</button>
-        </template>
-        <template v-else>
-          <div class="rr-hint">Tap any note to set your root</div>
-        </template>
-      </div>
-
-      <div class="root-facts">
-        <div class="rf-item">
-          <span class="rf-heading">12 notes</span>
-          <span class="rf-body">Western music uses 12 notes before the pattern repeats. The 7 natural notes (A B C D E F G) plus 5 sharps in between — the black keys on a piano.</span>
-        </div>
-        <div class="rf-item">
-          <span class="rf-heading">Octaves</span>
-          <span class="rf-body">Every note repeats at double the frequency — same name, higher pitch. C and the C above it sound related because the higher one vibrates exactly twice as fast.</span>
-        </div>
-        <div class="rf-item">
-          <span class="rf-heading">Keys</span>
-          <span class="rf-body">When someone says a song is in <em>C major</em>, C is the root. The root gives the key its name and is the note the music wants to return to.</span>
-        </div>
-      </div>
-
-      <div class="step-bridge">
-        Once you have a root, you can describe the <strong>distance</strong> to any other note. That distance is called an <strong>interval</strong>.
-      </div>
-    </div>
+    <LearnRootNotes v-if="step === 0" />
 
     <!-- ── Step 2: Intervals ─────────────────────────────────────────────── -->
-    <div v-if="step === 1" class="step-content">
-      <p class="step-intro">Tap any two notes - hear the sound and see the <strong>interval</strong> between them.</p>
+    <LearnIntervals v-if="step === 1" />
 
-      <NoteStripPicker
-        :from-index="fromIdx"
-        :to-index="toIdx"
-        @note-down="pickNote"
-      />
+    <!-- ── Step 3: Scales ───────────────────────────────────────────────── -->
+    <LearnScales v-if="step === 2" />
 
-      <div class="interval-result">
-        <template v-if="intervalInfo">
-          <div class="iv-name">{{ intervalInfo.name }}</div>
-          <div class="iv-semi">{{ intervalInfo.semi }} semitone{{ intervalInfo.semi !== 1 ? 's' : '' }}</div>
-          <div class="iv-feel">{{ intervalInfo.feel }}</div>
-          <div v-if="fromIdx !== null && toIdx !== null" class="iv-path">
-            {{ CHROMATIC[fromIdx] }} → {{ CHROMATIC[toIdx] }}
-          </div>
-        </template>
-        <template v-else-if="fromIdx !== null">
-          <div class="iv-hint">Now pick a second note</div>
-          <div class="iv-hint-sub">{{ CHROMATIC[fromIdx] }} selected</div>
-        </template>
-        <template v-else>
-          <div class="iv-hint">Pick a starting note</div>
-        </template>
-      </div>
-
-      <div class="iv-reference">
-        <div class="ref-label">All intervals from root — tap to hear</div>
-        <div class="ref-grid">
-          <div v-for="iv in INTERVALS" :key="iv.semi" class="ref-item"
-            :class="{ highlight: intervalInfo && intervalInfo.semi === iv.semi }"
-            @click="pickRefInterval(iv.semi)">
-            <span class="ref-semi">{{ iv.semi }}</span>
-            <span class="ref-name">{{ iv.name }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="step-bridge">
-        Three intervals matter most: <strong>Minor 3rd</strong> (3 semitones), <strong>Major 3rd</strong> (4), and <strong>Perfect 5th</strong> (7). Stack a 3rd and a 5th above any root and you have a <strong>chord</strong>. Stack several chords in a row and you have a <strong>progression</strong>.
-      </div>
-    </div>
-
-    <!-- ── Step 2: Scales ────────────────────────────────────────────────── -->
-    <div v-if="step === 2" class="step-content">
-      <p class="step-intro">A <strong>scale</strong> is a fixed pattern of intervals repeating from a root. The Major scale uses the same intervals every time — that's why it always sounds the same no matter which root you pick. Pick a root, choose a scale, hear which notes light up.</p>
-
-      <div class="picker-row">
-        <span class="picker-label">Root</span>
-        <NoteStripPicker
-          small
-          :from-index="scaleRoot"
-          @note-down="pickScaleRoot"
-        />
-      </div>
-
-      <div class="picker-row">
-        <span class="picker-label">Scale</span>
-        <div class="scale-tabs">
-          <button
-            v-for="(sc, si) in SCALES"
-            :key="si"
-            class="scale-tab"
-            :class="{ active: scaleIdx === si }"
-            @click="scaleIdx = si"
-          >{{ sc.name }}</button>
-        </div>
-      </div>
-
-      <div class="scale-display-legend">
-        <span class="sdl-item sdl-root">Root</span>
-        <span class="sdl-item sdl-scale">Scale</span>
-      </div>
-
-      <div class="scale-display">
-        <div
-          v-for="(note, i) in CHROMATIC"
-          :key="i"
-          class="scale-tile"
-          :class="{
-            active:   scaleNotes.includes(i),
-            root:     i === scaleRoot,
-            sharp:    IS_SHARP.has(i),
-            playing:  scalePlayingNote === i,
-          }"
-          @pointerdown.prevent="playNote(60 + i)"
-        >{{ note }}</div>
-      </div>
-
-      <div class="scale-meta">
-        <span class="scale-name">{{ scaleFullName }}</span>
-        <span class="scale-feel">{{ SCALES[scaleIdx].feel }}</span>
-        <button class="play-scale-btn" @click="playScale">Play scale</button>
-      </div>
-    </div>
-
-    <!-- ── Step 3: Progressions ──────────────────────────────────────────── -->
-    <div v-if="step === 3" class="step-content">
-      <p class="step-intro">Chords are labelled with <strong>Roman numerals</strong> based on the scale they come from — every chord in a key uses only notes from that key's scale. That's why they all sound good together. Tap any chord to hear it, or tap a progression to play it.</p>
-
-      <div class="picker-row">
-        <span class="picker-label">Key</span>
-        <NoteStripPicker
-          small
-          :from-index="progRoot"
-          @note-down="pickProgRoot"
-        />
-      </div>
-
-      <div class="section-label">Chords in key</div>
-
-      <div class="diatonic-row">
-        <button
-          v-for="(roman, di) in ROMAN"
-          :key="di"
-          class="diatonic-chord"
-          :class="{
-            maj:       DIA_TYPES[di] === 'maj',
-            min:       DIA_TYPES[di] === 'min',
-            dim:       DIA_TYPES[di] === 'dim',
-            highlight: activeDegrees.has(di),
-            playing:   progActiveDeg === di,
-          }"
-          @pointerdown.prevent="tapDiatonic(di)"
-        >
-          <span class="dc-roman">{{ roman }}</span>
-          <span class="dc-name">{{ chordLabel(progRoot, di) }}</span>
-        </button>
-      </div>
-
-      <div class="section-label">Common progressions</div>
-
-      <div class="prog-list">
-        <button
-          v-for="(prog, pi) in PROGS"
-          :key="pi"
-          class="prog-item"
-          :class="{ active: activeProg === pi }"
-          @click="tapProg(pi)"
-        >
-          <div class="prog-top">
-            <span class="prog-name">{{ prog.name }}</span>
-            <span class="prog-feel">{{ prog.feel }}</span>
-          </div>
-          <div v-if="activeProg === pi" class="prog-bottom">
-            <div class="prog-chords">
-              <span
-                v-for="(deg, ci) in prog.degIdx"
-                :key="ci"
-                class="prog-chord-pill"
-                :class="[DIA_TYPES[deg], { playing: progActiveChordIdx === ci }]"
-              >{{ chordLabel(progRoot, deg) }}</span>
-            </div>
-            <div class="prog-songs">{{ prog.songs }}</div>
-          </div>
-        </button>
-      </div>
-    </div>
+    <!-- ── Step 4: Progressions ─────────────────────────────────────────── -->
+    <LearnProgressions v-if="step === 3" />
 
     <!-- ── Step 4: Chords ───────────────────────────────────────────────── -->
     <div v-if="step === 4" class="step-content">
