@@ -95,3 +95,144 @@ const intervalInfo = computed(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.step-intro {
+  font-size: 0.87rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.step-intro strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.interval-result {
+  min-height: 7rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 1rem;
+  background: var(--raised);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+}
+
+.iv-name {
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.iv-semi {
+  font-size: 0.82rem;
+  color: var(--accent-mid);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.iv-feel {
+  font-size: 0.88rem;
+  color: var(--text2);
+}
+
+.iv-path {
+  font-size: 0.78rem;
+  color: var(--text4);
+  margin-top: 0.2rem;
+  letter-spacing: 0.05em;
+}
+
+.iv-hint {
+  font-size: 1rem;
+  color: var(--text3);
+  font-weight: 600;
+}
+
+.iv-hint-sub {
+  font-size: 0.82rem;
+  color: var(--accent-mid);
+}
+
+.iv-reference {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ref-label {
+  font-size: 0.72rem;
+  color: var(--text4);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+}
+
+.ref-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.ref-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--input);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ref-item:hover {
+  background: var(--raised);
+  border-color: var(--border2);
+}
+
+.ref-item.highlight {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.ref-semi {
+  color: var(--accent-mid);
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 0.8rem;
+}
+
+.ref-name { color: var(--text3); }
+
+.ref-item.highlight .ref-semi { color: var(--accent); }
+.ref-item.highlight .ref-name { color: var(--text2); }
+
+.step-bridge {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--raised);
+  font-size: 0.84rem;
+  color: var(--text3);
+  line-height: 1.6;
+}
+
+.step-bridge strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+</style>

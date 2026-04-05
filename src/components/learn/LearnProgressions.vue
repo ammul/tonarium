@@ -132,3 +132,182 @@ const progActiveDeg = computed(() =>
     </div>
   </div>
 </template>
+
+<style scoped>
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.step-intro {
+  font-size: 0.87rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.step-intro strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: -0.25rem;
+}
+
+.diatonic-row {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.diatonic-chord {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.55rem 0.5rem;
+  min-width: 3.2rem;
+  border-radius: 7px;
+  border: 1px solid var(--border2);
+  background: var(--raised);
+  cursor: pointer;
+  font-family: inherit;
+  user-select: none;
+  touch-action: none;
+  transition: background 0.12s, border-color 0.12s, transform 0.08s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.diatonic-chord:hover { background: var(--border); }
+.diatonic-chord:active { transform: scale(0.94); }
+
+.diatonic-chord.highlight {
+  background: var(--selected);
+  border-color: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.diatonic-chord.playing {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.diatonic-chord.min { border-color: var(--border); }
+.diatonic-chord.dim { opacity: 0.7; }
+
+.dc-roman {
+  font-size: 0.68rem;
+  color: var(--text4);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.dc-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.diatonic-chord.min .dc-name { color: var(--accent-lo); }
+.diatonic-chord.dim .dc-name { color: var(--text3); }
+.diatonic-chord.highlight .dc-roman { color: var(--accent-mid); }
+.diatonic-chord.highlight .dc-name { color: var(--accent-hi); }
+
+.prog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.prog-item {
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--raised);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s, background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.prog-item:hover { background: var(--border); }
+
+.prog-item.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.prog-top {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.prog-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.prog-feel {
+  font-size: 0.78rem;
+  color: var(--text4);
+}
+
+.prog-bottom {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.prog-chords {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.prog-chord-pill {
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: var(--input);
+  color: var(--accent);
+  border: 1px solid var(--border2);
+}
+
+.prog-chord-pill.min { color: var(--accent-lo); }
+.prog-chord-pill.dim { color: var(--text3); }
+
+.prog-chord-pill.playing {
+  background: var(--selected);
+  border-color: var(--accent);
+  color: var(--accent-hi);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.prog-songs {
+  font-size: 0.76rem;
+  color: var(--text4);
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 600px) {
+  .diatonic-row { gap: 0.3rem; }
+  .diatonic-chord { min-width: 2.6rem; padding: 0.45rem 0.35rem; }
+}
+</style>

@@ -104,3 +104,171 @@ function playScale() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.step-intro {
+  font-size: 0.87rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.step-intro strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.scale-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.scale-tab {
+  padding: 0.35rem 0.7rem;
+  border-radius: 5px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text3);
+  font-size: 0.8rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.scale-tab:hover { background: var(--raised); color: var(--text2); }
+
+.scale-tab.active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.scale-display-legend {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.sdl-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--text4);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sdl-item::before {
+  content: '';
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.sdl-root::before {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
+}
+
+.sdl-scale::before {
+  background: var(--raised);
+  border: 1px solid var(--border2);
+}
+
+.scale-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.scale-tile {
+  min-width: 2.8rem;
+  padding: 0.6rem 0.4rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--input);
+  color: var(--text5);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  user-select: none;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.scale-tile.active {
+  background: var(--raised);
+  border-color: var(--border2);
+  color: var(--text2);
+}
+
+.scale-tile.root {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
+.scale-tile.sharp { font-size: 0.75rem; }
+.scale-tile.active.sharp { color: var(--text3); }
+.scale-tile.root.sharp { color: var(--accent); font-size: 0.82rem; }
+
+.scale-tile.playing {
+  border-color: var(--accent);
+  background: var(--selected);
+  color: var(--accent-hi);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.scale-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.scale-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.scale-feel {
+  font-size: 0.85rem;
+  color: var(--text3);
+  flex: 1;
+}
+
+.play-scale-btn {
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent-mid);
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.play-scale-btn:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}
+</style>
