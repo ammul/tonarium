@@ -100,29 +100,13 @@ function playScale() {
     <div class="scale-meta">
       <span class="scale-name">{{ scaleFullName }}</span>
       <span class="scale-feel">{{ SCALES[scaleIdx].feel }}</span>
-      <button class="play-scale-btn" @click="playScale">Play scale</button>
+      <button class="btn btn-accent flex-shrink-0" @click="playScale">Play scale</button>
     </div>
   </div>
 </template>
 
 <style scoped>
-.step-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.35rem;
-}
-
-.step-intro {
-  font-size: 0.87rem;
-  color: var(--text2);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.step-intro strong {
-  color: var(--accent);
-  font-weight: 600;
-}
+/* step-content, step-intro — from learn.css */
 
 .scale-tabs {
   display: flex;
@@ -252,23 +236,4 @@ function playScale() {
   flex: 1;
 }
 
-.play-scale-btn {
-  padding: 0.4rem 1rem;
-  border-radius: 6px;
-  border: 1px solid var(--accent-mid);
-  background: transparent;
-  color: var(--accent);
-  font-size: 0.82rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  letter-spacing: 0.04em;
-  transition: background 0.15s, border-color 0.15s;
-  flex-shrink: 0;
-}
-
-.play-scale-btn:hover {
-  background: var(--accent-bg);
-  border-color: var(--accent);
-}
 </style>

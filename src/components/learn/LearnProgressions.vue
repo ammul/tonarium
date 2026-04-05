@@ -109,7 +109,7 @@ const progActiveDeg = computed(() =>
       <button
         v-for="(prog, pi) in PROGS"
         :key="pi"
-        class="prog-item"
+        class="card card-sm card-interactive prog-item"
         :class="{ active: activeProg === pi }"
         @click="tapProg(pi)"
       >
@@ -134,23 +134,7 @@ const progActiveDeg = computed(() =>
 </template>
 
 <style scoped>
-.step-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.35rem;
-}
-
-.step-intro {
-  font-size: 0.87rem;
-  color: var(--text2);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.step-intro strong {
-  color: var(--accent);
-  font-weight: 600;
-}
+/* step-content, step-intro — from learn.css */
 
 .section-label {
   font-size: 0.7rem;
@@ -228,24 +212,11 @@ const progActiveDeg = computed(() =>
   gap: 0.35rem;
 }
 
+/* unique properties not covered by .card + .card-sm + .card-interactive */
 .prog-item {
   width: 100%;
   text-align: left;
-  padding: 0.65rem 0.85rem;
-  border-radius: 8px;
-  border: 1px solid var(--border2);
-  background: var(--raised);
-  cursor: pointer;
   font-family: inherit;
-  transition: border-color 0.12s, background 0.12s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.prog-item:hover { background: var(--border); }
-
-.prog-item.active {
-  border-color: var(--accent);
-  background: var(--accent-bg);
 }
 
 .prog-top {

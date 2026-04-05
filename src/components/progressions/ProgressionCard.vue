@@ -22,17 +22,17 @@ defineEmits(['toggle-expand', 'play', 'stop', 'loop-start', 'loop-stop'])
       </div>
       <div class="prog-card-controls" @click.stop>
         <button
-          class="ctrl-btn"
+          class="btn btn-xs btn-subtle btn-icon btn-toggle ctrl-btn"
           :class="{ active: isPlaying }"
           :aria-label="isPlaying ? 'Stop' : 'Play'"
           @click="isPlaying ? $emit('stop') : $emit('play')"
         >{{ isPlaying ? '■' : '▶' }}</button>
         <button
-          class="ctrl-btn"
+          class="btn btn-xs btn-subtle btn-icon btn-toggle"
           aria-label="Loop"
           @click="$emit('loop-start')"
         >⟳</button>
-        <button class="expand-btn" :aria-label="isExpanded ? 'Collapse' : 'Expand'">
+        <button class="btn btn-xs btn-subtle btn-icon" :aria-label="isExpanded ? 'Collapse' : 'Expand'">
           {{ isExpanded ? '▲' : '▼' }}
         </button>
       </div>
@@ -103,29 +103,6 @@ defineEmits(['toggle-expand', 'play', 'stop', 'loop-start', 'loop-stop'])
   gap: 0.3rem;
   flex-shrink: 0;
 }
-
-.ctrl-btn,
-.expand-btn {
-  height: 1.7rem;
-  min-width: 1.7rem;
-  padding: 0 0.35rem;
-  border: 1px solid var(--border2);
-  border-radius: 4px;
-  background: var(--input);
-  color: var(--text2);
-  font-size: 0.75rem;
-  cursor: pointer;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-}
-
-.ctrl-btn:hover,
-.expand-btn:hover { border-color: var(--accent); color: var(--text); }
-
-.ctrl-btn.active  { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
 .prog-card-body {
   padding: 0.5rem 0.75rem 0.65rem;

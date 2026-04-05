@@ -91,7 +91,7 @@ onUnmounted(() => {
             <span class="dw-dot"></span>
             <span class="dw-label">Drums</span>
             <button
-              class="dw-btn"
+              class="btn btn-icon dw-btn"
               :aria-label="drumIsPlaying ? 'Pause drums' : 'Play drums'"
               @click.stop="drumIsPlaying ? drumPause() : drumPlay()"
             >
@@ -104,13 +104,13 @@ onUnmounted(() => {
               </svg>
             </button>
           </div>
-          <button class="icon-btn" @click="activeTab === 'settings' ? closeSettings() : selectTab('settings')" :class="{ active: activeTab === 'settings' }" aria-label="Settings">
+          <button class="btn btn-icon icon-btn" @click="activeTab === 'settings' ? closeSettings() : selectTab('settings')" :class="{ active: activeTab === 'settings' }" aria-label="Settings">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
               <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.474l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
             </svg>
           </button>
-          <button class="burger-btn" @click="menuOpen = true" aria-label="Open menu">
+          <button class="btn burger-btn" @click="menuOpen = true" aria-label="Open menu">
             <span></span><span></span><span></span>
           </button>
         </div>
@@ -132,7 +132,7 @@ onUnmounted(() => {
     <div class="menu-overlay" :class="{ open: menuOpen }" @click="menuOpen = false"></div>
 
     <nav class="side-menu" :class="{ open: menuOpen }">
-      <button class="close-btn" @click="menuOpen = false" aria-label="Close menu">&#x2715;</button>
+      <button class="btn btn-ghost close-btn" @click="menuOpen = false" aria-label="Close menu">&#x2715;</button>
       <ul>
         <li v-for="tab in tabs" :key="tab.id">
           <button
@@ -253,26 +253,13 @@ h1 {
   color: var(--accent);
 }
 
+/* unique properties not covered by .btn + .btn-icon */
 .dw-btn {
   width: 24px;
   height: 24px;
-  background: transparent;
-  border: 1px solid var(--border2);
+  min-width: unset;
+  min-height: unset;
   border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text3);
-  flex-shrink: 0;
-  padding: 0;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
-}
-
-.dw-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-bg);
 }
 
 .drum-widget.playing .dw-btn {
@@ -280,39 +267,20 @@ h1 {
   border-color: var(--accent-mid);
 }
 
-/* Settings / icon button */
+/* unique properties not covered by .btn + .btn-icon */
 .icon-btn {
   width: 36px;
   height: 36px;
-  background: transparent;
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text3);
   flex-shrink: 0;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
-.icon-btn:hover  { border-color: var(--accent); color: var(--accent); }
-.icon-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
-
-/* Burger button */
+/* unique properties not covered by .btn */
 .burger-btn {
-  display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 5px;
+  padding: 8px 7px;
   width: 36px;
   height: 36px;
-  background: transparent;
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  cursor: pointer;
-  padding: 8px 7px;
   flex-shrink: 0;
 }
 
@@ -323,9 +291,7 @@ h1 {
   border-radius: 1px;
 }
 
-.burger-btn:hover {
-  border-color: var(--accent);
-}
+.burger-btn:hover { border-color: var(--accent); }
 
 main {
   padding-top: 4rem;
@@ -428,20 +394,14 @@ main {
   transform: translateX(0);
 }
 
+/* unique properties not covered by .btn + .btn-ghost */
 .close-btn {
   align-self: flex-end;
-  background: transparent;
-  border: none;
-  color: var(--text3);
   font-size: 1.1rem;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
   margin-bottom: 1.25rem;
 }
 
-.close-btn:hover {
-  color: var(--text);
-}
+.close-btn:hover { color: var(--text); }
 
 .side-menu ul {
   list-style: none;

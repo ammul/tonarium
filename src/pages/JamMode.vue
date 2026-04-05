@@ -144,8 +144,8 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 
     <ModeLayout>
       <template #pad>
-        <div class="grid">
-          <div class="row" v-for="(row, ri) in rows" :key="ri" :style="{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
+        <div class="pad-grid">
+          <div class="pad-row" v-for="(row, ri) in rows" :key="ri" :style="{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
             <div
               v-for="pad in row"
               :key="pad.number"
@@ -271,20 +271,7 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
   margin: 1.5rem 0;
 }
 
-/* Pad grid */
-.grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  max-width: 420px;
-  margin: 0 auto;
-}
-
-.row {
-  display: grid;
-  gap: 0.6rem;
-}
-
+/* Pad grid — base layout from display-modes.css (.pad-grid, .pad-row) */
 .pad {
   display: flex;
   flex-direction: column;
@@ -353,87 +340,10 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 .chroma-tile.root     .tile-note { color: var(--rust-hi); }
 .chroma-tile.pressed  .tile-note { color: var(--accent); }
 
-/* Guitar neck */
-.guitar-neck-wrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin-bottom: 0.5rem;
-}
-
-.guitar-neck {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  min-width: 380px;
-}
-
-.neck-row {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid var(--border3);
-}
-
-.string-name {
-  width: 1.8rem;
-  font-size: 0.7rem;
-  color: var(--text4);
-  font-weight: 600;
-  text-align: right;
-  padding-right: 0.5rem;
-  flex-shrink: 0;
-}
-
-.neck-cell {
-  flex: 1;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-right: 1px solid var(--border3);
-  position: relative;
-  user-select: none;
-  touch-action: pan-x;
-  cursor: pointer;
-}
-
-.neck-cell.open {
-  border-right: 3px solid var(--border2);
-}
-
-.neck-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--text3);
-  display: block;
-}
-
-.neck-dot.anchor {
-  background: var(--accent-lo);
-}
-
-.neck-dot.root {
-  background: var(--dot-root);
-  box-shadow: 0 0 4px var(--rust-glow);
-}
-
-.fret-numbers {
-  display: flex;
-  align-items: center;
-  margin-top: 0.3rem;
-}
-
-.string-name-spacer {
-  width: 1.8rem;
-  flex-shrink: 0;
-}
-
-.fret-num {
-  flex: 1;
-  font-size: 0.6rem;
-  color: var(--text5);
-  text-align: center;
-}
+/* Guitar neck — base structure from display-modes.css; only unique properties here */
+.neck-dot { background: var(--text3); }
+.neck-dot.anchor { background: var(--accent-lo); }
+.neck-dot.root { background: var(--dot-root); box-shadow: 0 0 4px var(--rust-glow); }
 
 /* Scale notes strip */
 .scale-notes {

@@ -78,8 +78,8 @@ const subtitle = computed(() => {
       <div class="input-col">
         <ModeLayout>
           <template #pad>
-            <div class="grid">
-              <div class="row" v-for="(row, ri) in rows" :key="ri" :style="{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
+            <div class="pad-grid">
+              <div class="pad-row" v-for="(row, ri) in rows" :key="ri" :style="{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
                 <button
                   v-for="pad in row"
                   :key="pad.padIdx"
@@ -141,7 +141,7 @@ const subtitle = computed(() => {
           </template>
         </ModeLayout>
 
-        <button class="clear-btn" @click="clearAll" :disabled="selected.size === 0">
+        <button class="btn btn-sm clear-btn" @click="clearAll" :disabled="selected.size === 0">
           Clear
         </button>
       </div>
@@ -190,10 +190,7 @@ const subtitle = computed(() => {
   align-items: flex-start;
 }
 
-/* Pad grid */
-.grid { display: flex; flex-direction: column; gap: 0.6rem; max-width: 420px; margin: 0 auto; }
-.row { display: grid; gap: 0.6rem; }
-
+/* Pad grid — base layout from display-modes.css (.pad-grid, .pad-row) */
 .pad {
   display: flex;
   flex-direction: column;
@@ -225,49 +222,17 @@ const subtitle = computed(() => {
 .pad.sharp .pad-note { color: var(--accent-lo); }
 .pad.selected .pad-note { color: var(--accent-hi); }
 
-/* Guitar neck */
-.guitar-neck-wrap {
-  overflow-x: auto;
-}
-
-.guitar-neck {
-  display: flex;
-  flex-direction: column;
-  min-width: 600px;
-}
-
-.neck-row {
-  display: flex;
-  align-items: stretch;
-  border-bottom: 1px solid var(--border3);
-}
-
-.string-name {
-  width: 1.8rem;
-  font-size: 0.7rem;
-  color: var(--text4);
-  font-weight: 600;
-  text-align: right;
-  padding-right: 0.5rem;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
+/* Guitar neck — overrides display-modes.css base where ChordDetector differs */
+.guitar-neck-wrap { overflow-x: auto; }
+.guitar-neck { min-width: 600px; }
+.neck-row { align-items: stretch; }
+.string-name { display: flex; align-items: center; justify-content: flex-end; }
 
 .neck-cell {
-  flex: 1;
   height: 2.4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-right: 1px solid var(--border3);
   border: none;
   background: var(--input);
-  cursor: pointer;
-  user-select: none;
   touch-action: none;
-  position: relative;
   transition: background 0.1s;
   border-right: 1px solid var(--border3);
   -webkit-tap-highlight-color: transparent;
@@ -281,14 +246,7 @@ const subtitle = computed(() => {
 .neck-cell.selected { background: var(--selected); }
 .neck-cell.selected.sharp { background: var(--sharp-sel); }
 
-.neck-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  display: block;
-  box-shadow: 0 0 4px var(--accent-glow);
-}
+.neck-dot { background: var(--accent); box-shadow: 0 0 4px var(--accent-glow); }
 
 .neck-note {
   font-size: 0.6rem;
@@ -298,39 +256,10 @@ const subtitle = computed(() => {
 }
 
 .neck-cell.open .neck-note { color: var(--text5); }
+.fret-numbers { margin-top: 0.25rem; }
 
-.fret-numbers {
-  display: flex;
-  align-items: center;
-  margin-top: 0.25rem;
-}
-
-.string-name-spacer { width: 1.8rem; flex-shrink: 0; }
-
-.fret-num {
-  flex: 1;
-  font-size: 0.6rem;
-  color: var(--text5);
-  text-align: center;
-}
-
-/* Clear button */
-.clear-btn {
-  align-self: flex-start;
-  padding: 0.35rem 1rem;
-  border-radius: 6px;
-  border: 1px solid var(--border2);
-  background: transparent;
-  color: var(--text3);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.clear-btn:hover:not(:disabled) { color: var(--text); border-color: var(--accent-mid); }
-.clear-btn:disabled { opacity: 0.3; cursor: default; }
+/* unique properties not covered by .btn + .btn-sm */
+.clear-btn { align-self: flex-start; letter-spacing: 0.05em; }
 
 /* Result */
 .result {

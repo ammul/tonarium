@@ -1,0 +1,57 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   LEARN STEP LAYOUT
+   Shared across all learn step sub-components.
+   ───────────────────────────────────────────────────────────────────────────── */
+.step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.step-intro {
+  font-size: 0.87rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.step-intro strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.step-bridge {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--raised);
+  font-size: 0.84rem;
+  color: var(--text3);
+  line-height: 1.6;
+}
+
+.step-bridge strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   NUMBERED BADGE
+   Accent-filled circle used for numbered steps and tips.
+   Used as .tip-num and .br-num in learn components.
+   ───────────────────────────────────────────────────────────────────────────── */
+.numbered-badge {
+  flex-shrink: 0;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.1rem;
+}

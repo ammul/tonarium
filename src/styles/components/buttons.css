@@ -87,6 +87,49 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   STYLE VARIANTS (continued)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Accent outline — transparent bg, accent border/text, hover fills with accent-bg */
+.btn-accent {
+  border-color: var(--accent-mid);
+  color: var(--accent);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-accent.active,
+.btn-accent[aria-pressed="true"] {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent-hi);
+}
+
+/* Subtle — input background, muted text (compact icon buttons) */
+.btn-subtle {
+  background: var(--input);
+  color: var(--text2);
+}
+
+.btn-subtle:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+/* Toggle — overrides active state with full accent fill (transport, option selectors) */
+.btn-toggle.active,
+.btn-toggle[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    LAYOUT VARIANTS
    ───────────────────────────────────────────────────────────────────────────── */
 .btn-block {
@@ -97,4 +140,11 @@
   padding: var(--space-2);
   min-width: 2rem;
   min-height: 2rem;
+}
+
+.btn-round {
+  border-radius: 50%;
+  padding: var(--space-2);
+  min-width: 1.8rem;
+  min-height: 1.8rem;
 }

@@ -38,7 +38,7 @@ describe('ScaleVisualizer', () => {
   describe('pad mode', () => {
     it('renders 4 rows of 3 pads', () => {
       const wrapper = mount(ScaleVisualizer)
-      const rows = wrapper.findAll('.row')
+      const rows = wrapper.findAll('.pad-row')
       expect(rows.length).toBeGreaterThanOrEqual(4)
     })
 

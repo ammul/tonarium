@@ -191,14 +191,14 @@ watch([expandedId, selectedRoot], stopLoop)
 
       <!-- MIDI toolbar -->
       <div v-if="midiStatus === 'connected'" class="midi-toolbar">
-        <button class="play-btn" :class="{ playing: loopPlaying }" @click="loopPlaying ? stopLoop() : playLoop(expandedId)">
+        <button class="btn btn-sm btn-subtle btn-toggle play-btn" :class="{ active: loopPlaying }" @click="loopPlaying ? stopLoop() : playLoop(expandedId)">
           {{ loopPlaying ? 'Stop' : 'Play' }}
         </button>
         <span class="midi-divider"></span>
         <span class="midi-lbl">Oct</span>
-        <button class="mini-btn" @click="chordOctave = Math.max(2, chordOctave - 1)">−</button>
+        <button class="btn btn-xs btn-subtle btn-icon" @click="chordOctave = Math.max(2, chordOctave - 1)">−</button>
         <span class="midi-val">{{ chordOctave }}</span>
-        <button class="mini-btn" @click="chordOctave = Math.min(6, chordOctave + 1)">+</button>
+        <button class="btn btn-xs btn-subtle btn-icon" @click="chordOctave = Math.min(6, chordOctave + 1)">+</button>
         <span class="midi-divider"></span>
         <input type="number" v-model.number="bpm" min="40" max="200" class="bpm-input" />
         <span class="midi-lbl">BPM</span>
@@ -206,7 +206,7 @@ watch([expandedId, selectedRoot], stopLoop)
         <button
           v-for="b in [1, 2, 4, 8]"
           :key="b"
-          class="mini-btn"
+          class="btn btn-xs btn-subtle btn-icon btn-toggle"
           :class="{ active: beatsPerChord === b }"
           @click="beatsPerChord = b"
         >{{ b }}</button>
@@ -215,7 +215,7 @@ watch([expandedId, selectedRoot], stopLoop)
         <button
           v-for="(lane, i) in ['A','B','C','D']"
           :key="lane"
-          class="mini-btn"
+          class="btn btn-xs btn-subtle btn-icon btn-toggle"
           :class="{ active: midiChannel === i }"
           @click="midiChannel = i"
         >{{ lane }}</button>
@@ -247,7 +247,7 @@ watch([expandedId, selectedRoot], stopLoop)
             />
           </div>
           <button
-            class="info-btn card-info-btn"
+            class="btn btn-round btn-subtle card-info-btn"
             :class="{ active: showInfoIdx === card.idx }"
             @click.stop="showInfoIdx = showInfoIdx === card.idx ? null : card.idx"
             aria-label="Solo tip"
@@ -339,24 +339,6 @@ watch([expandedId, selectedRoot], stopLoop)
   flex-shrink: 0;
 }
 
-.mini-btn {
-  height: 1.7rem;
-  min-width: 1.7rem;
-  padding: 0 0.35rem;
-  border: 1px solid var(--border2);
-  border-radius: 4px;
-  background: var(--input);
-  color: var(--text2);
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  line-height: 1;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-}
-
-.mini-btn:hover  { border-color: var(--accent); color: var(--text); }
-.mini-btn.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-
 .bpm-input {
   width: 3.5rem;
   background: var(--input);
@@ -371,22 +353,8 @@ watch([expandedId, selectedRoot], stopLoop)
 
 .bpm-input:focus { border-color: var(--accent); }
 
-.play-btn {
-  padding: 0.3rem 0.9rem;
-  border: 1px solid var(--border2);
-  border-radius: 5px;
-  background: var(--input);
-  color: var(--text2);
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-}
-
-.play-btn:hover   { border-color: var(--accent); color: var(--accent); }
-.play-btn.playing { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+/* unique properties not covered by .btn + .btn-sm + .btn-subtle + .btn-toggle */
+.play-btn { letter-spacing: 0.05em; text-transform: uppercase; }
 
 /* Chord row */
 .chord-row {
@@ -431,30 +399,21 @@ watch([expandedId, selectedRoot], stopLoop)
 .chord-card:hover  { background: var(--hover); border-color: var(--accent-mid); }
 .chord-card.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
 
+/* unique properties not covered by .btn + .btn-round + .btn-subtle */
 .card-info-btn {
   position: absolute;
   top: 0.45rem;
   right: 0.45rem;
   width: 1.4rem;
   height: 1.4rem;
-  border-radius: 50%;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  color: var(--text3);
+  min-width: unset;
+  min-height: unset;
   font-size: 0.72rem;
   font-style: italic;
   font-weight: 700;
-  cursor: pointer;
-  line-height: 1;
-  flex-shrink: 0;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.card-info-btn:hover  { border-color: var(--accent); color: var(--text); }
-.card-info-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+.card-info-btn:hover { color: var(--text); }
 
 .solo-info {
   font-size: 0.78rem;

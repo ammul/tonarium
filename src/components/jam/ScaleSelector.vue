@@ -30,7 +30,7 @@ export default { name: 'ScaleSelector' }
       <select :value="modelValue" @change="onSelectChange">
         <option v-for="s in scales" :key="s.id" :value="s.id">{{ s.label }}</option>
       </select>
-      <button class="info-btn" :class="{ active: showInfo }" @click="toggleInfo" aria-label="Scale info">i</button>
+      <button class="btn btn-round btn-subtle info-btn" :class="{ active: showInfo }" @click="toggleInfo" aria-label="Scale info">i</button>
     </div>
     <p v-if="showInfo && selectedScale" class="scale-info">{{ selectedScale.description }}</p>
   </div>
@@ -44,24 +44,12 @@ export default { name: 'ScaleSelector' }
   flex-wrap: wrap;
 }
 
+/* unique properties not covered by .btn + .btn-round + .btn-subtle */
 .info-btn {
-  width: 1.6rem;
-  height: 1.6rem;
-  border-radius: 50%;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  color: var(--text3);
-  font-size: 0.8rem;
   font-style: italic;
   font-weight: 700;
-  cursor: pointer;
-  line-height: 1;
   flex-shrink: 0;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
-
-.info-btn:hover  { border-color: var(--accent); color: var(--text); }
-.info-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
 
 .scale-info {
   margin-top: 0.6rem;

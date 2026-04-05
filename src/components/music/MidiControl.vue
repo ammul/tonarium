@@ -14,7 +14,7 @@ const selectedDevice = computed({
 
 <template>
   <div v-if="midiStatus !== 'unsupported'" class="midi-control">
-    <button v-if="midiStatus === 'idle'" class="midi-btn" @click="initMidi">MIDI</button>
+    <button v-if="midiStatus === 'idle'" class="btn btn-sm midi-btn" @click="initMidi">MIDI</button>
 
     <template v-else-if="midiStatus === 'connected'">
       <span class="midi-dot connected"></span>
@@ -41,24 +41,10 @@ const selectedDevice = computed({
   flex-shrink: 0;
 }
 
+/* unique properties not covered by .btn + .btn-sm */
 .midi-btn {
-  height: 36px;
-  padding: 0 0.75rem;
-  background: transparent;
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  cursor: pointer;
-  color: var(--text3);
-  font-size: 0.75rem;
-  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  transition: border-color 0.15s, color 0.15s;
-}
-
-.midi-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
 }
 
 .midi-dot {

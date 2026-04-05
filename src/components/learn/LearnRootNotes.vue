@@ -35,7 +35,7 @@ function playRootOctave() {
       <template v-if="rootNoteIdx !== null">
         <div class="rr-name">{{ CHROMATIC[rootNoteIdx] }}</div>
         <div class="rr-label">your root note</div>
-        <button class="rr-octave-btn" @click="playRootOctave">Hear it one octave up</button>
+        <button class="btn btn-sm btn-accent rr-octave-btn" style="margin-top: 0.4rem" @click="playRootOctave">Hear it one octave up</button>
       </template>
       <template v-else>
         <div class="rr-hint">Tap any note to set your root</div>
@@ -43,15 +43,15 @@ function playRootOctave() {
     </div>
 
     <div class="root-facts">
-      <div class="rf-item">
+      <div class="card card-sm rf-item">
         <span class="rf-heading">12 notes</span>
         <span class="rf-body">Western music uses 12 notes before the pattern repeats. The 7 natural notes (A B C D E F G) plus 5 sharps in between — the black keys on a piano.</span>
       </div>
-      <div class="rf-item">
+      <div class="card card-sm rf-item">
         <span class="rf-heading">Octaves</span>
         <span class="rf-body">Every note repeats at double the frequency — same name, higher pitch. C and the C above it sound related because the higher one vibrates exactly twice as fast.</span>
       </div>
-      <div class="rf-item">
+      <div class="card card-sm rf-item">
         <span class="rf-heading">Keys</span>
         <span class="rf-body">When someone says a song is in <em>C major</em>, C is the root. The root gives the key its name and is the note the music wants to return to.</span>
       </div>
@@ -64,23 +64,7 @@ function playRootOctave() {
 </template>
 
 <style scoped>
-.step-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.35rem;
-}
-
-.step-intro {
-  font-size: 0.87rem;
-  color: var(--text2);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.step-intro strong {
-  color: var(--accent);
-  font-weight: 600;
-}
+/* step-content, step-intro, step-bridge — from learn.css */
 
 .root-note-picker {
   display: flex;
@@ -116,22 +100,6 @@ function playRootOctave() {
   letter-spacing: 0.05em;
 }
 
-.rr-octave-btn {
-  margin-top: 0.4rem;
-  padding: 0.3rem 0.8rem;
-  border-radius: 5px;
-  border: 1px solid var(--accent-mid);
-  background: transparent;
-  color: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.rr-octave-btn:hover { background: var(--accent-bg); border-color: var(--accent); }
-
 .rr-hint {
   font-size: 1rem;
   color: var(--text3);
@@ -144,14 +112,11 @@ function playRootOctave() {
   gap: 0.5rem;
 }
 
+/* unique properties not covered by .card + .card-sm */
 .rf-item {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  padding: 0.75rem 0.9rem;
-  background: var(--raised);
-  border: 1px solid var(--border2);
-  border-radius: 8px;
 }
 
 .rf-heading {
@@ -173,18 +138,5 @@ function playRootOctave() {
   font-weight: 600;
 }
 
-.step-bridge {
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--border2);
-  background: var(--raised);
-  font-size: 0.84rem;
-  color: var(--text3);
-  line-height: 1.6;
-}
-
-.step-bridge strong {
-  color: var(--accent);
-  font-weight: 600;
-}
+/* step-bridge, step-bridge strong — from learn.css */
 </style>

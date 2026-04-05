@@ -1,0 +1,41 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   TAB GROUP
+   Container for a row of tab buttons.
+   ───────────────────────────────────────────────────────────────────────────── */
+.tab-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TAB BUTTON
+   Filled pill button — input background, hover changes text to accent,
+   active state fills with accent (use for genre filters, option selectors).
+   ───────────────────────────────────────────────────────────────────────────── */
+.tab-btn {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border2);
+  background: var(--input);
+  color: var(--text3);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--transition-fast),
+              border-color var(--transition-fast),
+              background var(--transition-fast);
+}
+
+.tab-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}

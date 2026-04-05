@@ -22,9 +22,9 @@ export default { name: 'OctaveControl' }
 
 <template>
   <div class="octave-control">
-    <button class="octave-btn" :disabled="modelValue <= min" @click="decrement" aria-label="Octave down">−</button>
+    <button class="btn btn-round octave-btn" :disabled="modelValue <= min" @click="decrement" aria-label="Octave down">−</button>
     <span class="octave-value">{{ modelValue }}</span>
-    <button class="octave-btn" :disabled="modelValue >= max" @click="increment" aria-label="Octave up">+</button>
+    <button class="btn btn-round octave-btn" :disabled="modelValue >= max" @click="increment" aria-label="Octave up">+</button>
   </div>
 </template>
 
@@ -35,25 +35,13 @@ export default { name: 'OctaveControl' }
   gap: 0.5rem;
 }
 
+/* unique properties not covered by .btn + .btn-round */
 .octave-btn {
-  width: 1.8rem;
-  height: 1.8rem;
-  border-radius: 50%;
-  border: 1px solid var(--border2);
   background: var(--input);
   color: var(--text);
   font-size: 1rem;
   font-weight: 700;
-  cursor: pointer;
-  line-height: 1;
-  transition: background 0.12s, border-color 0.12s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
-
-.octave-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
-.octave-btn:disabled { opacity: 0.35; cursor: default; }
 
 .octave-value {
   font-size: 0.95rem;

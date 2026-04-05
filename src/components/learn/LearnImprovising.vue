@@ -17,7 +17,7 @@ function playImprovExample(chordSemis, noteSemi) {
     <p class="step-intro">Improvising is about choosing notes that sound <strong>intentional</strong>. The key: match your scale to the chord type you're playing over.</p>
 
     <div class="improv-list">
-      <div v-for="ct in CHORD_TYPES" :key="ct.chord" class="improv-item">
+      <div v-for="ct in CHORD_TYPES" :key="ct.chord" class="card improv-item">
         <span class="improv-chord-name">{{ ct.chord }}</span>
         <div class="improv-scales">
           <span v-for="sc in ct.scales" :key="sc.name" class="improv-scale-pill">
@@ -30,15 +30,15 @@ function playImprovExample(chordSemis, noteSemi) {
 
     <div class="tips">
       <div class="tip">
-        <span class="tip-num">1</span>
+        <span class="numbered-badge tip-num">1</span>
         <span>Start with <strong>minor pentatonic</strong> — 5 notes, no clashes, works over almost anything minor.</span>
       </div>
       <div class="tip">
-        <span class="tip-num">2</span>
+        <span class="numbered-badge tip-num">2</span>
         <span>Land on <strong>chord tones</strong> (root, 3rd, 5th) — they resolve. Other notes work best as passing notes.</span>
       </div>
       <div class="tip">
-        <span class="tip-num">3</span>
+        <span class="numbered-badge tip-num">3</span>
         <span><strong>Rhythm beats note choice.</strong> One confident two-note groove sounds better than a hundred random pitches.</span>
       </div>
     </div>
@@ -52,7 +52,7 @@ function playImprovExample(chordSemis, noteSemi) {
         <button
           v-for="(ct, i) in CHORD_TYPES"
           :key="ct.chord"
-          class="ie-chord-btn"
+          class="btn btn-sm ie-chord-btn"
           :class="{ active: improvChordIdx === i }"
           @click="improvChordIdx = i"
         >{{ ct.chord }}</button>
@@ -92,23 +92,7 @@ function playImprovExample(chordSemis, noteSemi) {
 </template>
 
 <style scoped>
-.step-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.35rem;
-}
-
-.step-intro {
-  font-size: 0.87rem;
-  color: var(--text2);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.step-intro strong {
-  color: var(--accent);
-  font-weight: 600;
-}
+/* step-content, step-intro — from learn.css */
 
 .improv-list {
   display: flex;
@@ -116,11 +100,8 @@ function playImprovExample(chordSemis, noteSemi) {
   gap: 0.75rem;
 }
 
+/* unique properties not covered by .card */
 .improv-item {
-  background: var(--raised);
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  padding: 0.85rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -177,21 +158,7 @@ function playImprovExample(chordSemis, noteSemi) {
 
 .tip strong { color: var(--accent); font-weight: 600; }
 
-.tip-num {
-  flex-shrink: 0;
-  width: 1.4rem;
-  height: 1.4rem;
-  border-radius: 50%;
-  background: var(--accent-bg);
-  border: 1px solid var(--accent-mid);
-  color: var(--accent);
-  font-size: 0.72rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 0.1rem;
-}
+/* .tip-num — from numbered-badge in learn.css */
 
 .improv-examples {
   display: flex;
@@ -228,22 +195,6 @@ function playImprovExample(chordSemis, noteSemi) {
   gap: 0.4rem;
   flex-wrap: wrap;
 }
-
-.ie-chord-btn {
-  padding: 0.3rem 0.75rem;
-  border-radius: 6px;
-  border: 1px solid var(--border2);
-  background: transparent;
-  color: var(--text3);
-  font-size: 0.8rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-}
-
-.ie-chord-btn:hover  { border-color: var(--accent-mid); color: var(--text2); }
-.ie-chord-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
 
 .ie-columns {
   display: grid;

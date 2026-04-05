@@ -97,23 +97,7 @@ const intervalInfo = computed(() => {
 </template>
 
 <style scoped>
-.step-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.35rem;
-}
-
-.step-intro {
-  font-size: 0.87rem;
-  color: var(--text2);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.step-intro strong {
-  color: var(--accent);
-  font-weight: 600;
-}
+/* step-content, step-intro, step-bridge — from learn.css */
 
 .interval-result {
   min-height: 7rem;
@@ -221,18 +205,5 @@ const intervalInfo = computed(() => {
 .ref-item.highlight .ref-semi { color: var(--accent); }
 .ref-item.highlight .ref-name { color: var(--text2); }
 
-.step-bridge {
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  border: 1px solid var(--border2);
-  background: var(--raised);
-  font-size: 0.84rem;
-  color: var(--text3);
-  line-height: 1.6;
-}
-
-.step-bridge strong {
-  color: var(--accent);
-  font-weight: 600;
-}
+/* step-bridge — from learn.css */
 </style>

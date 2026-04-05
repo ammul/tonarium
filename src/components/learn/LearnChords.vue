@@ -24,7 +24,7 @@ const chordsRoot = ref(0)
       <div
         v-for="ct in CHORD_TYPES"
         :key="ct.chord"
-        class="chord-type-card"
+        class="card chord-type-card"
       >
         <div class="ctc-main">
           <div class="ctc-text">
@@ -32,7 +32,7 @@ const chordsRoot = ref(0)
             <span class="ctc-def">{{ ct.def }}</span>
           </div>
           <button
-            class="ctc-play"
+            class="btn btn-sm btn-accent flex-shrink-0 ctc-play"
             @pointerdown.prevent="playChord(ct.itvs.map(s => 60 + chordsRoot + s))"
           >Hear it</button>
         </div>
@@ -49,23 +49,7 @@ const chordsRoot = ref(0)
 </template>
 
 <style scoped>
-.step-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.35rem;
-}
-
-.step-intro {
-  font-size: 0.87rem;
-  color: var(--text2);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.step-intro strong {
-  color: var(--accent);
-  font-weight: 600;
-}
+/* step-content, step-intro — from learn.css */
 
 .picker-row {
   display: flex;
@@ -90,11 +74,8 @@ const chordsRoot = ref(0)
   gap: 0.6rem;
 }
 
+/* unique properties not covered by .card */
 .chord-type-card {
-  background: var(--raised);
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  padding: 0.9rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -126,23 +107,6 @@ const chordsRoot = ref(0)
   color: var(--text3);
   line-height: 1.5;
 }
-
-.ctc-play {
-  padding: 0.3rem 0.8rem;
-  border-radius: 5px;
-  border: 1px solid var(--accent-mid);
-  background: transparent;
-  color: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.15s, border-color 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.ctc-play:hover { background: var(--accent-bg); border-color: var(--accent); }
 
 .ctc-intervals {
   display: flex;
