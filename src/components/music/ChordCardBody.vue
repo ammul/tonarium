@@ -51,7 +51,7 @@ const pianoActiveIndices = computed(() =>
     <StaffDisplay
       :activeIndices="pianoActiveIndices"
       :rootIndex="chordRootIdx"
-      :dimInactive="true"
+      :onlyActive="true"
     />
   </template>
 

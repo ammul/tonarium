@@ -166,7 +166,7 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
           :activeIndices="activeIndices"
           :rootIndex="rootIndex"
           :pressedIndices="pressedIndices"
-          :dimInactive="true"
+          :onlyActive="true"
           @note-down="onPadDown"
           @note-up="onPadUp"
         />

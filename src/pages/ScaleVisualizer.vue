@@ -136,7 +136,7 @@ const subtitle = computed(() => {
         <StaffDisplay
           :activeIndices="activeIndices"
           :rootIndex="rootIndex"
-          :dimInactive="true"
+          :onlyActive="true"
           @note-down="onPadDown"
           @note-up="onPadUp"
         />

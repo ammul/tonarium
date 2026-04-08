@@ -12,6 +12,7 @@ const props = defineProps({
   rootIndex:      { type: Number,  default: -1 },               // A-based, -1 = default to C
   pressedIndices: { type: Object,  default: () => new Set() }, // Set of A-based indices
   dimInactive:    { type: Boolean, default: false },
+  onlyActive:     { type: Boolean, default: false },            // show only active+root notes
 })
 
 const emit = defineEmits(['note-down', 'note-up'])
@@ -56,7 +57,18 @@ const notes = computed(() => {
   })
 })
 
-function noteX(i) { return 13 + i * (255 / 11) }
+// When onlyActive, filter to notes that are active or the root; fall back to all if nothing qualifies
+const visibleNotes = computed(() => {
+  if (!props.onlyActive) return notes.value
+  const filtered = notes.value.filter(n => n.isActive || n.isRoot)
+  return filtered.length > 0 ? filtered : notes.value
+})
+
+// Distribute visible notes evenly across the staff area
+function noteX(i) {
+  const total = visibleNotes.value.length
+  return total <= 1 ? 135 : 13 + i * (255 / (total - 1))
+}
 </script>
 
 <template>
@@ -68,7 +80,7 @@ function noteX(i) { return 13 + i * (255 / 11) }
       <line v-for="y in [20, 30, 40, 50, 60]" :key="y" :x1="8" :y1="y" x2="262" :y2="y" class="staff-line" />
 
       <!-- Ledger lines drawn beneath individual notes -->
-      <template v-for="(n, i) in notes" :key="`led-${n.noteIdx}-${i}`">
+      <template v-for="(n, i) in visibleNotes" :key="`led-${n.noteIdx}-${i}`">
         <!-- Below staff: C4, step 0 → y=70 -->
         <line v-if="n.step === 0"  :x1="noteX(i) - 9" y1="70" :x2="noteX(i) + 9" y2="70" class="staff-line" />
         <!-- Above staff: A5, step 12 → y=10 -->
@@ -77,7 +89,7 @@ function noteX(i) { return 13 + i * (255 / 11) }
 
       <!-- Note groups -->
       <g
-        v-for="(n, i) in notes"
+        v-for="(n, i) in visibleNotes"
         :key="`note-${n.noteIdx}-${i}`"
         class="note-group"
         :class="{
@@ -111,7 +123,7 @@ function noteX(i) { return 13 + i * (255 / 11) }
 
 .staff-svg {
   width: 100%;
-  min-width: 200px;
+  min-width: 100px;
   display: block;
 }
 
