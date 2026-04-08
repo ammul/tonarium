@@ -119,12 +119,12 @@ describe('ScaleVisualizer', () => {
   })
 
   describe('notes mode', () => {
-    it('renders chromatic tiles in notes mode', async () => {
+    it('renders staff display in notes mode', async () => {
       displayMode.value = 'notes'
       const wrapper = mount(ScaleVisualizer)
       await nextTick()
-      const tiles = wrapper.findAll('.chroma-tile, .note-tile, .note-btn')
-      expect(tiles.length).toBeGreaterThan(0)
+      const staff = wrapper.find('.staff-wrapper')
+      expect(staff.exists()).toBe(true)
     })
   })
 })

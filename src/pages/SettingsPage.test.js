@@ -53,9 +53,9 @@ describe('SettingsPage', () => {
       expect(activeLabels).toContain('Pad')
     })
 
-    it('clicking Notes updates displayMode', async () => {
+    it('clicking Staff updates displayMode', async () => {
       const wrapper = mount(SettingsPage)
-      const notesBtn = wrapper.findAll('.option-btn').find(b => b.text() === 'Notes')
+      const notesBtn = wrapper.findAll('.option-btn').find(b => b.text() === 'Staff')
       expect(notesBtn).toBeDefined()
       await notesBtn.trigger('click')
       expect(displayMode.value).toBe('notes')

@@ -10,6 +10,7 @@ import PianoOctave from '@/components/music/PianoOctave.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import NoteStripPicker from '@/components/ui/NoteStripPicker.vue'
+import StaffDisplay from '@/components/music/StaffDisplay.vue'
 
 const selected = ref(new Set())
 const pianoOctave = ref(4)
@@ -95,8 +96,8 @@ const subtitle = computed(() => {
           </template>
 
           <template #notes>
-            <NoteStripPicker
-              :highlight-set="selected"
+            <StaffDisplay
+              :activeIndices="selected"
               @note-down="toggleNote"
             />
           </template>

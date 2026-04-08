@@ -37,7 +37,7 @@ describe('step navigation', () => {
   it('step labels match the expected order', () => {
     const wrapper = mount(LearnMode)
     const labels = wrapper.findAll('.step-label').map(el => el.text())
-    expect(labels).toEqual(['Root Notes', 'Intervals', 'Scales', 'Progressions', 'Chords', 'Improvising', 'Beats'])
+    expect(labels).toEqual(['Root Notes', 'Intervals', 'Scales', 'Chords', 'Progressions', 'Improvising', 'Beats'])
   })
 
   it('first step is active by default', () => {
@@ -92,16 +92,16 @@ describe('step components', () => {
     expect(wrapper.findComponent({ name: 'LearnScales' }).exists()).toBe(true)
   })
 
-  it('renders LearnProgressions at step 3', async () => {
+  it('renders LearnChords at step 3', async () => {
     const wrapper = mount(LearnMode)
     await wrapper.findAll('.step-btn')[3].trigger('click')
-    expect(wrapper.findComponent({ name: 'LearnProgressions' }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: 'LearnChords' }).exists()).toBe(true)
   })
 
-  it('renders LearnChords at step 4', async () => {
+  it('renders LearnProgressions at step 4', async () => {
     const wrapper = mount(LearnMode)
     await wrapper.findAll('.step-btn')[4].trigger('click')
-    expect(wrapper.findComponent({ name: 'LearnChords' }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: 'LearnProgressions' }).exists()).toBe(true)
   })
 
   it('renders LearnImprovising at step 5', async () => {

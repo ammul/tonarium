@@ -8,6 +8,7 @@ import { activeInputNotes, midiStatus } from '@/audio/midiManager.js'
 import { octave } from '@/state/octave.js'
 import { useNotePlayback } from '@/composables/useNotePlayback.js'
 import PianoOctave from '@/components/music/PianoOctave.vue'
+import StaffDisplay from '@/components/music/StaffDisplay.vue'
 import ScaleLegend from '@/components/music/ScaleLegend.vue'
 import RootNotePicker from '@/components/music/RootNotePicker.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
@@ -25,7 +26,7 @@ const selectedScaleId = ref('mi.p')
 const showInfo        = ref(false)
 const pianoOctave     = ref(4)
 
-const SUBTITLE = { pad: 'lit pads', notes: 'highlighted notes', guitar: 'highlighted frets', piano: 'highlighted keys' }
+const SUBTITLE = { pad: 'lit pads', notes: 'highlighted staff notes', guitar: 'highlighted frets', piano: 'highlighted keys' }
 const subtitle = computed(() => `pick a key and scale - ${SUBTITLE[displayMode.value] ?? 'highlighted items'} are safe to play`)
 
 const selectedScale = computed(() => SCALES.find(s => s.id === selectedScaleId.value))
@@ -68,16 +69,6 @@ const pads = computed(() =>
 
 const rows = computed(() => sliceRows(pads.value, cols.value))
 
-const chromaTiles = computed(() =>
-  NOTES.map((note, i) => ({
-    note,
-    noteIndex: i,
-    isSharp:  SHARPS.has(note),
-    isActive: activeIndices.value.has(i),
-    isAnchor: anchorIndices.value.has(i),
-    isRoot:   i === rootIndex.value,
-  }))
-)
 
 const pressedIndices = computed(() => {
   const result = new Set()
@@ -171,26 +162,14 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
       </template>
 
       <template #notes>
-        <div class="chroma-strip">
-          <div
-            v-for="tile in chromaTiles"
-            :key="tile.note"
-            class="chroma-tile"
-            :class="{
-              active:   tile.isActive && !tile.isAnchor && !tile.isRoot,
-              anchor:   tile.isAnchor && !tile.isRoot,
-              root:     tile.isRoot,
-              inactive: !tile.isActive,
-              pressed:  pressedIndices.has(tile.noteIndex),
-            }"
-            @pointerdown.prevent="onPadDown(tile.noteIndex)"
-            @pointerup="onPadUp(tile.noteIndex)"
-            @pointerleave="onPadUp(tile.noteIndex)"
-            @pointercancel="onPadUp(tile.noteIndex)"
-          >
-            <span class="tile-note">{{ tile.note }}</span>
-          </div>
-        </div>
+        <StaffDisplay
+          :activeIndices="activeIndices"
+          :rootIndex="rootIndex"
+          :pressedIndices="pressedIndices"
+          :dimInactive="true"
+          @note-down="onPadDown"
+          @note-up="onPadUp"
+        />
       </template>
 
       <template #piano>
@@ -304,41 +283,6 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 .pad.root     .pad-note { color: var(--rust-hi); }
 .pad.pressed  .pad-note { color: var(--accent); }
 
-/* Notes mode */
-.chroma-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.chroma-tile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.2rem;
-  height: 3.2rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  transition: background 0.15s, border-color 0.15s;
-  user-select: none;
-  touch-action: none;
-  cursor: pointer;
-}
-
-.chroma-tile.inactive { background: transparent; border-color: transparent; opacity: 0.4; }
-.chroma-tile.active   { background: var(--raised); border-color: var(--border2); }
-.chroma-tile.anchor   { background: var(--accent-bg); border-color: var(--accent-mid); }
-.chroma-tile.root     { background: var(--rust-bg); border-color: var(--rust); }
-.chroma-tile.pressed  { background: var(--accent-bg); border-color: var(--accent); opacity: 1; }
-
-.tile-note { font-size: 1.1rem; font-weight: 700; line-height: 1; }
-
-.chroma-tile.inactive .tile-note { color: var(--text5); }
-.chroma-tile.active   .tile-note { color: var(--text2); }
-.chroma-tile.anchor   .tile-note { color: var(--accent); }
-.chroma-tile.root     .tile-note { color: var(--rust-hi); }
-.chroma-tile.pressed  .tile-note { color: var(--accent); }
 
 /* Guitar neck — base structure from display-modes.css; only unique properties here */
 .neck-dot { background: var(--text3); }

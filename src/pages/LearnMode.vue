@@ -13,7 +13,7 @@ import LearnStepFooter from '@/components/learn/LearnStepFooter.vue'
 
 const emit = defineEmits(['navigate'])
 
-const STEPS = ['Root Notes', 'Intervals', 'Scales', 'Progressions', 'Chords', 'Improvising', 'Beats']
+const STEPS = ['Root Notes', 'Intervals', 'Scales', 'Chords', 'Progressions', 'Improvising', 'Beats']
 const step  = ref(0)
 
 watch(step, (newStep, oldStep) => {
@@ -29,8 +29,8 @@ watch(step, (newStep, oldStep) => {
     <LearnRootNotes     v-if="step === 0" />
     <LearnIntervals     v-else-if="step === 1" />
     <LearnScales        v-else-if="step === 2" />
-    <LearnProgressions  v-else-if="step === 3" />
-    <LearnChords        v-else-if="step === 4" />
+    <LearnChords        v-else-if="step === 3" />
+    <LearnProgressions  v-else-if="step === 4" />
     <LearnImprovising   v-else-if="step === 5" />
     <LearnBeats         v-else-if="step === 6" @navigate="emit('navigate', $event)" />
 

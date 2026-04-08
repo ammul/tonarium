@@ -32,9 +32,6 @@ defineEmits(['toggle-expand', 'play', 'stop', 'loop-start', 'loop-stop'])
           aria-label="Loop"
           @click="$emit('loop-start')"
         >⟳</button>
-        <button class="btn btn-xs btn-subtle btn-icon" :aria-label="isExpanded ? 'Collapse' : 'Expand'">
-          {{ isExpanded ? '▲' : '▼' }}
-        </button>
       </div>
     </div>
 

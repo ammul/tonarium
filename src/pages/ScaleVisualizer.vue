@@ -6,6 +6,7 @@ import { NOTES, SHARPS, FRET_COUNT, NOTE_TO_SEMI } from '@/constants/musicConsta
 import { buildGuitarNeck, sliceRows } from '@/utils/musicUtils.js'
 import { useNotePlayback } from '@/composables/useNotePlayback.js'
 import PianoOctave from '@/components/music/PianoOctave.vue'
+import StaffDisplay from '@/components/music/StaffDisplay.vue'
 import RootNotePicker from '@/components/music/RootNotePicker.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -54,16 +55,6 @@ const pads = computed(() =>
 
 const rows = computed(() => sliceRows(pads.value, cols.value))
 
-// Notes mode: all 12 chromatic notes as tiles
-const chromaTiles = computed(() =>
-  NOTES.map((note, i) => ({
-    note,
-    isSharp: SHARPS.has(note),
-    isActive: activeIndices.value.has(i),
-    isRoot: i === rootIndex.value,
-    degree: degreeMap.value[i] ?? null,
-  }))
-)
 
 // Guitar neck: 6 strings displayed high→low (e, B, G, D, A, E)
 const guitarNeck = computed(() =>
@@ -86,7 +77,7 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx)) }
 
 const subtitle = computed(() => {
   if (displayMode.value === 'pad') return 'see which pads are active for any scale'
-  if (displayMode.value === 'notes') return 'chromatic note strip - scale notes highlighted'
+  if (displayMode.value === 'notes') return 'treble clef staff - scale notes highlighted'
   if (displayMode.value === 'guitar') return 'guitar neck (standard tuning) - scale positions highlighted'
   return 'piano keyboard - scale notes highlighted'
 })
@@ -142,27 +133,15 @@ const subtitle = computed(() => {
       </template>
 
       <template #notes>
-        <div class="chroma-strip">
-          <div
-            v-for="(tile, ti) in chromaTiles"
-            :key="tile.note"
-            class="chroma-tile"
-            :class="{
-              active: tile.isActive,
-              root: tile.isRoot,
-              sharp: tile.isSharp,
-              inactive: !tile.isActive,
-            }"
-            @pointerdown.prevent="onPadDown(ti)"
-            @pointerup="onPadUp(ti)"
-            @pointerleave="onPadUp(ti)"
-            @pointercancel="onPadUp(ti)"
-          >
-            <span class="tile-note">{{ tile.note }}</span>
-            <span class="tile-degree" v-if="tile.isActive">{{ tile.isRoot ? '①' : tile.degree }}</span>
-          </div>
-        </div>
+        <StaffDisplay
+          :activeIndices="activeIndices"
+          :rootIndex="rootIndex"
+          :dimInactive="true"
+          @note-down="onPadDown"
+          @note-up="onPadUp"
+        />
       </template>
+
 
       <template #piano>
         <PianoOctave
@@ -327,41 +306,6 @@ select:focus { border-color: var(--accent); }
 .pad-degree           { font-size: 0.72rem; color: var(--accent-dim); }
 .pad.root .pad-degree { color: var(--rust); }
 
-/* Notes mode chromatic strip */
-.chroma-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.chroma-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  width: 3.2rem;
-  height: 3.2rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  transition: background 0.15s, border-color 0.15s;
-  user-select: none;
-  touch-action: none;
-  cursor: pointer;
-}
-
-.chroma-tile.inactive { background: transparent; border-color: transparent; opacity: 0.4; }
-.chroma-tile.active   { background: var(--raised); border-color: var(--accent-mid); }
-.chroma-tile.root     { background: var(--rust-bg); border-color: var(--rust); }
-
-.tile-note { font-size: 1.1rem; font-weight: 700; line-height: 1; }
-.chroma-tile.inactive .tile-note { color: var(--text5); }
-.chroma-tile.active .tile-note   { color: var(--accent); }
-.chroma-tile.root .tile-note     { color: var(--rust-hi); }
-
-.tile-degree           { font-size: 0.65rem; color: var(--accent-dim); }
-.chroma-tile.root .tile-degree { color: var(--rust); }
 
 /* Guitar neck — base structure from display-modes.css; only unique properties here */
 .neck-dot { background: var(--dot-scale); }

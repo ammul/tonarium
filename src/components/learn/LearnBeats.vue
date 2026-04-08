@@ -7,6 +7,7 @@ const emit = defineEmits(['navigate'])
 
 const BEAT_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }
 const loadedPattern = ref(null)
+let _navigatingToDrums = false
 
 function buildDrumPattern(pi) {
   const newPattern = Array.from({ length: 9 }, () => new Array(16).fill(false))
@@ -29,14 +30,19 @@ function loadBeat(pi) {
 }
 
 function editBeat(pi) {
-  if (drumIsPlaying.value) drumPause()
   drumPattern.value = buildDrumPattern(pi)
   loadedPattern.value = pi
+  _navigatingToDrums = true
+  emit('navigate', 'drums')
+}
+
+function goToDrumComputer() {
+  _navigatingToDrums = true
   emit('navigate', 'drums')
 }
 
 onUnmounted(() => {
-  if (drumIsPlaying.value) drumPause()
+  if (!_navigatingToDrums && drumIsPlaying.value) drumPause()
 })
 </script>
 
@@ -107,7 +113,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <button class="btn btn-accent btn-block btn-lg" @click="emit('navigate', 'drums')">
+    <button class="btn btn-accent btn-block btn-lg" @click="goToDrumComputer">
       Build your own beat in the Drum Computer &rarr;
     </button>
   </div>

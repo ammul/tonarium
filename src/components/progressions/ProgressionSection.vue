@@ -1,7 +1,8 @@
 <script setup>
+import { ref, computed } from 'vue'
 import ProgressionCard from './ProgressionCard.vue'
 
-defineProps({
+const props = defineProps({
   title: { type: String, required: true },
   progressions: { type: Array, required: true },
   rootNote: { type: String, required: true },
@@ -10,6 +11,15 @@ defineProps({
 })
 
 defineEmits(['toggle-expand', 'play', 'stop', 'loop-start', 'loop-stop'])
+
+const INITIAL_COUNT = 5
+const showAll = ref(false)
+
+const visibleProgressions = computed(() =>
+  showAll.value ? props.progressions : props.progressions.slice(0, INITIAL_COUNT)
+)
+
+const hiddenCount = computed(() => props.progressions.length - INITIAL_COUNT)
 </script>
 
 <template>
@@ -17,7 +27,7 @@ defineEmits(['toggle-expand', 'play', 'stop', 'loop-start', 'loop-stop'])
     <h3 class="prog-section-title">{{ title }}</h3>
     <div class="prog-section-list">
       <ProgressionCard
-        v-for="p in progressions"
+        v-for="p in visibleProgressions"
         :key="p.id"
         :progression="p"
         :rootNote="rootNote"
@@ -30,6 +40,12 @@ defineEmits(['toggle-expand', 'play', 'stop', 'loop-start', 'loop-stop'])
         @loop-stop="$emit('loop-stop', p.id)"
       />
     </div>
+    <button v-if="!showAll && hiddenCount > 0" class="btn btn-xs btn-subtle show-more-btn" @click="showAll = true">
+      Show {{ hiddenCount }} more
+    </button>
+    <button v-else-if="showAll && progressions.length > INITIAL_COUNT" class="btn btn-xs btn-subtle show-more-btn" @click="showAll = false">
+      Show less
+    </button>
   </section>
 </template>
 
@@ -52,5 +68,10 @@ defineEmits(['toggle-expand', 'play', 'stop', 'loop-start', 'loop-stop'])
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+}
+
+.show-more-btn {
+  margin-top: 0.4rem;
+  color: var(--text3);
 }
 </style>

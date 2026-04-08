@@ -159,32 +159,6 @@ watch([expandedId, selectedRoot], stopLoop)
 
     <GenreTabs v-model="selectedGenre" :genres="GENRES" />
 
-    <ProgressionSection
-      title="Major Key Progressions"
-      :progressions="majorProgressions"
-      :rootNote="selectedRoot"
-      :expandedId="expandedId"
-      :playingId="loopProgressionId"
-      @toggle-expand="handleToggleExpand"
-      @play="playLoop"
-      @stop="stopLoop"
-      @loop-start="playLoop"
-      @loop-stop="stopLoop"
-    />
-
-    <ProgressionSection
-      title="Minor Key Progressions"
-      :progressions="minorProgressions"
-      :rootNote="selectedRoot"
-      :expandedId="expandedId"
-      :playingId="loopProgressionId"
-      @toggle-expand="handleToggleExpand"
-      @play="playLoop"
-      @stop="stopLoop"
-      @loop-start="playLoop"
-      @loop-stop="stopLoop"
-    />
-
     <!-- Chord cards for selected progression -->
     <template v-if="expandedId">
       <p class="prog-examples">{{ selectedProgression.examples }}</p>
@@ -259,6 +233,32 @@ watch([expandedId, selectedRoot], stopLoop)
         </div>
       </div>
     </template>
+
+    <ProgressionSection
+      title="Major Key Progressions"
+      :progressions="majorProgressions"
+      :rootNote="selectedRoot"
+      :expandedId="expandedId"
+      :playingId="loopProgressionId"
+      @toggle-expand="handleToggleExpand"
+      @play="playLoop"
+      @stop="stopLoop"
+      @loop-start="playLoop"
+      @loop-stop="stopLoop"
+    />
+
+    <ProgressionSection
+      title="Minor Key Progressions"
+      :progressions="minorProgressions"
+      :rootNote="selectedRoot"
+      :expandedId="expandedId"
+      :playingId="loopProgressionId"
+      @toggle-expand="handleToggleExpand"
+      @play="playLoop"
+      @stop="stopLoop"
+      @loop-start="playLoop"
+      @loop-stop="stopLoop"
+    />
   </div>
 </template>
 

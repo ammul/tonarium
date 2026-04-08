@@ -35,7 +35,6 @@ function playRootOctave() {
       <template v-if="rootNoteIdx !== null">
         <div class="rr-name">{{ CHROMATIC[rootNoteIdx] }}</div>
         <div class="rr-label">your root note</div>
-        <button class="btn btn-sm btn-accent rr-octave-btn" style="margin-top: 0.4rem" @click="playRootOctave">Hear it one octave up</button>
       </template>
       <template v-else>
         <div class="rr-hint">Tap any note to set your root</div>
@@ -50,6 +49,7 @@ function playRootOctave() {
       <div class="card card-sm rf-item">
         <span class="rf-heading">Octaves</span>
         <span class="rf-body">Every note repeats at double the frequency — same name, higher pitch. C and the C above it sound related because the higher one vibrates exactly twice as fast.</span>
+        <button v-if="rootNoteIdx !== null" class="btn btn-sm btn-accent rr-octave-btn" @click="playRootOctave">Hear it one octave up</button>
       </div>
       <div class="card card-sm rf-item">
         <span class="rf-heading">Keys</span>
