@@ -53,32 +53,11 @@ describe('ChordCardBody - pad mode', () => {
 })
 
 describe('ChordCardBody - notes mode', () => {
-  it('renders note badges', async () => {
+  it('renders staff display in notes mode', async () => {
     displayMode.value = 'notes'
     const wrapper = mount(ChordCardBody, { props: baseProps })
     await nextTick()
-    expect(wrapper.find('.note-badges').exists()).toBe(true)
-    const badges = wrapper.findAll('.note-badge')
-    expect(badges).toHaveLength(baseProps.noteNames.length)
-  })
-
-  it('displays correct note names', async () => {
-    displayMode.value = 'notes'
-    const wrapper = mount(ChordCardBody, { props: baseProps })
-    await nextTick()
-    const badgeTexts = wrapper.findAll('.note-badge').map(b => b.text())
-    expect(badgeTexts).toContain('C')
-    expect(badgeTexts).toContain('E')
-    expect(badgeTexts).toContain('G')
-  })
-
-  it('root note badge has root class', async () => {
-    displayMode.value = 'notes'
-    const wrapper = mount(ChordCardBody, { props: baseProps })
-    await nextTick()
-    const rootBadges = wrapper.findAll('.note-badge.root')
-    expect(rootBadges).toHaveLength(1)
-    expect(rootBadges[0].text()).toBe('C')
+    expect(wrapper.find('.staff-wrapper').exists()).toBe(true)
   })
 
   it('does not render mini-grid in notes mode', async () => {
@@ -98,7 +77,7 @@ describe('ChordCardBody - display mode switching', () => {
     await nextTick()
 
     expect(wrapper.find('.mini-grid').exists()).toBe(false)
-    expect(wrapper.find('.note-badges').exists()).toBe(true)
+    expect(wrapper.find('.staff-wrapper').exists()).toBe(true)
   })
 
   it('switches to guitar mode and renders chord diagram', async () => {

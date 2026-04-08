@@ -4,6 +4,7 @@ import { displayMode } from '@/state/displayMode.js'
 import { NOTES } from '@/constants/musicConstants.js'
 import GuitarChordDiagram from '@/components/music/GuitarChordDiagram.vue'
 import PianoOctave from '@/components/music/PianoOctave.vue'
+import StaffDisplay from '@/components/music/StaffDisplay.vue'
 
 const props = defineProps({
   rows:         { type: Array,  required: true },
@@ -45,16 +46,13 @@ const pianoActiveIndices = computed(() =>
     </div>
   </template>
 
-  <!-- Notes mode: note name badges -->
+  <!-- Notes mode: treble clef staff -->
   <template v-else-if="displayMode === 'notes'">
-    <div class="note-badges">
-      <span
-        v-for="n in noteNames"
-        :key="n"
-        class="note-badge"
-        :class="{ root: n === NOTES[chordRootIdx] }"
-      >{{ n }}</span>
-    </div>
+    <StaffDisplay
+      :activeIndices="pianoActiveIndices"
+      :rootIndex="chordRootIdx"
+      :dimInactive="true"
+    />
   </template>
 
   <!-- Guitar mode: chord diagram -->

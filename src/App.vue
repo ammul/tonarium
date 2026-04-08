@@ -286,6 +286,7 @@ h1 {
 
 .burger-btn span {
   display: block;
+  width: 100%;
   height: 2px;
   background: var(--accent);
   border-radius: 1px;
