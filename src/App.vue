@@ -334,7 +334,7 @@ main {
 .dt-inner::-webkit-scrollbar { display: none; }
 
 .dt-tab {
-  padding: 0.6rem 0.9rem;
+  padding: 0.85rem 0.9rem;
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;

@@ -24,14 +24,14 @@ const SOLO_ADVICE = {
   sus4: { scale: 'Major pentatonic', why: 'The open sound of pentatonic matches the unresolved feel of a sus4 chord.' },
 }
 
-const selectedRoot   = ref('A')
+const selectedRoot   = ref('C')
 const selectedGenre  = ref('all')
 const expandedId     = ref('pop-1')
 const showInfoIdx    = ref(null)
 
 const chordOctave   = ref(4)
-const bpm           = ref(80)
-const beatsPerChord = ref(4)
+const bpm           = ref(120)
+const beatsPerChord = ref(2)
 const loopActiveIdx = ref(null)
 const loopPlaying   = ref(false)
 const loopProgressionId = ref(null)
@@ -150,15 +150,6 @@ watch([expandedId, selectedRoot], stopLoop)
   <div class="chord-prog">
     <PageHeader title="Chord Progressions" subtitle="explore chord sequences by genre - transposed to any key" />
 
-    <div class="controls">
-      <div class="control-group">
-        <label>Key</label>
-        <RootNotePicker v-model="selectedRoot" />
-      </div>
-    </div>
-
-    <GenreTabs v-model="selectedGenre" :genres="GENRES" />
-
     <!-- Chord cards for selected progression -->
     <template v-if="expandedId">
       <p class="prog-examples">{{ selectedProgression.examples }}</p>
@@ -234,6 +225,15 @@ watch([expandedId, selectedRoot], stopLoop)
       </div>
     </template>
 
+    <div class="controls">
+      <div class="control-group">
+        <label>Key</label>
+        <RootNotePicker v-model="selectedRoot" />
+      </div>
+    </div>
+
+    <GenreTabs v-model="selectedGenre" :genres="GENRES" />
+
     <ProgressionSection
       title="Major Key Progressions"
       :progressions="majorProgressions"
@@ -243,8 +243,6 @@ watch([expandedId, selectedRoot], stopLoop)
       @toggle-expand="handleToggleExpand"
       @play="playLoop"
       @stop="stopLoop"
-      @loop-start="playLoop"
-      @loop-stop="stopLoop"
     />
 
     <ProgressionSection
@@ -256,8 +254,6 @@ watch([expandedId, selectedRoot], stopLoop)
       @toggle-expand="handleToggleExpand"
       @play="playLoop"
       @stop="stopLoop"
-      @loop-start="playLoop"
-      @loop-stop="stopLoop"
     />
   </div>
 </template>
@@ -297,7 +293,7 @@ watch([expandedId, selectedRoot], stopLoop)
 .prog-examples {
   font-size: 0.82rem;
   color: var(--text3);
-  margin-bottom: 1rem;
+  margin: 1.5rem 0 1rem;
   font-style: italic;
   padding: 0 0.1rem;
 }
@@ -361,6 +357,7 @@ watch([expandedId, selectedRoot], stopLoop)
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
+  margin-bottom: 0.5rem;
 }
 
 .chord-row.piano-mode {

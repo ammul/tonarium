@@ -38,7 +38,7 @@
 .neck-row {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid var(--border3);
+  border-bottom: 1px solid var(--border2);
 }
 
 .string-name {
@@ -62,7 +62,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid var(--border3);
+  border-right: 1px solid var(--border2);
   position: relative;
   user-select: none;
   touch-action: pan-x;

@@ -42,10 +42,10 @@ describe('ScaleVisualizer', () => {
       expect(rows.length).toBeGreaterThanOrEqual(4)
     })
 
-    it('major scale from A highlights correct 7 notes', async () => {
+    it('major scale highlights correct 7 notes', async () => {
       const wrapper = mount(ScaleVisualizer)
       await nextTick()
-      // default is A major - 7 active pads
+      // default is C major - 7 active pads
       const activePads = wrapper.findAll('.pad.active')
       expect(activePads).toHaveLength(7)
     })
@@ -118,13 +118,4 @@ describe('ScaleVisualizer', () => {
     })
   })
 
-  describe('notes mode', () => {
-    it('renders staff display in notes mode', async () => {
-      displayMode.value = 'notes'
-      const wrapper = mount(ScaleVisualizer)
-      await nextTick()
-      const staff = wrapper.find('.staff-wrapper')
-      expect(staff.exists()).toBe(true)
-    })
-  })
 })

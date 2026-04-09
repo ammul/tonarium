@@ -10,7 +10,7 @@ defineProps({
   isPlaying: { type: Boolean, default: false },
 })
 
-defineEmits(['toggle-expand', 'play', 'stop', 'loop-start', 'loop-stop'])
+defineEmits(['toggle-expand', 'play', 'stop'])
 </script>
 
 <template>
@@ -27,11 +27,6 @@ defineEmits(['toggle-expand', 'play', 'stop', 'loop-start', 'loop-stop'])
           :aria-label="isPlaying ? 'Stop' : 'Play'"
           @click="isPlaying ? $emit('stop') : $emit('play')"
         >{{ isPlaying ? '■' : '▶' }}</button>
-        <button
-          class="btn btn-xs btn-subtle btn-icon btn-toggle"
-          aria-label="Loop"
-          @click="$emit('loop-start')"
-        >⟳</button>
       </div>
     </div>
 

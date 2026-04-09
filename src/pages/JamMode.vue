@@ -5,10 +5,8 @@ import { padSize } from '@/state/padSize.js'
 import { NOTES, SHARPS, FRET_COUNT, NOTE_TO_SEMI } from '@/constants/musicConstants.js'
 import { buildGuitarNeck, sliceRows } from '@/utils/musicUtils.js'
 import { activeInputNotes, midiStatus } from '@/audio/midiManager.js'
-import { octave } from '@/state/octave.js'
 import { useNotePlayback } from '@/composables/useNotePlayback.js'
 import PianoOctave from '@/components/music/PianoOctave.vue'
-import StaffDisplay from '@/components/music/StaffDisplay.vue'
 import ScaleLegend from '@/components/music/ScaleLegend.vue'
 import RootNotePicker from '@/components/music/RootNotePicker.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
@@ -21,12 +19,12 @@ import { JAM_SCALES as SCALES } from '@/constants/scales.js'
 // Semitone offsets from root considered "anchor" notes (root, minor 3rd, major 3rd, 5th)
 const ANCHOR_OFFSETS = new Set([0, 3, 4, 7])
 
-const selectedRoot    = ref('A')
+const selectedRoot    = ref('C')
 const selectedScaleId = ref('mi.p')
 const showInfo        = ref(false)
 const pianoOctave     = ref(4)
 
-const SUBTITLE = { pad: 'lit pads', notes: 'highlighted staff notes', guitar: 'highlighted frets', piano: 'highlighted keys' }
+const SUBTITLE = { pad: 'lit pads', guitar: 'highlighted frets', piano: 'highlighted keys' }
 const subtitle = computed(() => `pick a key and scale - ${SUBTITLE[displayMode.value] ?? 'highlighted items'} are safe to play`)
 
 const selectedScale = computed(() => SCALES.find(s => s.id === selectedScaleId.value))
@@ -62,7 +60,7 @@ const pads = computed(() =>
       isActive:    activeIndices.value.has(noteIndex),
       isAnchor:    anchorIndices.value.has(noteIndex),
       isRoot:      noteIndex === rootIndex.value,
-      midi:        12 * (octave.value + 1 + octaveOffset) + NOTE_TO_SEMI[noteIndex],
+      midi:        12 * (pianoOctave.value + 1 + octaveOffset) + NOTE_TO_SEMI[noteIndex],
     }
   })
 )
@@ -102,8 +100,8 @@ function padMidi(noteIndex, oct) {
   return 12 * (oct + 1) + NOTE_TO_SEMI[noteIndex]
 }
 
-function onPadDown(noteIndex, octaveOffset = 0) { pressDown(12 * (octave.value + 1 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
-function onPadUp(noteIndex, octaveOffset = 0)   { pressUp(12 * (octave.value + 1 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
+function onPadDown(noteIndex, octaveOffset = 0) { pressDown(12 * (pianoOctave.value + 1 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
+function onPadUp(noteIndex, octaveOffset = 0)   { pressUp(12 * (pianoOctave.value + 1 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
 
 function onCellDown(stringIdx, fret) { pressDown(STRING_BASE_MIDI[stringIdx] + fret) }
 function onCellUp(stringIdx, fret)   { pressUp(STRING_BASE_MIDI[stringIdx] + fret) }
@@ -128,9 +126,21 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
         />
       </PickerRow>
 
-      <PickerRow label="Octave">
+      <PickerRow v-if="displayMode !== 'guitar'" label="Octave">
         <OctaveControl v-model="pianoOctave" :min="1" :max="7" />
       </PickerRow>
+    </div>
+
+    <ScaleLegend />
+
+    <div class="scale-notes">
+      <span class="scale-label">Notes</span>
+      <span
+        v-for="n in scaleNotes"
+        :key="n.note"
+        class="scale-note"
+        :class="{ root: n.isRoot, anchor: n.isAnchor && !n.isRoot }"
+      >{{ n.note }}</span>
     </div>
 
     <ModeLayout>
@@ -159,17 +169,6 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
             </div>
           </div>
         </div>
-      </template>
-
-      <template #notes>
-        <StaffDisplay
-          :activeIndices="activeIndices"
-          :rootIndex="rootIndex"
-          :pressedIndices="pressedIndices"
-          :onlyActive="true"
-          @note-down="onPadDown"
-          @note-up="onPadUp"
-        />
       </template>
 
       <template #piano>
@@ -220,18 +219,6 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
         </div>
       </template>
     </ModeLayout>
-
-    <ScaleLegend />
-
-    <div class="scale-notes">
-      <span class="scale-label">Notes</span>
-      <span
-        v-for="n in scaleNotes"
-        :key="n.note"
-        class="scale-note"
-        :class="{ root: n.isRoot, anchor: n.isAnchor && !n.isRoot }"
-      >{{ n.note }}</span>
-    </div>
   </div>
 </template>
 
@@ -289,12 +276,15 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 .neck-dot.anchor { background: var(--accent-lo); }
 .neck-dot.root { background: var(--dot-root); box-shadow: 0 0 4px var(--rust-glow); }
 
+:deep(.legend) { margin-top: 0; }
+
 /* Scale notes strip */
 .scale-notes {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.75rem;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
 
@@ -350,6 +340,7 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 
   .scale-notes {
     margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
   }
 }
 </style>

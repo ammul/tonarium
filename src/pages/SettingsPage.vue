@@ -15,7 +15,6 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 
 const DISPLAY_OPTIONS = [
   { value: 'pad',    label: 'Pad',    desc: 'Chromatic pad grid - pad numbers and note names visible. Layout (4x3 or 4x4) is configurable below.' },
-  { value: 'notes',  label: 'Staff',  desc: 'Treble clef staff with all 12 chromatic notes as clickable note heads - C4 to B4.' },
   { value: 'guitar', label: 'Guitar', desc: 'Guitar neck or chord diagrams in standard tuning (E A D G B e).' },
   { value: 'piano',  label: 'Piano',  desc: 'Piano keyboard across one octave.' },
 ]

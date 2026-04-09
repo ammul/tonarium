@@ -36,14 +36,13 @@ Requires Chrome or any browser with Web MIDI API support.
 
 ## Display Modes
 
-All tools adapt to four layouts, selectable via Settings:
+All tools adapt to three layouts, selectable via Settings:
 
 | Mode | Description |
 |------|-------------|
 | Pad | Chromatic pad grid (4x3 or 4x4, configurable in Settings) |
 | Guitar | 6-string fretboard in standard tuning |
 | Piano | Keyboard layout |
-| Notes | Plain chromatic note names |
 
 ## Development
 

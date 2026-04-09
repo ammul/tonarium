@@ -65,7 +65,7 @@ const tools = [
       <span class="open-label">Open &rarr;</span>
     </button>
 
-    <p class="display-hint">Use <strong>Settings</strong> (⚙ in the header) to choose your instrument view - Pad, Notes, Guitar, or Piano. All tools adapt to the selected mode.</p>
+    <p class="display-hint">Use <strong>Settings</strong> (⚙ in the header) to choose your instrument view - Pad, Guitar, or Piano. All tools adapt to the selected mode.</p>
 
     <section class="tools">
       <button

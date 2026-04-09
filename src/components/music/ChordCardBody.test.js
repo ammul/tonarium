@@ -52,34 +52,7 @@ describe('ChordCardBody - pad mode', () => {
   })
 })
 
-describe('ChordCardBody - notes mode', () => {
-  it('renders staff display in notes mode', async () => {
-    displayMode.value = 'notes'
-    const wrapper = mount(ChordCardBody, { props: baseProps })
-    await nextTick()
-    expect(wrapper.find('.staff-wrapper').exists()).toBe(true)
-  })
-
-  it('does not render mini-grid in notes mode', async () => {
-    displayMode.value = 'notes'
-    const wrapper = mount(ChordCardBody, { props: baseProps })
-    await nextTick()
-    expect(wrapper.find('.mini-grid').exists()).toBe(false)
-  })
-})
-
 describe('ChordCardBody - display mode switching', () => {
-  it('switches from pad to notes mode', async () => {
-    const wrapper = mount(ChordCardBody, { props: baseProps })
-    expect(wrapper.find('.mini-grid').exists()).toBe(true)
-
-    displayMode.value = 'notes'
-    await nextTick()
-
-    expect(wrapper.find('.mini-grid').exists()).toBe(false)
-    expect(wrapper.find('.staff-wrapper').exists()).toBe(true)
-  })
-
   it('switches to guitar mode and renders chord diagram', async () => {
     displayMode.value = 'guitar'
     const wrapper = mount(ChordCardBody, { props: baseProps })

@@ -6,13 +6,13 @@ import { NOTES, SHARPS, FRET_COUNT, NOTE_TO_SEMI } from '@/constants/musicConsta
 import { buildGuitarNeck, sliceRows } from '@/utils/musicUtils.js'
 import { useNotePlayback } from '@/composables/useNotePlayback.js'
 import PianoOctave from '@/components/music/PianoOctave.vue'
-import StaffDisplay from '@/components/music/StaffDisplay.vue'
 import RootNotePicker from '@/components/music/RootNotePicker.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
+import ScaleLegend from '@/components/music/ScaleLegend.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import { VISUALIZER_SCALES as SCALES } from '@/constants/scales.js'
 
-const selectedRoot = ref('A')
+const selectedRoot = ref('C')
 const selectedScaleId = ref('maj')
 const showInfo = ref(false)
 const pianoOctave = ref(4)
@@ -77,7 +77,6 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx)) }
 
 const subtitle = computed(() => {
   if (displayMode.value === 'pad') return 'see which pads are active for any scale'
-  if (displayMode.value === 'notes') return 'treble clef staff - scale notes highlighted'
   if (displayMode.value === 'guitar') return 'guitar neck (standard tuning) - scale positions highlighted'
   return 'piano keyboard - scale notes highlighted'
 })
@@ -105,6 +104,8 @@ const subtitle = computed(() => {
       </div>
     </div>
 
+    <ScaleLegend :showAnchor="false" activeLabel="in scale" />
+
     <ModeLayout>
       <template #pad>
         <div class="pad-grid">
@@ -131,17 +132,6 @@ const subtitle = computed(() => {
           </div>
         </div>
       </template>
-
-      <template #notes>
-        <StaffDisplay
-          :activeIndices="activeIndices"
-          :rootIndex="rootIndex"
-          :onlyActive="true"
-          @note-down="onPadDown"
-          @note-up="onPadUp"
-        />
-      </template>
-
 
       <template #piano>
         <PianoOctave

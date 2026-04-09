@@ -1,10 +1,19 @@
+<script setup>
+const props = defineProps({
+  showAnchor:  { type: Boolean, default: true },
+  activeLabel: { type: String,  default: 'safe' },
+})
+</script>
+
 <template>
   <div class="legend">
     <span class="legend-item root">root</span>
+    <template v-if="showAnchor">
+      <span class="legend-sep">·</span>
+      <span class="legend-item anchor">anchor - land here</span>
+    </template>
     <span class="legend-sep">·</span>
-    <span class="legend-item anchor">anchor - land here</span>
-    <span class="legend-sep">·</span>
-    <span class="legend-item safe">safe</span>
+    <span class="legend-item safe">{{ activeLabel }}</span>
   </div>
 </template>
 

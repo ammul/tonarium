@@ -10,7 +10,6 @@ import PianoOctave from '@/components/music/PianoOctave.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import NoteStripPicker from '@/components/ui/NoteStripPicker.vue'
-import StaffDisplay from '@/components/music/StaffDisplay.vue'
 
 const selected = ref(new Set())
 const pianoOctave = ref(4)
@@ -64,7 +63,6 @@ const chord = computed(() => detectChord([...selected.value]))
 
 const subtitle = computed(() => {
   if (displayMode.value === 'pad') return "Tap the notes you're playing - the chord is identified instantly"
-  if (displayMode.value === 'notes') return 'Click note names to select - chord identified instantly'
   if (displayMode.value === 'guitar') return 'Click frets on the neck - chord identified instantly'
   return 'Click piano keys to select - chord identified instantly'
 })
@@ -93,13 +91,6 @@ const subtitle = computed(() => {
                 </button>
               </div>
             </div>
-          </template>
-
-          <template #notes>
-            <StaffDisplay
-              :activeIndices="selected"
-              @note-down="toggleNote"
-            />
           </template>
 
           <template #piano>

@@ -39,11 +39,11 @@ describe('SettingsPage', () => {
   })
 
   describe('display mode buttons', () => {
-    it('renders four display mode options', () => {
+    it('renders three display mode options', () => {
       const wrapper = mount(SettingsPage)
       const displaySection = wrapper.find('.settings-section')
       const buttons = displaySection.findAll('.option-btn')
-      expect(buttons.length).toBeGreaterThanOrEqual(4)
+      expect(buttons.length).toBeGreaterThanOrEqual(3)
     })
 
     it('pad button is active by default', () => {
@@ -51,14 +51,6 @@ describe('SettingsPage', () => {
       const buttons = wrapper.findAll('.option-btn')
       const activeLabels = buttons.filter(b => b.classes('active')).map(b => b.text())
       expect(activeLabels).toContain('Pad')
-    })
-
-    it('clicking Staff updates displayMode', async () => {
-      const wrapper = mount(SettingsPage)
-      const notesBtn = wrapper.findAll('.option-btn').find(b => b.text() === 'Staff')
-      expect(notesBtn).toBeDefined()
-      await notesBtn.trigger('click')
-      expect(displayMode.value).toBe('notes')
     })
 
     it('clicking Guitar updates displayMode', async () => {
