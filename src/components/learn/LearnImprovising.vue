@@ -16,6 +16,11 @@ function playImprovExample(chordSemis, noteSemi) {
   <div class="step-content">
     <p class="step-intro">Improvising is about choosing notes that sound <strong>intentional</strong>. The key: match your scale to the chord type you're playing over.</p>
 
+    <div class="cheat-box">
+      <span class="cheat-label">Cheat code</span>
+      <p class="cheat-text"><strong>Minor pentatonic works over almost everything.</strong> It's only 5 notes and none of them clash. Pick your key's minor pentatonic and you can solo over nearly any chord in that key without thinking about it. Start here, always.</p>
+    </div>
+
     <div class="improv-list">
       <div v-for="ct in CHORD_TYPES" :key="ct.chord" class="card improv-item">
         <span class="improv-chord-name">{{ ct.chord }}</span>
@@ -93,6 +98,33 @@ function playImprovExample(chordSemis, noteSemi) {
 
 <style scoped>
 /* step-content, step-intro — from learn.css */
+
+.cheat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface2));
+}
+
+.cheat-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.cheat-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.55;
+}
+
+.cheat-text strong { color: var(--accent); }
 
 .improv-list {
   display: flex;

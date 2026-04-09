@@ -9,11 +9,12 @@ import LearnProgressions from '@/components/learn/LearnProgressions.vue'
 import LearnChords from '@/components/learn/LearnChords.vue'
 import LearnImprovising from '@/components/learn/LearnImprovising.vue'
 import LearnBeats from '@/components/learn/LearnBeats.vue'
+import LearnSongStructure from '@/components/learn/LearnSongStructure.vue'
 import LearnStepFooter from '@/components/learn/LearnStepFooter.vue'
 
 const emit = defineEmits(['navigate'])
 
-const STEPS = ['Root Notes', 'Intervals', 'Scales', 'Chords', 'Progressions', 'Improvising', 'Beats']
+const STEPS = ['Root Notes', 'Intervals', 'Scales', 'Chords', 'Progressions', 'Improvising', 'Beats', 'Song Structure']
 const step  = ref(0)
 
 watch(step, (newStep, oldStep) => {
@@ -33,6 +34,7 @@ watch(step, (newStep, oldStep) => {
     <LearnProgressions  v-else-if="step === 4" />
     <LearnImprovising   v-else-if="step === 5" />
     <LearnBeats         v-else-if="step === 6" @navigate="emit('navigate', $event)" />
+    <LearnSongStructure v-else-if="step === 7" @navigate="emit('navigate', $event)" />
 
     <LearnStepFooter
       :step="step"

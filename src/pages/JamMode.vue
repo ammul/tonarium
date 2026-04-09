@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { displayMode } from '@/state/displayMode.js'
 import { padSize } from '@/state/padSize.js'
-import { NOTES, SHARPS, FRET_COUNT, NOTE_TO_SEMI } from '@/constants/musicConstants.js'
+import { NOTES, SHARPS, FRET_COUNT, NOTE_TO_SEMI, CHORD_TYPES, CHORD_SUFFIX } from '@/constants/musicConstants.js'
 import { buildGuitarNeck, sliceRows } from '@/utils/musicUtils.js'
 import { activeInputNotes, midiStatus } from '@/audio/midiManager.js'
 import { useNotePlayback } from '@/composables/useNotePlayback.js'
@@ -19,13 +19,42 @@ import { JAM_SCALES as SCALES } from '@/constants/scales.js'
 // Semitone offsets from root considered "anchor" notes (root, minor 3rd, major 3rd, 5th)
 const ANCHOR_OFFSETS = new Set([0, 3, 4, 7])
 
-const selectedRoot    = ref('C')
-const selectedScaleId = ref('mi.p')
-const showInfo        = ref(false)
-const pianoOctave     = ref(4)
+// Chord options shown in the chord picker
+const CHORD_OPTIONS = [
+  ['maj',  ''],
+  ['min',  'm'],
+  ['dom7', '7'],
+  ['min7', 'm7'],
+  ['maj7', 'M7'],
+]
+
+const selectedRoot      = ref('A')
+const selectedScaleId   = ref('mi.p')
+const showInfo          = ref(false)
+const pianoOctave       = ref(4)
+const selectedChordRoot = ref(null)   // null = follow selectedRoot
+const selectedChordType = ref(null)   // null = chord mode off
+
+function setChordType(key) {
+  if (selectedChordType.value === key) {
+    selectedChordType.value = null
+    selectedChordRoot.value = null
+  } else {
+    selectedChordType.value = key
+  }
+}
+
+const chordRoot = computed(() => selectedChordRoot.value ?? selectedRoot.value)
 
 const SUBTITLE = { pad: 'lit pads', guitar: 'highlighted frets', piano: 'highlighted keys' }
-const subtitle = computed(() => `pick a key and scale - ${SUBTITLE[displayMode.value] ?? 'highlighted items'} are safe to play`)
+const subtitle = computed(() => {
+  const mode = SUBTITLE[displayMode.value] ?? 'highlighted items'
+  if (selectedChordType.value) {
+    const chordName = chordRoot.value + (CHORD_SUFFIX[selectedChordType.value] ?? '')
+    return `${mode} = chord tones of ${chordName} — bright = best note choices`
+  }
+  return `pick a key and scale - ${mode} are safe to play`
+})
 
 const selectedScale = computed(() => SCALES.find(s => s.id === selectedScaleId.value))
 const rootIndex     = computed(() => NOTES.indexOf(selectedRoot.value))
@@ -36,6 +65,12 @@ const activeIndices = computed(() => {
 })
 
 const anchorIndices = computed(() => {
+  if (selectedChordType.value) {
+    const rootIdx = NOTES.indexOf(chordRoot.value)
+    const chordTones = new Set(CHORD_TYPES[selectedChordType.value].map(i => (rootIdx + i) % 12))
+    // Only highlight chord tones that are also in the active scale — outside-scale tones stay dimmed
+    return new Set([...chordTones].filter(i => activeIndices.value.has(i)))
+  }
   const root = rootIndex.value
   return new Set(
     selectedScale.value.intervals
@@ -128,6 +163,34 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 
       <PickerRow v-if="displayMode !== 'guitar'" label="Octave">
         <OctaveControl v-model="pianoOctave" :min="1" :max="7" />
+      </PickerRow>
+
+      <PickerRow label="Chord">
+        <div class="chord-picker">
+          <div class="chord-type-row">
+            <button
+              class="chord-type-btn"
+              :class="{ active: !selectedChordType }"
+              @click="selectedChordType = null; selectedChordRoot = null"
+            >—</button>
+            <button
+              v-for="[key, sfx] in CHORD_OPTIONS"
+              :key="key"
+              class="chord-type-btn"
+              :class="{ active: selectedChordType === key }"
+              @click="setChordType(key)"
+            >{{ chordRoot }}{{ sfx }}</button>
+          </div>
+          <div v-if="selectedChordType" class="chord-root-row">
+            <button
+              v-for="note in NOTES"
+              :key="note"
+              class="chord-root-btn"
+              :class="{ active: chordRoot === note, sharp: SHARPS.has(note) }"
+              @click="selectedChordRoot = note"
+            >{{ note }}</button>
+          </div>
+        </div>
       </PickerRow>
     </div>
 
@@ -235,6 +298,69 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
   flex-direction: column;
   gap: 1.2rem;
   margin: 1.5rem 0;
+}
+
+/* Chord picker */
+.chord-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chord-type-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.chord-type-btn {
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--input);
+  color: var(--text3);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+}
+
+.chord-type-btn:hover { border-color: var(--accent); color: var(--text); }
+
+.chord-type-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.chord-root-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.chord-root-btn {
+  padding: 0.2rem 0.45rem;
+  border-radius: 5px;
+  border: 1px solid var(--border2);
+  background: var(--input);
+  color: var(--text4);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.1s, background 0.1s, color 0.1s;
+}
+
+.chord-root-btn.sharp { color: var(--text5); }
+
+.chord-root-btn:hover { border-color: var(--accent); color: var(--text2); }
+
+.chord-root-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
 }
 
 /* Pad grid — base layout from display-modes.css (.pad-grid, .pad-row) */

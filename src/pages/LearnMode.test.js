@@ -29,15 +29,15 @@ beforeEach(async () => {
 // ── Step navigation ─────────────────────────────────────────────────────────
 
 describe('step navigation', () => {
-  it('renders 7 step buttons', () => {
+  it('renders 8 step buttons', () => {
     const wrapper = mount(LearnMode)
-    expect(wrapper.findAll('.step-btn')).toHaveLength(7)
+    expect(wrapper.findAll('.step-btn')).toHaveLength(8)
   })
 
   it('step labels match the expected order', () => {
     const wrapper = mount(LearnMode)
     const labels = wrapper.findAll('.step-label').map(el => el.text())
-    expect(labels).toEqual(['Root Notes', 'Intervals', 'Scales', 'Chords', 'Progressions', 'Improvising', 'Beats'])
+    expect(labels).toEqual(['Root Notes', 'Intervals', 'Scales', 'Chords', 'Progressions', 'Improvising', 'Beats', 'Song Structure'])
   })
 
   it('first step is active by default', () => {
@@ -66,9 +66,9 @@ describe('step navigation', () => {
 
   it('step counter reflects current position', async () => {
     const wrapper = mount(LearnMode)
-    expect(wrapper.find('.step-counter').text()).toBe('1 / 7')
+    expect(wrapper.find('.step-counter').text()).toBe('1 / 8')
     await wrapper.findAll('.step-btn')[3].trigger('click')
-    expect(wrapper.find('.step-counter').text()).toBe('4 / 7')
+    expect(wrapper.find('.step-counter').text()).toBe('4 / 8')
   })
 })
 

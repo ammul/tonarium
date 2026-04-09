@@ -1,11 +1,50 @@
 <script setup>
+import { ref } from 'vue'
 import { pattern, bpm, isPlaying, currentStep, play, pause, clearPattern, toggleCell, INSTRUMENTS } from '@/audio/drumEngine.js'
+import { BEAT_PATTERNS } from '@/constants/beatPatterns.js'
 import PageHeader from '@/components/ui/PageHeader.vue'
+
+const GROOVE_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }
+const loadedGroove = ref(null)
+
+function loadGroove(pi) {
+  if (isPlaying.value) pause()
+  if (loadedGroove.value === pi) {
+    loadedGroove.value = null
+    clearPattern()
+    return
+  }
+  const newPattern = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
+  for (const row of BEAT_PATTERNS[pi].rows) {
+    const instIdx = GROOVE_INST_MAP[row.name]
+    if (instIdx !== undefined) newPattern[instIdx] = row.steps.map(s => s === 1)
+  }
+  pattern.value = newPattern
+  loadedGroove.value = pi
+  if (BEAT_PATTERNS[pi].bpm) bpm.value = BEAT_PATTERNS[pi].bpm
+  play()
+}
 </script>
 
 <template>
   <div class="drum-computer">
     <PageHeader title="Drum Computer" subtitle="loop continues while switching tabs" />
+
+    <div class="groove-picker">
+      <span class="groove-label">Grooves</span>
+      <div class="groove-btns">
+        <button
+          v-for="(gp, pi) in BEAT_PATTERNS"
+          :key="gp.name"
+          class="groove-btn"
+          :class="{ active: loadedGroove === pi }"
+          @click="loadGroove(pi)"
+        >
+          <span class="groove-name">{{ gp.name }}</span>
+          <span class="groove-genre">{{ gp.genre }} · {{ gp.bpm }} BPM</span>
+        </button>
+      </div>
+    </div>
 
     <div class="transport">
       <button
@@ -58,6 +97,62 @@ import PageHeader from '@/components/ui/PageHeader.vue'
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
+}
+
+.groove-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1.5rem 0 0;
+}
+
+.groove-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.groove-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.groove-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--input);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.groove-btn:hover { border-color: var(--accent); }
+
+.groove-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.groove-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.groove-btn.active .groove-name { color: var(--accent); }
+
+.groove-genre {
+  font-size: 0.65rem;
+  color: var(--text5);
 }
 
 .transport {
