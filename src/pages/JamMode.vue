@@ -67,12 +67,12 @@ const subtitle = computed(() => {
     const chord = sessionProgression.value.chords[sessionCurrentChordIdx.value]
     if (chord) {
       const name = NOTES[(NOTES.indexOf(selectedRoot.value) + chord.degree) % 12] + (CHORD_SUFFIX[chord.type] ?? '')
-      return `playing over ${name} — ${mode} are safe notes`
+      return `playing over ${name}. ${mode} are safe notes`
     }
   }
   if (selectedChordType.value) {
     const chordName = chordRoot.value + (CHORD_SUFFIX[selectedChordType.value] ?? '')
-    return `${mode} = chord tones of ${chordName} — bright = best note choices`
+    return `${mode} = chord tones of ${chordName}. Bright = best note choices`
   }
   return `pick a key and scale - ${mode} are safe to play`
 })
@@ -264,7 +264,7 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
               class="chord-type-btn"
               :class="{ active: !selectedChordType }"
               @click="selectedChordType = null; selectedChordRoot = null"
-            >—</button>
+            >off</button>
             <button
               v-for="[key, sfx] in CHORD_OPTIONS"
               :key="key"

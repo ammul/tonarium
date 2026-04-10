@@ -34,8 +34,8 @@ const panels = [
 <template>
   <div class="start-page">
     <section v-if="!openPanel" class="hero">
-      <p class="tagline">Play music. No sheet music required.</p>
-      <p class="sub">Pick a chord progression, add a beat, and jam — the app shows you which notes sound good as each chord cycles.</p>
+      <p class="tagline">No sheet music required.</p>
+      <p class="sub">Pick a chord progression, add a beat, and jam. The app shows you which notes sound good as each chord cycles.</p>
     </section>
 
     <div class="panels">

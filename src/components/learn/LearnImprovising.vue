@@ -36,11 +36,11 @@ function playImprovExample(chordSemis, noteSemi) {
     <div class="tips">
       <div class="tip">
         <span class="numbered-badge tip-num">1</span>
-        <span>Start with <strong>minor pentatonic</strong> — 5 notes, no clashes, works over almost anything minor.</span>
+        <span>Start with <strong>minor pentatonic</strong>: 5 notes, no clashes, works over almost anything minor.</span>
       </div>
       <div class="tip">
         <span class="numbered-badge tip-num">2</span>
-        <span>Land on <strong>chord tones</strong> (root, 3rd, 5th) — they resolve. Other notes work best as passing notes.</span>
+        <span>Land on <strong>chord tones</strong> (root, 3rd, 5th). They resolve. Other notes work best as passing notes.</span>
       </div>
       <div class="tip">
         <span class="numbered-badge tip-num">3</span>
@@ -51,7 +51,7 @@ function playImprovExample(chordSemis, noteSemi) {
     <div class="improv-examples">
       <div class="ie-header">
         <span class="ie-title">Hear the difference</span>
-        <span class="ie-subtitle">Chord plays first, then the note — all in C</span>
+        <span class="ie-subtitle">Chord plays first, then the note (all in C)</span>
       </div>
       <div class="ie-chord-picker">
         <button
@@ -91,7 +91,7 @@ function playImprovExample(chordSemis, noteSemi) {
     </div>
 
     <div class="improv-cta">
-      Try it in <strong>Jam Mode</strong> — pick a key and scale to see safe pads highlighted.
+      Try it in <strong>Jam Mode</strong>. Pick a key and scale to see safe pads highlighted.
     </div>
   </div>
 </template>

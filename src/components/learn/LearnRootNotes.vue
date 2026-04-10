@@ -22,7 +22,7 @@ function playRootOctave() {
 
 <template>
   <div class="step-content">
-    <p class="step-intro">Every piece of music orbits a home note — the <strong>root</strong>. When a melody lands on it, it sounds resolved. When it moves away, it creates tension. Everything else — scales, chords, keys — is named and measured relative to this anchor.</p>
+    <p class="step-intro">Every piece of music orbits a home note called the <strong>root</strong>. When a melody lands on it, it sounds resolved. When it moves away, it creates tension. Everything else (scales, chords, keys) is named and measured relative to this anchor.</p>
 
     <div class="root-note-picker">
       <NoteStripPicker
@@ -44,11 +44,11 @@ function playRootOctave() {
     <div class="root-facts">
       <div class="card card-sm rf-item">
         <span class="rf-heading">12 notes</span>
-        <span class="rf-body">Western music uses 12 notes before the pattern repeats. The 7 natural notes (A B C D E F G) plus 5 sharps in between — the black keys on a piano.</span>
+        <span class="rf-body">Western music uses 12 notes before the pattern repeats. The 7 natural notes (A B C D E F G) plus 5 sharps in between (the black keys on a piano).</span>
       </div>
       <div class="card card-sm rf-item">
         <span class="rf-heading">Octaves</span>
-        <span class="rf-body">Every note repeats at double the frequency — same name, higher pitch. C and the C above it sound related because the higher one vibrates exactly twice as fast.</span>
+        <span class="rf-body">Every note repeats at double the frequency: same name, higher pitch. C and the C above it sound related because the higher one vibrates exactly twice as fast.</span>
         <button v-if="rootNoteIdx !== null" class="btn btn-sm btn-accent rr-octave-btn" @click="playRootOctave">Hear it one octave up</button>
       </div>
       <div class="card card-sm rf-item">

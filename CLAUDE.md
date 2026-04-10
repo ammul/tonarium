@@ -45,4 +45,7 @@ Every tab adapts to three modes. Components import `displayMode` directly from `
 - Scoped CSS in every SFC; no global stylesheet beyond `src/style.css`
 - No emojis, no unnecessary comments
 
+## Language
+- No em dashes (`—`) in display text (labels, descriptions, tooltips, UI copy). Use a period or rewrite the sentence instead.
+
 @ROADMAP.md

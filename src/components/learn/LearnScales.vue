@@ -53,7 +53,7 @@ function playScale() {
 
 <template>
   <div class="step-content">
-    <p class="step-intro">A <strong>scale</strong> is a fixed pattern of intervals repeating from a root. The Major scale uses the same intervals every time — that's why it always sounds the same no matter which root you pick. Pick a root, choose a scale, hear which notes light up.</p>
+    <p class="step-intro">A <strong>scale</strong> is a fixed pattern of intervals repeating from a root. The Major scale uses the same intervals every time, so it always sounds the same no matter which root you pick. Pick a root, choose a scale, hear which notes light up.</p>
 
     <div class="picker-row">
       <span class="picker-label">Root</span>

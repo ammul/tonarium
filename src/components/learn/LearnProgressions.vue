@@ -71,7 +71,7 @@ const progActiveDeg = computed(() =>
 
 <template>
   <div class="step-content">
-    <p class="step-intro">Chords are labelled with <strong>Roman numerals</strong> based on the scale they come from — every chord in a key uses only notes from that key's scale. That's why they all sound good together. Tap any chord to hear it, or tap a progression to play it.</p>
+    <p class="step-intro">Chords are labelled with <strong>Roman numerals</strong> based on the scale they come from. Every chord in a key uses only notes from that key's scale. That's why they all sound good together. Tap any chord to hear it, or tap a progression to play it.</p>
 
     <div class="picker-row">
       <span class="picker-label">Key</span>

@@ -20,13 +20,13 @@ const SONG_TEMPLATES = [
     desc: 'I-V-vi-IV is the most played progression in modern pop. Verse sets up the story, chorus pays it off.',
     sections: [
       { label: 'Verse',  role: 'Quieter, builds anticipation',    degIdx: [0, 4, 5, 3] },
-      { label: 'Chorus', role: 'The hook — biggest energy',       degIdx: [0, 3, 4]    },
+      { label: 'Chorus', role: 'The hook. Biggest energy.',        degIdx: [0, 3, 4]    },
       { label: 'Bridge', role: 'Contrast before the final chorus', degIdx: [5, 3, 0, 4] },
     ],
   },
   {
     name: '12-bar blues',
-    desc: 'A closed three-section loop — the form that built rock, jazz, and blues. Not verse/chorus; just three turns of the wheel.',
+    desc: 'A closed three-section loop. The form that built rock, jazz, and blues. Not verse/chorus; just three turns of the wheel.',
     sections: [
       { label: 'Bars 1–4',  role: 'Establish the key',           degIdx: [0, 0, 0, 0] },
       { label: 'Bars 5–8',  role: 'Build tension with IV',       degIdx: [3, 3, 0, 0] },
@@ -35,7 +35,7 @@ const SONG_TEMPLATES = [
   },
   {
     name: 'Folk / country',
-    desc: 'Three chords and the truth. I, IV, and V cover hundreds of songs — verse tells the story, chorus lands it.',
+    desc: 'Three chords and the truth. I, IV, and V cover hundreds of songs. Verse tells the story, chorus lands it.',
     sections: [
       { label: 'Verse',  role: 'Plain, grounded storytelling', degIdx: [0, 3, 0, 4] },
       { label: 'Chorus', role: 'Full resolution, memorable',   degIdx: [0, 3, 4, 0] },
@@ -93,16 +93,16 @@ function tapSection(ti, si) {
 
 <template>
   <div class="step-content">
-    <p class="step-intro">Songs are built from repeating sections. Each section has a <strong>job</strong> — verse tells the story, chorus makes the hook, bridge adds contrast. Learning the pattern makes any song easier to figure out and write.</p>
+    <p class="step-intro">Songs are built from repeating sections. Each section has a job: verse tells the story, chorus makes the hook, bridge adds contrast. Learning the pattern makes any song easier to figure out and write.</p>
 
     <div class="concepts">
       <div class="concept-card">
         <span class="concept-label">Verse</span>
-        <span class="concept-desc">Quieter, more words, tells the story. Uses a progression that feels unresolved — pulling toward the chorus.</span>
+        <span class="concept-desc">Quieter, more words, tells the story. Uses a progression that feels unresolved, pulling toward the chorus.</span>
       </div>
       <div class="concept-card">
         <span class="concept-label chorus">Chorus</span>
-        <span class="concept-desc">Loudest, most repeated, most memorable. The hook lands here — strong resolution, clear chords.</span>
+        <span class="concept-desc">Loudest, most repeated, most memorable. The hook lands here: strong resolution, clear chords.</span>
       </div>
       <div class="concept-card">
         <span class="concept-label bridge">Bridge</span>
@@ -150,14 +150,14 @@ function tapSection(ti, si) {
     </div>
 
     <div class="song-cta">
-      Build your own song structure in <strong>Progression Builder</strong> — enter chords as symbols like <code>C F G Am</code>.
+      Build your own song structure in <strong>Progression Builder</strong>. Enter chords as symbols like <code>C F G Am</code>.
       <button class="btn btn-accent btn-block" style="margin-top:0.75rem" @click="emit('navigate', 'builder')">
         Open Progression Builder &rarr;
       </button>
     </div>
 
     <div class="song-cta">
-      Ready to play? <strong>Jam Mode</strong> loops a progression with a drum beat while you improvise — highlights follow each chord.
+      Ready to play? <strong>Jam Mode</strong> loops a progression with a drum beat while you improvise. Highlights follow each chord.
       <button class="btn btn-accent btn-block" style="margin-top:0.75rem" @click="emit('navigate', 'jam')">
         Try in Jam Mode &rarr;
       </button>

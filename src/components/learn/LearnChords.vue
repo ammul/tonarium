@@ -9,7 +9,7 @@ const chordsRoot = ref(0)
 
 <template>
   <div class="step-content">
-    <p class="step-intro">A <strong>chord</strong> is three or more notes played at once. Just three chord types are behind most of the music you know — they differ only by one note.</p>
+    <p class="step-intro">A <strong>chord</strong> is three or more notes played at once. Just three chord types are behind most of the music you know. They differ only by one note.</p>
 
     <div class="picker-row">
       <span class="picker-label">Root</span>

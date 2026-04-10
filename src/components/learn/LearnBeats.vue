@@ -55,7 +55,7 @@ onUnmounted(() => {
       <div class="beat-recipe-steps">
         <div class="br-step">
           <span class="numbered-badge br-num">1</span>
-          <div><strong>Snare on beats 2 and 4.</strong> This is the backbeat — the most important rule in drumming. Get this right first, everything else is decoration.</div>
+          <div><strong>Snare on beats 2 and 4.</strong> This is the backbeat, the most important rule in drumming. Get this right first. Everything else is decoration.</div>
         </div>
         <div class="br-step">
           <span class="numbered-badge br-num">2</span>

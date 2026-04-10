@@ -79,7 +79,7 @@ const intervalInfo = computed(() => {
     </div>
 
     <div class="iv-reference">
-      <div class="ref-label">All intervals from root — tap to hear</div>
+      <div class="ref-label">All intervals from root (tap to hear)</div>
       <div class="ref-grid">
         <div v-for="iv in INTERVALS" :key="iv.semi" class="ref-item"
           :class="{ highlight: intervalInfo && intervalInfo.semi === iv.semi }"
