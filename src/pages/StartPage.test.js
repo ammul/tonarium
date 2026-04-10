@@ -41,7 +41,7 @@ describe('StartPage', () => {
     const wrapper = mount(StartPage)
     await wrapper.findAll('.panel-header')[0].trigger('click')
     expect(wrapper.emitted('navigate')).toBeTruthy()
-    expect(wrapper.emitted('navigate')[0][0]).toBe('jam')
+    expect(wrapper.emitted('navigate')[0][0]).toBe('chords')
   })
 
   it('shows hero text when no panel is open', () => {

@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import JamMode from '@/pages/JamMode.vue'
 import ChordProgressions from '@/pages/ChordProgressions.vue'
 import DrumComputer from '@/pages/DrumComputer.vue'
+import JamSessionBar from '@/components/jam/JamSessionBar.vue'
 import { sessionPlaying } from '@/state/sessionState.js'
 import { isPlaying as drumIsPlaying } from '@/audio/drumEngine.js'
 
@@ -14,12 +15,6 @@ const emit = defineEmits(['navigate'])
 
 const panels = [
   {
-    id: 'jam',
-    label: 'Jam Mode',
-    description: 'Pick a key and scale. Play over a looping chord progression with a beat.',
-    component: JamMode,
-  },
-  {
     id: 'chords',
     label: 'Chord Progressions',
     description: 'Browse 69 classic progressions across 10 genres, transposed to any key.',
@@ -30,6 +25,12 @@ const panels = [
     label: 'Drum Computer',
     description: 'Build a beat from 9 synthesised instruments across 16 steps.',
     component: DrumComputer,
+  },
+  {
+    id: 'jam',
+    label: 'Jam Mode',
+    description: 'Pick a key and scale. See which notes are safe to play.',
+    component: JamMode,
   },
 ]
 
@@ -73,6 +74,8 @@ const panelRunning = computed(() => ({
         </div>
       </div>
     </div>
+
+    <JamSessionBar class="jam-session-bar-outer" />
 
     <section v-if="!openPanel" class="about">
       <p>Built by <a href="https://github.com/ammul" target="_blank" rel="noopener">ammul</a>.</p>
@@ -221,6 +224,10 @@ const panelRunning = computed(() => ({
 .panel-body-inner {
   overflow: hidden;
   background: var(--bg);
+}
+
+.jam-session-bar-outer {
+  margin-top: 0.5rem;
 }
 
 .about {
