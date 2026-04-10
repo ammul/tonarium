@@ -15,6 +15,9 @@ dist-ssr
 # Git worktrees
 .worktrees
 
+# Playwright MCP screenshots
+.playwright-mcp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
