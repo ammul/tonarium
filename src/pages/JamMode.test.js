@@ -31,7 +31,7 @@ describe('JamMode', () => {
 
   it('renders key and scale pickers', () => {
     const wrapper = mount(JamMode)
-    expect(wrapper.findComponent({ name: 'RootNotePicker' }).exists()).toBe(true)
+    expect(wrapper.findAllComponents({ name: 'PickerRow' }).length).toBeGreaterThan(0)
     expect(wrapper.findComponent({ name: 'ScaleSelector' }).exists()).toBe(true)
   })
 

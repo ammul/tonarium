@@ -8,7 +8,6 @@ import { activeInputNotes, midiStatus } from '@/audio/midiManager.js'
 import { useNotePlayback } from '@/composables/useNotePlayback.js'
 import PianoOctave from '@/components/music/PianoOctave.vue'
 import ScaleLegend from '@/components/music/ScaleLegend.vue'
-import RootNotePicker from '@/components/music/RootNotePicker.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
@@ -49,12 +48,11 @@ const selectedChordType = ref(null)   // null = chord mode off
 const selectedProgressionId = ref(null)
 const showSessionControls   = ref(false)
 
-function setChordType(key) {
-  if (selectedChordType.value === key) {
-    selectedChordType.value = null
+function onChordTypeChange() {
+  if (!selectedChordType.value) {
     selectedChordRoot.value = null
-  } else {
-    selectedChordType.value = key
+  } else if (!selectedChordRoot.value) {
+    selectedChordRoot.value = selectedRoot.value
   }
 }
 
@@ -85,18 +83,17 @@ const topProgressions = computed(() => {
 })
 
 function selectProgression(id) {
-  if (selectedProgressionId.value === id) {
-    selectedProgressionId.value = null
+  selectedProgressionId.value = id
+  if (id === null) {
     sessionProgression.value = null
     if (sessionPlaying.value) stopTransport()
     return
   }
-  selectedProgressionId.value = id
   const prog = ALL_PROGRESSIONS.find(p => p.id === id)
   if (!prog) return
 
   const ri = rootIndex.value
-  const enriched = {
+  sessionProgression.value = {
     ...prog,
     chords: prog.chords.map(c => ({
       ...c,
@@ -104,23 +101,19 @@ function selectProgression(id) {
       _octave: pianoOctave.value,
     })),
   }
-  sessionProgression.value = enriched
 
   if (sessionBeatIdx.value === null) {
     const suggestedBeat = GENRE_BEAT_MAP[prog.genre] ?? 0
-    selectBeat(suggestedBeat)
+    applyBeat(suggestedBeat)
   }
 
   const autoScale = prog.key === 'minor' ? 'mi.p' : 'ma.p'
   if (selectedScaleId.value !== autoScale) selectedScaleId.value = autoScale
+
+  if (sessionPlaying.value) { stopTransport(); startTransport() }
 }
 
-function selectBeat(idx) {
-  if (sessionBeatIdx.value === idx) {
-    sessionBeatIdx.value = null
-    drumPattern.value = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
-    return
-  }
+function applyBeat(idx) {
   sessionBeatIdx.value = idx
   const bp = BEAT_PATTERNS[idx]
   const newPattern = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
@@ -132,6 +125,17 @@ function selectBeat(idx) {
   sessionBpm.value = bp.bpm
 }
 
+function selectBeat(idx) {
+  sessionBeatIdx.value = idx
+  if (idx === null) {
+    drumPattern.value = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
+    if (sessionPlaying.value) stopTransport()
+    return
+  }
+  applyBeat(idx)
+  if (sessionPlaying.value) { stopTransport(); startTransport() }
+}
+
 function toggleTransport() {
   if (sessionPlaying.value) {
     stopTransport()
@@ -139,6 +143,14 @@ function toggleTransport() {
     startTransport()
   }
 }
+
+watch(pianoOctave, (newOct) => {
+  if (!sessionProgression.value) return
+  sessionProgression.value = {
+    ...sessionProgression.value,
+    chords: sessionProgression.value.chords.map(c => ({ ...c, _octave: newOct })),
+  }
+})
 
 watch(sessionCurrentChordIdx, (idx) => {
   const prog = sessionProgression.value
@@ -242,7 +254,9 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 
     <div class="controls">
       <PickerRow label="Key">
-        <RootNotePicker v-model="selectedRoot" />
+        <select v-model="selectedRoot" class="picker-select">
+          <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
+        </select>
       </PickerRow>
 
       <PickerRow label="Scale">
@@ -258,30 +272,14 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
       </PickerRow>
 
       <PickerRow label="Chord">
-        <div class="chord-picker">
-          <div class="chord-type-row">
-            <button
-              class="chord-type-btn"
-              :class="{ active: !selectedChordType }"
-              @click="selectedChordType = null; selectedChordRoot = null"
-            >off</button>
-            <button
-              v-for="[key, sfx] in CHORD_OPTIONS"
-              :key="key"
-              class="chord-type-btn"
-              :class="{ active: selectedChordType === key }"
-              @click="setChordType(key)"
-            >{{ chordRoot }}{{ sfx }}</button>
-          </div>
-          <div v-if="selectedChordType" class="chord-root-row">
-            <button
-              v-for="note in NOTES"
-              :key="note"
-              class="chord-root-btn"
-              :class="{ active: chordRoot === note, sharp: SHARPS.has(note) }"
-              @click="selectedChordRoot = note"
-            >{{ note }}</button>
-          </div>
+        <div class="chord-dropdowns">
+          <select v-model="selectedChordType" class="picker-select" @change="onChordTypeChange">
+            <option :value="null">off</option>
+            <option v-for="[key, sfx] in CHORD_OPTIONS" :key="key" :value="key">{{ chordRoot }}{{ sfx }}</option>
+          </select>
+          <select v-if="selectedChordType" v-model="selectedChordRoot" class="picker-select">
+            <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
+          </select>
         </div>
       </PickerRow>
     </div>
@@ -294,27 +292,17 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 
     <div v-if="showSessionControls" class="session-controls">
       <PickerRow label="Progression">
-        <div class="progression-pills">
-          <button
-            v-for="p in topProgressions"
-            :key="p.id"
-            class="prog-pill"
-            :class="{ active: selectedProgressionId === p.id }"
-            @click="selectProgression(p.id)"
-          >{{ p.numeral }}</button>
-        </div>
+        <select v-model="selectedProgressionId" class="picker-select" @change="selectProgression(selectedProgressionId)">
+          <option :value="null">None</option>
+          <option v-for="p in topProgressions" :key="p.id" :value="p.id">{{ p.numeral }} — {{ p.name }}</option>
+        </select>
       </PickerRow>
 
       <PickerRow label="Beat">
-        <div class="beat-pills">
-          <button
-            v-for="(bp, i) in BEAT_PATTERNS"
-            :key="i"
-            class="beat-pill"
-            :class="{ active: sessionBeatIdx === i }"
-            @click="selectBeat(i)"
-          >{{ bp.name }}</button>
-        </div>
+        <select v-model="sessionBeatIdx" class="picker-select" @change="selectBeat(sessionBeatIdx)">
+          <option :value="null">None</option>
+          <option v-for="(bp, i) in BEAT_PATTERNS" :key="i" :value="i">{{ bp.name }}</option>
+        </select>
       </PickerRow>
 
       <PickerRow label="BPM">
@@ -450,67 +438,28 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
   margin: 1.5rem 0;
 }
 
-/* Chord picker */
-.chord-picker {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.chord-type-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.chord-type-btn {
-  padding: 0.3rem 0.65rem;
+/* Dropdowns */
+.picker-select {
+  padding: 0.3rem 0.5rem;
   border-radius: 6px;
   border: 1px solid var(--border2);
   background: var(--input);
-  color: var(--text3);
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
+  color: var(--text);
+  font-size: 0.85rem;
   font-family: inherit;
-  transition: border-color 0.12s, background 0.12s, color 0.12s;
+  cursor: pointer;
+  min-width: 8rem;
 }
 
-.chord-type-btn:hover { border-color: var(--accent); color: var(--text); }
-
-.chord-type-btn.active {
+.picker-select:focus {
+  outline: none;
   border-color: var(--accent);
-  background: var(--accent-bg);
-  color: var(--accent);
 }
 
-.chord-root-row {
+.chord-dropdowns {
   display: flex;
+  gap: 0.5rem;
   flex-wrap: wrap;
-  gap: 0.25rem;
-}
-
-.chord-root-btn {
-  padding: 0.2rem 0.45rem;
-  border-radius: 5px;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  color: var(--text4);
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: border-color 0.1s, background 0.1s, color 0.1s;
-}
-
-.chord-root-btn.sharp { color: var(--text5); }
-
-.chord-root-btn:hover { border-color: var(--accent); color: var(--text2); }
-
-.chord-root-btn.active {
-  border-color: var(--accent);
-  background: var(--accent-bg);
-  color: var(--accent);
 }
 
 /* Pad grid — base layout from display-modes.css (.pad-grid, .pad-row) */
@@ -625,28 +574,6 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
   border-radius: 10px;
   background: var(--bg);
 }
-
-.progression-pills, .beat-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.prog-pill, .beat-pill {
-  padding: 0.25rem 0.55rem;
-  border-radius: 5px;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  color: var(--text4);
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: border-color 0.1s, background 0.1s, color 0.1s;
-}
-
-.prog-pill:hover, .beat-pill:hover { border-color: var(--accent); color: var(--text2); }
-.prog-pill.active, .beat-pill.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
 
 .bpm-row {
   display: flex;

@@ -1,7 +1,10 @@
 <script setup>
+import { computed } from 'vue'
 import JamMode from '@/pages/JamMode.vue'
 import ChordProgressions from '@/pages/ChordProgressions.vue'
 import DrumComputer from '@/pages/DrumComputer.vue'
+import { sessionPlaying } from '@/state/sessionState.js'
+import { isPlaying as drumIsPlaying } from '@/audio/drumEngine.js'
 
 const props = defineProps({
   openPanel: { type: String, default: null },
@@ -29,6 +32,12 @@ const panels = [
     component: DrumComputer,
   },
 ]
+
+const panelRunning = computed(() => ({
+  jam:    sessionPlaying.value,
+  chords: false,
+  drums:  drumIsPlaying.value,
+}))
 </script>
 
 <template>
@@ -50,10 +59,17 @@ const panels = [
             <span class="panel-label">{{ panel.label }}</span>
             <span v-if="openPanel !== panel.id" class="panel-desc">{{ panel.description }}</span>
           </div>
-          <span class="panel-chevron">{{ openPanel === panel.id ? '▲' : '▼' }}</span>
+          <div class="panel-header-right">
+            <span v-if="openPanel !== panel.id && panelRunning[panel.id]" class="panel-running-dot"></span>
+            <svg class="panel-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="4 6 8 10 12 6" />
+            </svg>
+          </div>
         </button>
-        <div v-show="openPanel === panel.id" class="panel-body">
-          <component :is="panel.component" @navigate="emit('navigate', $event)" />
+        <div class="panel-body-wrapper">
+          <div class="panel-body-inner">
+            <component :is="panel.component" @navigate="emit('navigate', $event)" />
+          </div>
         </div>
       </div>
     </div>
@@ -161,13 +177,49 @@ const panels = [
   line-height: 1.4;
 }
 
-.panel-chevron {
-  font-size: 0.65rem;
-  color: var(--text4);
+.panel-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   flex-shrink: 0;
 }
 
-.panel-body {
+.panel-chevron {
+  color: var(--text4);
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.panel.open .panel-chevron {
+  transform: rotate(180deg);
+}
+
+.panel-running-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: running-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes running-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.panel-body-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+}
+
+.panel.open .panel-body-wrapper {
+  grid-template-rows: 1fr;
+}
+
+.panel-body-inner {
+  overflow: hidden;
   background: var(--bg);
 }
 
