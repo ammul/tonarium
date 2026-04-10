@@ -48,34 +48,33 @@ describe('desktop tab bar', () => {
     expect(wrapper.find('.desktop-tabs').exists()).toBe(true)
   })
 
-  it('renders 9 tabs (all except Settings)', () => {
+  it('renders 3 primary tabs (Jam, Drums, Progressions)', () => {
     const wrapper = shallowMount(App)
-    expect(wrapper.findAll('.dt-tab')).toHaveLength(9)
+    expect(wrapper.findAll('.dt-tab')).toHaveLength(3)
   })
 
   it('uses shortLabels on desktop tab buttons', () => {
     const wrapper = shallowMount(App)
     const labels = wrapper.findAll('.dt-tab').map(el => el.text())
-    expect(labels).toContain('Home')
     expect(labels).toContain('Jam')
-    expect(labels).toContain('Scales')
     expect(labels).toContain('Progressions')
     expect(labels).toContain('Drums')
     expect(labels).not.toContain('Settings')
+    expect(labels).not.toContain('Home')
+    expect(labels).not.toContain('Learn')
+    expect(labels).not.toContain('Scales')
   })
 
-  it('Home tab is active by default', () => {
+  it('no desktop tab is active by default (home page is active)', () => {
     const wrapper = shallowMount(App)
-    const activeTabs = wrapper.findAll('.dt-tab.active')
-    expect(activeTabs).toHaveLength(1)
-    expect(activeTabs[0].text()).toBe('Home')
+    expect(wrapper.findAll('.dt-tab.active')).toHaveLength(0)
   })
 
   it('clicking a desktop tab makes it active', async () => {
     const wrapper = shallowMount(App)
-    const learnTab = wrapper.findAll('.dt-tab').find(t => t.text() === 'Learn')
-    await learnTab.trigger('click')
-    expect(learnTab.classes()).toContain('active')
+    const jamTab = wrapper.findAll('.dt-tab').find(t => t.text() === 'Jam')
+    await jamTab.trigger('click')
+    expect(jamTab.classes()).toContain('active')
   })
 })
 
@@ -136,16 +135,16 @@ describe('drum widget', () => {
 describe('tab switching', () => {
   it('opening settings records previous tab', async () => {
     const wrapper = shallowMount(App)
-    // Go to Learn first
-    const learnTab = wrapper.findAll('.dt-tab').find(t => t.text() === 'Learn')
-    await learnTab.trigger('click')
+    // Go to Jam first via desktop tab
+    const jamTab = wrapper.findAll('.dt-tab').find(t => t.text() === 'Jam')
+    await jamTab.trigger('click')
     // Open settings via icon button
     await wrapper.find('.icon-btn').trigger('click')
     // Close settings
     await wrapper.find('.icon-btn').trigger('click')
-    // Should return to Learn
-    const learnDtTab = wrapper.findAll('.dt-tab').find(t => t.text() === 'Learn')
-    expect(learnDtTab.classes()).toContain('active')
+    // Should return to Jam
+    const jamDtTab = wrapper.findAll('.dt-tab').find(t => t.text() === 'Jam')
+    expect(jamDtTab.classes()).toContain('active')
   })
 
   it('closing side menu after tab select', async () => {
@@ -163,30 +162,33 @@ describe('tab switching', () => {
 describe('SPA history (handlePopState)', () => {
   it('navigates to tab from popstate event', async () => {
     const wrapper = shallowMount(App)
-    // Simulate browser back to 'learn'
-    const event = new PopStateEvent('popstate', { state: { tab: 'learn' } })
+    // Simulate browser back to 'jam'
+    const event = new PopStateEvent('popstate', { state: { tab: 'jam' } })
     window.dispatchEvent(event)
     await nextTick()
-    const learnTab = wrapper.findAll('.dt-tab').find(t => t.text() === 'Learn')
-    expect(learnTab.classes()).toContain('active')
+    const jamTab = wrapper.findAll('.dt-tab').find(t => t.text() === 'Jam')
+    expect(jamTab.classes()).toContain('active')
   })
 
   it('ignores popstate for unknown tab ids', async () => {
     const wrapper = shallowMount(App)
+    const jamTab = wrapper.findAll('.dt-tab').find(t => t.text() === 'Jam')
+    await jamTab.trigger('click')
     const event = new PopStateEvent('popstate', { state: { tab: 'nonexistent' } })
     window.dispatchEvent(event)
     await nextTick()
-    // Should stay on home
-    const homeTab = wrapper.findAll('.dt-tab').find(t => t.text() === 'Home')
-    expect(homeTab.classes()).toContain('active')
+    // Should stay on jam (last known tab)
+    expect(jamTab.classes()).toContain('active')
   })
 
   it('ignores popstate with no state', async () => {
     const wrapper = shallowMount(App)
+    // No active desktop tab initially (on home)
+    expect(wrapper.findAll('.dt-tab.active')).toHaveLength(0)
     const event = new PopStateEvent('popstate', { state: null })
     window.dispatchEvent(event)
     await nextTick()
-    const homeTab = wrapper.findAll('.dt-tab').find(t => t.text() === 'Home')
-    expect(homeTab.classes()).toContain('active')
+    // Still no active desktop tab
+    expect(wrapper.findAll('.dt-tab.active')).toHaveLength(0)
   })
 })

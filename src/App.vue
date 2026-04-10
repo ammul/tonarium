@@ -19,14 +19,14 @@ import AboutPage from '@/pages/AboutPage.vue'
 
 const allTabs = [
   { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: StartPage },
-  { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LearnMode },
   { id: 'jam',            label: 'Jam Mode',            shortLabel: 'Jam',          component: JamMode },
   { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer },
-  { id: 'scales',         label: 'Scale Visualizer',    shortLabel: 'Scales',       component: ScaleVisualizer },
   { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions },
-  { id: 'chord-detector', label: 'Chord Detector',      shortLabel: 'Detector',     component: ChordDetector },
-  { id: 'prog-builder',   label: 'Progression Builder', shortLabel: 'Builder',      component: ProgressionBuilder },
-  { id: 'about',          label: 'About',               shortLabel: 'About',        component: AboutPage },
+  { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LearnMode,          menuOnly: true },
+  { id: 'scales',         label: 'Scale Visualizer',    shortLabel: 'Scales',       component: ScaleVisualizer,    menuOnly: true },
+  { id: 'chord-detector', label: 'Chord Detector',      shortLabel: 'Detector',     component: ChordDetector,      menuOnly: true },
+  { id: 'prog-builder',   label: 'Progression Builder', shortLabel: 'Builder',      component: ProgressionBuilder, menuOnly: true },
+  { id: 'about',          label: 'About',               shortLabel: 'About',        component: AboutPage,          menuOnly: true },
   { id: 'settings',       label: 'Settings',            shortLabel: 'Settings',     component: SettingsPage },
 ]
 
@@ -155,7 +155,7 @@ onUnmounted(() => {
     <nav class="desktop-tabs" aria-label="Main navigation">
       <div class="dt-inner">
         <button
-          v-for="tab in tabs.filter(t => t.id !== 'settings')"
+          v-for="tab in tabs.filter(t => ['jam', 'drums', 'chords'].includes(t.id))"
           :key="tab.id"
           class="dt-tab"
           :class="{ active: activeTab === tab.id }"

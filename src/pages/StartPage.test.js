@@ -8,33 +8,37 @@ describe('StartPage', () => {
     expect(wrapper.exists()).toBe(true)
   })
 
-  it('renders the learn featured card', () => {
+  it('renders 3 feature buttons', () => {
     const wrapper = mount(StartPage)
-    expect(wrapper.find('.learn-card').exists()).toBe(true)
-    expect(wrapper.find('.learn-card h2').text()).toBe('Learn')
+    expect(wrapper.findAll('.feature-btn')).toHaveLength(3)
   })
 
-  it('renders tool cards', () => {
+  it('feature buttons have labels for Jam, Progressions, and Drums', () => {
     const wrapper = mount(StartPage)
-    expect(wrapper.findAll('.tool-card').length).toBeGreaterThan(0)
+    const labels = wrapper.findAll('.feature-label').map(el => el.text())
+    expect(labels).toContain('Jam Mode')
+    expect(labels).toContain('Chord Progressions')
+    expect(labels).toContain('Drum Computer')
   })
 
-  it('emits navigate with tool id when a tool card is clicked', async () => {
+  it('emits navigate with correct id when a feature button is clicked', async () => {
     const wrapper = mount(StartPage)
-    await wrapper.find('.tool-card').trigger('click')
+    await wrapper.findAll('.feature-btn')[0].trigger('click')
     expect(wrapper.emitted('navigate')).toBeTruthy()
-    expect(typeof wrapper.emitted('navigate')[0][0]).toBe('string')
+    expect(wrapper.emitted('navigate')[0][0]).toBe('jam')
   })
 
-  it('emits navigate with "learn" when learn card is clicked', async () => {
+  it('emits navigate with "chords" when progressions button is clicked', async () => {
     const wrapper = mount(StartPage)
-    await wrapper.find('.learn-card').trigger('click')
-    expect(wrapper.emitted('navigate')).toBeTruthy()
-    expect(wrapper.emitted('navigate')[0][0]).toBe('learn')
+    const chordsBtn = wrapper.findAll('.feature-btn')[1]
+    await chordsBtn.trigger('click')
+    expect(wrapper.emitted('navigate')[0][0]).toBe('chords')
   })
 
-  it('does not mention Notes display mode', () => {
+  it('emits navigate with "drums" when drum computer button is clicked', async () => {
     const wrapper = mount(StartPage)
-    expect(wrapper.text()).not.toContain('Notes')
+    const drumsBtn = wrapper.findAll('.feature-btn')[2]
+    await drumsBtn.trigger('click')
+    expect(wrapper.emitted('navigate')[0][0]).toBe('drums')
   })
 })
