@@ -1,26 +1,10 @@
 import { midiStatus } from '@/audio/midiManager.js'
 import { soundEnabled } from '@/state/soundEnabled.js'
 import { soundStyle } from '@/state/soundStyle.js'
+import { getCtx, getCompressor } from '@/audio/audioContext.js'
 
-let _ctx = null
-let _compressor = null
 let _gen = 0
 const _active = new Map() // midiNote → { gainNode, oscs, gen }
-
-function getCtx() {
-  if (!_ctx) {
-    _ctx = new AudioContext()
-    _compressor = _ctx.createDynamicsCompressor()
-    _compressor.threshold.value = -18
-    _compressor.knee.value = 6
-    _compressor.ratio.value = 4
-    _compressor.attack.value = 0.003
-    _compressor.release.value = 0.1
-    _compressor.connect(_ctx.destination)
-  }
-  if (_ctx.state === 'suspended') _ctx.resume()
-  return _ctx
-}
 
 function midiToFreq(note) {
   return 440 * Math.pow(2, (note - 69) / 12)
@@ -36,7 +20,7 @@ export function startNote(midiNote) {
   const gen = ++_gen
 
   const gainNode = ctx.createGain()
-  gainNode.connect(_compressor)
+  gainNode.connect(getCompressor())
 
   const style = soundStyle.value
   let oscs

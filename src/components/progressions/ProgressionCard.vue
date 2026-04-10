@@ -10,7 +10,7 @@ defineProps({
   isPlaying: { type: Boolean, default: false },
 })
 
-defineEmits(['toggle-expand', 'play', 'stop'])
+defineEmits(['toggle-expand', 'play', 'stop', 'jam'])
 </script>
 
 <template>
@@ -27,6 +27,11 @@ defineEmits(['toggle-expand', 'play', 'stop'])
           :aria-label="isPlaying ? 'Stop' : 'Play'"
           @click="isPlaying ? $emit('stop') : $emit('play')"
         >{{ isPlaying ? '■' : '▶' }}</button>
+        <button
+          class="btn btn-xs btn-subtle ctrl-btn jam-btn"
+          aria-label="Jam with this"
+          @click="$emit('jam')"
+        >Jam</button>
       </div>
     </div>
 
@@ -112,6 +117,13 @@ defineEmits(['toggle-expand', 'play', 'stop'])
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem;
+}
+
+.jam-btn {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .chord-pill {

@@ -3,6 +3,9 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { displayMode } from '@/state/displayMode.js'
 import { colorScheme as _colorScheme } from '@/state/colorScheme.js'
 import { isPlaying as drumIsPlaying, play as drumPlay, pause as drumPause } from '@/audio/drumEngine.js'
+import { sessionPlaying, sessionProgression, sessionCurrentChordIdx } from '@/state/sessionState.js'
+import { startTransport, stopTransport } from '@/audio/transportClock.js'
+import { NOTES, CHORD_SUFFIX } from '@/constants/musicConstants.js'
 import StartPage from '@/pages/StartPage.vue'
 import ScaleVisualizer from '@/pages/ScaleVisualizer.vue'
 import ChordProgressions from '@/pages/ChordProgressions.vue'
@@ -32,8 +35,22 @@ const previousTab    = ref('home')
 const menuOpen       = ref(false)
 const drumEverPlayed = ref(false)
 
+const sessionEverStarted = ref(false)
+
 watch(drumIsPlaying, (playing) => {
   if (playing) drumEverPlayed.value = true
+})
+
+watch(sessionPlaying, (playing) => {
+  if (playing) sessionEverStarted.value = true
+})
+
+const currentChordName = computed(() => {
+  const prog = sessionProgression.value
+  if (!prog) return ''
+  const chord = prog.chords[sessionCurrentChordIdx.value]
+  if (!chord) return ''
+  return NOTES[chord._rootIdx] + (CHORD_SUFFIX[chord.type] ?? '')
 })
 
 const tabs = computed(() =>
@@ -87,7 +104,25 @@ onUnmounted(() => {
           <h1 @click="selectTab('home')" class="home-link">Tonarium</h1>
         </div>
         <div class="header-controls">
-          <div v-if="drumEverPlayed" class="drum-widget" :class="{ playing: drumIsPlaying }" @click="selectTab('drums')">
+          <div v-if="sessionEverStarted" class="drum-widget session-widget" :class="{ playing: sessionPlaying }" @click="selectTab('jam')">
+            <span class="dw-dot"></span>
+            <span v-if="sessionPlaying && currentChordName" class="dw-label">{{ currentChordName }}</span>
+            <span v-else class="dw-label">Session</span>
+            <button
+              class="btn btn-icon dw-btn"
+              :aria-label="sessionPlaying ? 'Stop session' : 'Start session'"
+              @click.stop="sessionPlaying ? stopTransport() : startTransport()"
+            >
+              <svg v-if="sessionPlaying" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+                <rect x="1.5" y="1" width="3" height="8" rx="1"/>
+                <rect x="5.5" y="1" width="3" height="8" rx="1"/>
+              </svg>
+              <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+                <polygon points="2,1 9,5 2,9"/>
+              </svg>
+            </button>
+          </div>
+          <div v-else-if="drumEverPlayed" class="drum-widget" :class="{ playing: drumIsPlaying }" @click="selectTab('drums')">
             <span class="dw-dot"></span>
             <span class="dw-label">Drums</span>
             <button

@@ -3,6 +3,9 @@ import { ref } from 'vue'
 import { pattern, bpm, isPlaying, currentStep, play, pause, clearPattern, toggleCell, INSTRUMENTS } from '@/audio/drumEngine.js'
 import { BEAT_PATTERNS } from '@/constants/beatPatterns.js'
 import PageHeader from '@/components/ui/PageHeader.vue'
+import { sessionBeatIdx, sessionBpm } from '@/state/sessionState.js'
+
+const emit = defineEmits(['navigate'])
 
 const GROOVE_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }
 const loadedGroove = ref(null)
@@ -23,6 +26,12 @@ function loadGroove(pi) {
   loadedGroove.value = pi
   if (BEAT_PATTERNS[pi].bpm) bpm.value = BEAT_PATTERNS[pi].bpm
   play()
+}
+
+function useInJam() {
+  sessionBeatIdx.value = loadedGroove.value
+  sessionBpm.value = bpm.value
+  emit('navigate', 'jam')
 }
 </script>
 
@@ -53,6 +62,7 @@ function loadGroove(pi) {
         @click="isPlaying ? pause() : play()"
       >{{ isPlaying ? 'Pause' : 'Play' }}</button>
       <button class="transport-btn" @click="clearPattern">Clear</button>
+      <button class="transport-btn jam-btn" @click="useInJam">Use in Jam</button>
       <div class="bpm-control">
         <label>BPM</label>
         <input type="number" v-model.number="bpm" min="60" max="200" class="bpm-input" />
@@ -177,6 +187,7 @@ function loadGroove(pi) {
 
 .transport-btn:hover  { border-color: var(--accent); color: var(--text); }
 .transport-btn.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.transport-btn.jam-btn { font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; }
 
 .bpm-control {
   display: flex;

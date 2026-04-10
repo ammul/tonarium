@@ -1,64 +1,87 @@
 # Tonarium
 
-A free web toolkit for people who love music but never learned to read it. Explore scales, chords, and progressions visually - then jam over a beat you built yourself. Works with synths, guitars, and MIDI controllers.
+**Play music. No sheet music required.**
 
-**[Live demo →](https://ammul.github.io/tonarium/)**
+A free web app for people who love music but never learned to read it. Pick a chord progression, add a beat, and jam - the app highlights which notes sound good as each chord cycles. Works with synths, guitars, MIDI controllers, or just your screen.
 
-Built by [ammul](https://github.com/ammul) - lazy music fan.
+**[Try it live](https://ammul.github.io/tonarium/)**
 
 ---
 
-## Tools
+## The Jam Experience
 
-- **Learn** - interactive lessons on intervals, scales, chord progressions, improvising, and building beats; each step is hands-on with audio playback
-- **Jam Mode** - pick a key and scale to see safe notes highlighted; anchor notes (root, 3rd, 5th) are marked; tap pads to hear notes and layer melodies over a running drum beat; includes Chromatic mode for free play
-- **Drum Computer** - 8-instrument, 16-step sequencer (kick, snare, hi-hats, toms, crash); synthesised sounds, no samples; loop continues playing when you switch to other tools
-- **Chord Progressions** - browse classic progressions (I–V–vi–IV, ii–V–I, Canon in D, …) in any root key; tap a chord card to preview it, or loop the progression via MIDI while you improvise
-- **Scale Visualizer** - see any scale across all 12 notes at a glance
-- **Chord Detector** - select a set of notes and instantly identify the chord
-- **Progression Builder** - arrange your own chord sequence and see it mapped out across your instrument
+This is the core of Tonarium. In Jam Mode:
+
+1. **Pick a chord progression** - browse 69 presets across 10 genres, or type your own
+2. **Add a drum beat** - choose from 10 grooves (rock, hip-hop, bossa nova, trap...)
+3. **Set the tempo** and hit play
+4. **Improvise** - as each chord loops, the pads/frets/keys light up to show you the best notes to play right now
+
+Everything stays in sync. The drums and chords share one clock so nothing drifts.
+
+## Three Pillars
+
+### Beats
+A 16-step drum sequencer with 9 synthesised instruments. Pick a groove preset or build your own pattern from scratch. The beat keeps playing when you switch tabs.
+
+### Chord Progressions
+69 classic progressions from pop to jazz to cinematic, transposed to any key. Hear how I-V-vi-IV sounds, then tap "Jam" to play over it with a beat running.
+
+### Improvising
+Pick a key, pick a scale, and see which notes are safe. Anchor notes (root, 3rd, 5th) glow brighter. Turn on chord mode and the highlights shift to match each chord as it plays.
+
+## All Tools
+
+| Tool | What it does |
+|------|-------------|
+| **Learn** | 9-step interactive course: root notes through jam sessions |
+| **Jam Mode** | The unified performance surface - progression + beat + improv |
+| **Drum Computer** | 16-step sequencer, 9 instruments, 10 groove presets |
+| **Chord Progressions** | 69 presets across 10 genres with playback |
+| **Scale Visualizer** | See any scale across all 12 notes |
+| **Chord Detector** | Select notes, identify the chord |
+| **Progression Builder** | Type chord symbols, see them mapped to your instrument |
+
+## Learn Mode
+
+A 9-step hands-on course that takes you from "what's a root note?" to jamming over a chord progression with a drum beat. Each step has interactive audio examples. The final step sets up a full jam session and drops you into Jam Mode.
 
 ## Audio
 
-All sound is synthesised in the browser via the Web Audio API - no samples or downloads required. The sound style for note playback (Synth, Piano, Bell, Pluck) is configurable in Settings, and persists across sessions.
+All sound is synthesised in the browser via the Web Audio API. No samples, no downloads. Four sound styles for note playback (Synth, Piano, Bell, Pluck), configurable in Settings.
 
-The Drum Computer runs independently in the background: start a loop, switch to Jam Mode or any other tool, and the beat keeps going.
+The drum engine and chord engine share a single AudioContext and transport clock, so drums and chord loops stay perfectly in sync.
 
 ## Web MIDI
 
-Connect a USB MIDI device and open **Settings → MIDI** to connect it. Once connected:
-
-- Notes and chords from all tools are sent to the device
-- MIDI note numbers are shown on pads for easy patch mapping
-- Octave control in Settings lets you match your device's tuning
-
-Requires Chrome or any browser with Web MIDI API support.
+Connect a USB MIDI device via **Settings**. Notes and chords from all tools are sent to the device. MIDI note numbers show on pads for easy patch mapping. Requires a browser with Web MIDI API support.
 
 ## Display Modes
 
-All tools adapt to three layouts, selectable via Settings:
+All tools adapt to three layouts, selectable in Settings:
 
 | Mode | Description |
 |------|-------------|
-| Pad | Chromatic pad grid (4x3 or 4x4, configurable in Settings) |
-| Guitar | 6-string fretboard in standard tuning |
-| Piano | Keyboard layout |
+| **Pad** | Chromatic pad grid (4x3 or 4x4) |
+| **Guitar** | 6-string fretboard, standard tuning |
+| **Piano** | Keyboard layout |
 
 ## Development
-
-Clone the repository - it's a plain Vite / Vue 3 app.
 
 ```bash
 npm install && npm run dev
 ```
 
-Tests:
-
 ```bash
-npm test          # unit + component tests (Vitest)
+npm test          # 417 unit + component tests (Vitest)
 npm run test:e2e  # end-to-end tests (Playwright)
+npm run build     # production build
 ```
 
 ## License
 
 MIT - see [LICENSE](LICENSE).
+
+---
+
+Built by [ammul](https://github.com/ammul). If Tonarium helps you make music, consider [supporting on Ko-fi](https://ko-fi.com/ammul).

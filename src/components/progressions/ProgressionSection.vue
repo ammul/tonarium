@@ -10,7 +10,7 @@ const props = defineProps({
   playingId: { type: String, default: null },
 })
 
-defineEmits(['toggle-expand', 'play', 'stop'])
+defineEmits(['toggle-expand', 'play', 'stop', 'jam'])
 
 const INITIAL_COUNT = 5
 const showAll = ref(false)
@@ -36,6 +36,7 @@ const hiddenCount = computed(() => props.progressions.length - INITIAL_COUNT)
         @toggle-expand="$emit('toggle-expand', p.id)"
         @play="$emit('play', p.id)"
         @stop="$emit('stop', p.id)"
+        @jam="$emit('jam', p.id)"
       />
     </div>
     <button v-if="!showAll && hiddenCount > 0" class="btn btn-xs btn-subtle show-more-btn" @click="showAll = true">

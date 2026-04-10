@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { displayMode } from '@/state/displayMode.js'
 import { padSize } from '@/state/padSize.js'
 import { NOTES, SHARPS, FRET_COUNT, NOTE_TO_SEMI, CHORD_TYPES, CHORD_SUFFIX } from '@/constants/musicConstants.js'
@@ -15,6 +15,18 @@ import PickerRow from '@/components/ui/PickerRow.vue'
 import ScaleSelector from '@/components/jam/ScaleSelector.vue'
 import OctaveControl from '@/components/jam/OctaveControl.vue'
 import { JAM_SCALES as SCALES } from '@/constants/scales.js'
+import { ALL_PROGRESSIONS } from '@/constants/progressions.js'
+import { BEAT_PATTERNS } from '@/constants/beatPatterns.js'
+import { pattern as drumPattern, INSTRUMENTS, bpm as drumBpm } from '@/audio/drumEngine.js'
+import { sessionProgression, sessionBeatIdx, sessionBpm, sessionPlaying, sessionCurrentChordIdx, sessionBeatsPerChord } from '@/state/sessionState.js'
+import { startTransport, stopTransport } from '@/audio/transportClock.js'
+
+const GROOVE_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }
+
+const GENRE_BEAT_MAP = {
+  pop: 0, rock: 0, blues: 3, jazz: 7, soul: 4,
+  classical: 0, latin: 7, cinematic: 5, modal: 0,
+}
 
 // Semitone offsets from root considered "anchor" notes (root, minor 3rd, major 3rd, 5th)
 const ANCHOR_OFFSETS = new Set([0, 3, 4, 7])
@@ -34,6 +46,8 @@ const showInfo          = ref(false)
 const pianoOctave       = ref(4)
 const selectedChordRoot = ref(null)   // null = follow selectedRoot
 const selectedChordType = ref(null)   // null = chord mode off
+const selectedProgressionId = ref(null)
+const showSessionControls   = ref(false)
 
 function setChordType(key) {
   if (selectedChordType.value === key) {
@@ -49,6 +63,13 @@ const chordRoot = computed(() => selectedChordRoot.value ?? selectedRoot.value)
 const SUBTITLE = { pad: 'lit pads', guitar: 'highlighted frets', piano: 'highlighted keys' }
 const subtitle = computed(() => {
   const mode = SUBTITLE[displayMode.value] ?? 'highlighted items'
+  if (sessionPlaying.value && sessionProgression.value) {
+    const chord = sessionProgression.value.chords[sessionCurrentChordIdx.value]
+    if (chord) {
+      const name = NOTES[(NOTES.indexOf(selectedRoot.value) + chord.degree) % 12] + (CHORD_SUFFIX[chord.type] ?? '')
+      return `playing over ${name} — ${mode} are safe notes`
+    }
+  }
   if (selectedChordType.value) {
     const chordName = chordRoot.value + (CHORD_SUFFIX[selectedChordType.value] ?? '')
     return `${mode} = chord tones of ${chordName} — bright = best note choices`
@@ -56,8 +77,80 @@ const subtitle = computed(() => {
   return `pick a key and scale - ${mode} are safe to play`
 })
 
+const rootIndex = computed(() => NOTES.indexOf(selectedRoot.value))
+
+const topProgressions = computed(() => {
+  const key = selectedScale.value?.intervals.includes(3) ? 'minor' : 'major'
+  return ALL_PROGRESSIONS.filter(p => p.key === key).slice(0, 12)
+})
+
+function selectProgression(id) {
+  if (selectedProgressionId.value === id) {
+    selectedProgressionId.value = null
+    sessionProgression.value = null
+    if (sessionPlaying.value) stopTransport()
+    return
+  }
+  selectedProgressionId.value = id
+  const prog = ALL_PROGRESSIONS.find(p => p.id === id)
+  if (!prog) return
+
+  const ri = rootIndex.value
+  const enriched = {
+    ...prog,
+    chords: prog.chords.map(c => ({
+      ...c,
+      _rootIdx: (ri + c.degree) % 12,
+      _octave: pianoOctave.value,
+    })),
+  }
+  sessionProgression.value = enriched
+
+  if (sessionBeatIdx.value === null) {
+    const suggestedBeat = GENRE_BEAT_MAP[prog.genre] ?? 0
+    selectBeat(suggestedBeat)
+  }
+
+  const autoScale = prog.key === 'minor' ? 'mi.p' : 'ma.p'
+  if (selectedScaleId.value !== autoScale) selectedScaleId.value = autoScale
+}
+
+function selectBeat(idx) {
+  if (sessionBeatIdx.value === idx) {
+    sessionBeatIdx.value = null
+    drumPattern.value = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
+    return
+  }
+  sessionBeatIdx.value = idx
+  const bp = BEAT_PATTERNS[idx]
+  const newPattern = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
+  for (const row of bp.rows) {
+    const instIdx = GROOVE_INST_MAP[row.name]
+    if (instIdx !== undefined) newPattern[instIdx] = row.steps.map(s => s === 1)
+  }
+  drumPattern.value = newPattern
+  sessionBpm.value = bp.bpm
+  drumBpm.value = bp.bpm
+}
+
+function toggleTransport() {
+  if (sessionPlaying.value) {
+    stopTransport()
+  } else {
+    startTransport()
+  }
+}
+
+watch(sessionCurrentChordIdx, (idx) => {
+  const prog = sessionProgression.value
+  if (!prog || !sessionPlaying.value) return
+  const chord = prog.chords[idx]
+  if (!chord) return
+  selectedChordRoot.value = NOTES[chord._rootIdx]
+  selectedChordType.value = chord.type
+})
+
 const selectedScale = computed(() => SCALES.find(s => s.id === selectedScaleId.value))
-const rootIndex     = computed(() => NOTES.indexOf(selectedRoot.value))
 
 const activeIndices = computed(() => {
   const root = rootIndex.value
@@ -192,6 +285,64 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
           </div>
         </div>
       </PickerRow>
+    </div>
+
+    <div class="session-toggle">
+      <button class="session-btn" :class="{ active: showSessionControls }" @click="showSessionControls = !showSessionControls">
+        {{ showSessionControls ? 'Hide Session' : 'Jam Session' }}
+      </button>
+    </div>
+
+    <div v-if="showSessionControls" class="session-controls">
+      <PickerRow label="Progression">
+        <div class="progression-pills">
+          <button
+            v-for="p in topProgressions"
+            :key="p.id"
+            class="prog-pill"
+            :class="{ active: selectedProgressionId === p.id }"
+            @click="selectProgression(p.id)"
+          >{{ p.numeral }}</button>
+        </div>
+      </PickerRow>
+
+      <PickerRow label="Beat">
+        <div class="beat-pills">
+          <button
+            v-for="(bp, i) in BEAT_PATTERNS"
+            :key="i"
+            class="beat-pill"
+            :class="{ active: sessionBeatIdx === i }"
+            @click="selectBeat(i)"
+          >{{ bp.name }}</button>
+        </div>
+      </PickerRow>
+
+      <PickerRow label="BPM">
+        <div class="bpm-row">
+          <input type="number" v-model.number="sessionBpm" min="40" max="200" class="bpm-input" />
+          <select v-model.number="sessionBeatsPerChord" class="bpc-select">
+            <option :value="1">1 beat/chord</option>
+            <option :value="2">2 beats/chord</option>
+            <option :value="4">4 beats/chord</option>
+            <option :value="8">8 beats/chord</option>
+          </select>
+        </div>
+      </PickerRow>
+
+      <div class="transport-row">
+        <button class="transport-btn" :class="{ playing: sessionPlaying }" @click="toggleTransport" :disabled="!sessionProgression && sessionBeatIdx === null">
+          {{ sessionPlaying ? 'Stop' : 'Play' }}
+        </button>
+        <div v-if="sessionProgression" class="chord-timeline">
+          <span
+            v-for="(c, i) in sessionProgression.chords"
+            :key="i"
+            class="chord-pill"
+            :class="{ active: sessionPlaying && sessionCurrentChordIdx === i }"
+          >{{ c.numeral }}</span>
+        </div>
+      </div>
     </div>
 
     <ScaleLegend />
@@ -442,6 +593,135 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
   background: var(--rust-bg);
   border-color: var(--rust);
   color: var(--rust-hi);
+}
+
+/* Session controls */
+.session-toggle {
+  margin: 1rem 0 0.5rem;
+}
+
+.session-btn {
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--input);
+  color: var(--text3);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+}
+
+.session-btn:hover { border-color: var(--accent); color: var(--text); }
+.session-btn.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
+
+.session-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.progression-pills, .beat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.prog-pill, .beat-pill {
+  padding: 0.25rem 0.55rem;
+  border-radius: 5px;
+  border: 1px solid var(--border2);
+  background: var(--input);
+  color: var(--text4);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.1s, background 0.1s, color 0.1s;
+}
+
+.prog-pill:hover, .beat-pill:hover { border-color: var(--accent); color: var(--text2); }
+.prog-pill.active, .beat-pill.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
+
+.bpm-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.bpm-input {
+  width: 4.5rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--input);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  text-align: center;
+}
+
+.bpc-select {
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--input);
+  color: var(--text3);
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.transport-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.transport-btn {
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--input);
+  color: var(--text3);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+}
+
+.transport-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+.transport-btn.playing { border-color: var(--rust); background: var(--rust-bg); color: var(--rust-hi); }
+.transport-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.chord-timeline {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.chord-pill {
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--border2);
+  background: var(--raised);
+  color: var(--text4);
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.chord-pill.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
 }
 
 @media (max-width: 600px) {

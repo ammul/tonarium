@@ -12,6 +12,9 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import { GENRES, ALL_PROGRESSIONS } from '@/constants/progressions.js'
 import GenreTabs from '@/components/progressions/GenreTabs.vue'
 import ProgressionSection from '@/components/progressions/ProgressionSection.vue'
+import { sessionProgression, sessionBpm, sessionKey } from '@/state/sessionState.js'
+
+const emit = defineEmits(['navigate'])
 
 const SOLO_ADVICE = {
   maj:  { scale: 'Major pentatonic', why: 'Open and resolved - all 5 notes sound great over a major chord.' },
@@ -143,6 +146,24 @@ function handleToggleExpand(id) {
   showInfoIdx.value = null
 }
 
+function jamWith(progressionId) {
+  stopLoop()
+  const prog = ALL_PROGRESSIONS.find(p => p.id === progressionId)
+  if (!prog) return
+  const ri = NOTES.indexOf(selectedRoot.value)
+  sessionProgression.value = {
+    ...prog,
+    chords: prog.chords.map(c => ({
+      ...c,
+      _rootIdx: (ri + c.degree) % 12,
+      _octave: chordOctave.value,
+    })),
+  }
+  sessionKey.value = selectedRoot.value
+  sessionBpm.value = bpm.value
+  emit('navigate', 'jam')
+}
+
 watch([expandedId, selectedRoot], stopLoop)
 </script>
 
@@ -243,6 +264,7 @@ watch([expandedId, selectedRoot], stopLoop)
       @toggle-expand="handleToggleExpand"
       @play="playLoop"
       @stop="stopLoop"
+      @jam="jamWith"
     />
 
     <ProgressionSection
@@ -254,6 +276,7 @@ watch([expandedId, selectedRoot], stopLoop)
       @toggle-expand="handleToggleExpand"
       @play="playLoop"
       @stop="stopLoop"
+      @jam="jamWith"
     />
   </div>
 </template>

@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import { playChord, stopAllNotes } from '@/audio/audioEngine.js'
 import NoteStripPicker from '@/components/ui/NoteStripPicker.vue'
+import { NOTES } from '@/constants/musicConstants.js'
+import { ALL_PROGRESSIONS } from '@/constants/progressions.js'
+import { sessionProgression, sessionKey, sessionBpm } from '@/state/sessionState.js'
 
 const emit = defineEmits(['navigate'])
 
@@ -150,6 +153,13 @@ function tapSection(ti, si) {
       Build your own song structure in <strong>Progression Builder</strong> — enter chords as symbols like <code>C F G Am</code>.
       <button class="btn btn-accent btn-block" style="margin-top:0.75rem" @click="emit('navigate', 'builder')">
         Open Progression Builder &rarr;
+      </button>
+    </div>
+
+    <div class="song-cta">
+      Ready to play? <strong>Jam Mode</strong> loops a progression with a drum beat while you improvise — highlights follow each chord.
+      <button class="btn btn-accent btn-block" style="margin-top:0.75rem" @click="emit('navigate', 'jam')">
+        Try in Jam Mode &rarr;
       </button>
     </div>
   </div>

@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { getCtx, getCompressor } from '@/audio/audioContext.js'
 
 export const INSTRUMENTS = [
   'Kick', 'Snare', 'Clap', 'Hi-Hat Closed', 'Hi-Hat Open',
@@ -10,14 +11,7 @@ export const bpm         = ref(120)
 export const isPlaying   = ref(false)
 export const currentStep = ref(0)
 
-let _ctx = null
 let _noiseBuffer = null
-
-function getCtx() {
-  if (!_ctx) _ctx = new AudioContext()
-  if (_ctx.state === 'suspended') _ctx.resume()
-  return _ctx
-}
 
 function getNoiseBuffer(ctx) {
   if (_noiseBuffer) return _noiseBuffer
@@ -29,6 +23,8 @@ function getNoiseBuffer(ctx) {
   return buf
 }
 
+function getDest() { return getCompressor() }
+
 function playKick(ctx, when) {
   const osc  = ctx.createOscillator()
   const gain = ctx.createGain()
@@ -38,7 +34,7 @@ function playKick(ctx, when) {
   gain.gain.setValueAtTime(1.0, when)
   gain.gain.exponentialRampToValueAtTime(0.001, when + 0.5)
   osc.connect(gain)
-  gain.connect(ctx.destination)
+  gain.connect(getDest())
   osc.start(when)
   osc.stop(when + 0.5)
 }
@@ -51,7 +47,7 @@ function playSnare(ctx, when) {
   oscGain.gain.setValueAtTime(0.5, when)
   oscGain.gain.exponentialRampToValueAtTime(0.001, when + 0.15)
   osc.connect(oscGain)
-  oscGain.connect(ctx.destination)
+  oscGain.connect(getDest())
   osc.start(when)
   osc.stop(when + 0.15)
 
@@ -61,7 +57,7 @@ function playSnare(ctx, when) {
   noiseGain.gain.setValueAtTime(0.8, when)
   noiseGain.gain.exponentialRampToValueAtTime(0.001, when + 0.15)
   noise.connect(noiseGain)
-  noiseGain.connect(ctx.destination)
+  noiseGain.connect(getDest())
   noise.start(when)
   noise.stop(when + 0.15)
 }
@@ -77,7 +73,7 @@ function playHiHatClosed(ctx, when) {
   gain.gain.exponentialRampToValueAtTime(0.001, when + 0.05)
   noise.connect(hpf)
   hpf.connect(gain)
-  gain.connect(ctx.destination)
+  gain.connect(getDest())
   noise.start(when)
   noise.stop(when + 0.05)
 }
@@ -93,7 +89,7 @@ function playHiHatOpen(ctx, when) {
   gain.gain.exponentialRampToValueAtTime(0.001, when + 0.3)
   noise.connect(hpf)
   hpf.connect(gain)
-  gain.connect(ctx.destination)
+  gain.connect(getDest())
   noise.start(when)
   noise.stop(when + 0.3)
 }
@@ -107,7 +103,7 @@ function playTom(ctx, when, freqStart, freqEnd, dur) {
   gain.gain.setValueAtTime(0.8, when)
   gain.gain.exponentialRampToValueAtTime(0.001, when + dur)
   osc.connect(gain)
-  gain.connect(ctx.destination)
+  gain.connect(getDest())
   osc.start(when)
   osc.stop(when + dur)
 }
@@ -126,7 +122,7 @@ function playClap(ctx, when) {
     gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07)
     noise.connect(bpf)
     bpf.connect(gain)
-    gain.connect(ctx.destination)
+    gain.connect(getDest())
     noise.start(t)
     noise.stop(t + 0.08)
   }
@@ -144,7 +140,7 @@ function playCrash(ctx, when) {
   gain.gain.exponentialRampToValueAtTime(0.001, when + 1.0)
   noise.connect(bpf)
   bpf.connect(gain)
-  gain.connect(ctx.destination)
+  gain.connect(getDest())
   noise.start(when)
   noise.stop(when + 1.0)
 }
@@ -160,6 +156,11 @@ const PLAY_FNS = [
   (ctx, when) => playTom(ctx, when, 80, 35, 0.3),
   playCrash,
 ]
+
+export function triggerDrumHit(instrumentIdx, when) {
+  const ctx = getCtx()
+  if (PLAY_FNS[instrumentIdx]) PLAY_FNS[instrumentIdx](ctx, when)
+}
 
 const LOOKAHEAD = 0.1
 const TICK_MS   = 25
