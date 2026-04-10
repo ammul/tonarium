@@ -17,7 +17,7 @@ import OctaveControl from '@/components/jam/OctaveControl.vue'
 import { JAM_SCALES as SCALES } from '@/constants/scales.js'
 import { ALL_PROGRESSIONS } from '@/constants/progressions.js'
 import { BEAT_PATTERNS } from '@/constants/beatPatterns.js'
-import { pattern as drumPattern, INSTRUMENTS, bpm as drumBpm } from '@/audio/drumEngine.js'
+import { pattern as drumPattern, INSTRUMENTS } from '@/audio/drumEngine.js'
 import { sessionProgression, sessionBeatIdx, sessionBpm, sessionPlaying, sessionCurrentChordIdx, sessionBeatsPerChord } from '@/state/sessionState.js'
 import { startTransport, stopTransport } from '@/audio/transportClock.js'
 
@@ -130,7 +130,6 @@ function selectBeat(idx) {
   }
   drumPattern.value = newPattern
   sessionBpm.value = bp.bpm
-  drumBpm.value = bp.bpm
 }
 
 function toggleTransport() {

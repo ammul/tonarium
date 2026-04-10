@@ -30,12 +30,13 @@ vi.mock('@/audio/audioContext.js', () => ({
   getCompressor: () => mockCompressor,
 }))
 
-import { pattern, bpm, isPlaying, currentStep, play, pause, clearPattern, toggleCell, INSTRUMENTS, triggerDrumHit } from './drumEngine.js'
+import { pattern, isPlaying, currentStep, play, pause, clearPattern, toggleCell, INSTRUMENTS, triggerDrumHit } from './drumEngine.js'
+import { sessionBpm } from '@/state/sessionState.js'
 
 beforeEach(() => {
   clearPattern()
   if (isPlaying.value) pause()
-  bpm.value = 120
+  sessionBpm.value = 120
 })
 
 describe('INSTRUMENTS', () => {
@@ -110,13 +111,13 @@ describe('triggerDrumHit', () => {
   })
 })
 
-describe('bpm', () => {
+describe('sessionBpm (shared BPM)', () => {
   it('defaults to 120', () => {
-    expect(bpm.value).toBe(120)
+    expect(sessionBpm.value).toBe(120)
   })
 
   it('is settable', () => {
-    bpm.value = 90
-    expect(bpm.value).toBe(90)
+    sessionBpm.value = 90
+    expect(sessionBpm.value).toBe(90)
   })
 })

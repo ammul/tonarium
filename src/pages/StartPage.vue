@@ -1,45 +1,64 @@
 <script setup>
+import JamMode from '@/pages/JamMode.vue'
+import ChordProgressions from '@/pages/ChordProgressions.vue'
+import DrumComputer from '@/pages/DrumComputer.vue'
+
+const props = defineProps({
+  openPanel: { type: String, default: null },
+})
+
 const emit = defineEmits(['navigate'])
 
-const features = [
+const panels = [
   {
     id: 'jam',
     label: 'Jam Mode',
-    description: 'Pick a key and scale. Play over a looping chord progression with a drum beat running.',
+    description: 'Pick a key and scale. Play over a looping chord progression with a beat.',
+    component: JamMode,
   },
   {
     id: 'chords',
     label: 'Chord Progressions',
-    description: 'Browse 69 classic progressions across 10 genres. Transpose to any key or take one into Jam Mode.',
+    description: 'Browse 69 classic progressions across 10 genres, transposed to any key.',
+    component: ChordProgressions,
   },
   {
     id: 'drums',
     label: 'Drum Computer',
-    description: 'Build a beat from 9 synthesised instruments across 16 steps. Keeps running while you switch tools.',
+    description: 'Build a beat from 9 synthesised instruments across 16 steps.',
+    component: DrumComputer,
   },
 ]
 </script>
 
 <template>
   <div class="start-page">
-    <section class="hero">
+    <section v-if="!openPanel" class="hero">
       <p class="tagline">Play music. No sheet music required.</p>
       <p class="sub">Pick a chord progression, add a beat, and jam — the app shows you which notes sound good as each chord cycles.</p>
     </section>
 
-    <section class="features">
-      <button
-        v-for="feature in features"
-        :key="feature.id"
-        class="feature-btn"
-        @click="emit('navigate', feature.id)"
+    <div class="panels">
+      <div
+        v-for="panel in panels"
+        :key="panel.id"
+        class="panel"
+        :class="{ open: openPanel === panel.id }"
       >
-        <span class="feature-label">{{ feature.label }}</span>
-        <span class="feature-desc">{{ feature.description }}</span>
-      </button>
-    </section>
+        <button class="panel-header" @click="emit('navigate', panel.id)">
+          <div class="panel-header-text">
+            <span class="panel-label">{{ panel.label }}</span>
+            <span v-if="openPanel !== panel.id" class="panel-desc">{{ panel.description }}</span>
+          </div>
+          <span class="panel-chevron">{{ openPanel === panel.id ? '▲' : '▼' }}</span>
+        </button>
+        <div v-show="openPanel === panel.id" class="panel-body">
+          <component :is="panel.component" @navigate="emit('navigate', $event)" />
+        </div>
+      </div>
+    </div>
 
-    <section class="about">
+    <section v-if="!openPanel" class="about">
       <p>Built by <a href="https://github.com/ammul" target="_blank" rel="noopener">ammul</a>.</p>
       <a href="https://github.com/ammul/tonarium" target="_blank" rel="noopener" class="github-btn">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -53,13 +72,13 @@ const features = [
 
 <style scoped>
 .start-page {
-  max-width: 560px;
+  max-width: 720px;
   margin: 0 auto;
   padding: 0 0.5rem 3rem;
 }
 
 .hero {
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 .tagline {
@@ -78,47 +97,82 @@ const features = [
   margin: 0;
 }
 
-.features {
+.panels {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 3rem;
+  gap: 0.5rem;
 }
 
-.feature-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.4rem;
-  width: 100%;
-  padding: 1.25rem 1.4rem;
-  background: var(--raised);
+.panel {
   border: 1px solid var(--border);
   border-radius: 10px;
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.15s, background 0.15s;
+  overflow: hidden;
+  transition: border-color 0.15s;
 }
 
-.feature-btn:hover {
-  border-color: var(--accent);
+.panel.open {
+  border-color: var(--accent-mid);
+}
+
+.panel-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  background: var(--raised);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.panel-header:hover {
   background: var(--hover);
 }
 
-.feature-label {
-  font-size: 1.05rem;
+.panel.open .panel-header {
+  background: var(--hover);
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.panel-label {
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text);
   letter-spacing: 0.02em;
 }
 
-.feature-desc {
-  font-size: 0.85rem;
+.panel.open .panel-label {
+  color: var(--accent);
+}
+
+.panel-desc {
+  font-size: 0.82rem;
   color: var(--text3);
-  line-height: 1.5;
+  line-height: 1.4;
+}
+
+.panel-chevron {
+  font-size: 0.65rem;
+  color: var(--text4);
+  flex-shrink: 0;
+}
+
+.panel-body {
+  background: var(--bg);
 }
 
 .about {
+  margin-top: 2.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
 }

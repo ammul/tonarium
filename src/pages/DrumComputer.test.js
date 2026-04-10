@@ -2,37 +2,49 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 
-// Mock AudioContext before importing drumEngine
-vi.stubGlobal('AudioContext', vi.fn(() => ({
-  state: 'running',
-  currentTime: 0,
-  resume: vi.fn(),
-  createOscillator: vi.fn(() => ({
-    type: '',
-    frequency: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), value: 0 },
-    connect: vi.fn(), start: vi.fn(), stop: vi.fn(),
+vi.mock('@/audio/audioContext.js', () => ({
+  getCtx: vi.fn(() => ({
+    state: 'running', currentTime: 0, resume: vi.fn(), sampleRate: 44100,
+    createOscillator: vi.fn(() => ({
+      type: '', frequency: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), value: 0 },
+      connect: vi.fn(), start: vi.fn(), stop: vi.fn(),
+    })),
+    createGain: vi.fn(() => ({
+      gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn(), cancelScheduledValues: vi.fn() },
+      connect: vi.fn(),
+    })),
+    createBuffer: vi.fn(() => ({ getChannelData: vi.fn(() => new Float32Array(1)) })),
+    createBufferSource: vi.fn(() => ({ buffer: null, connect: vi.fn(), start: vi.fn(), stop: vi.fn() })),
+    createBiquadFilter: vi.fn(() => ({ type: '', frequency: { value: 0 }, Q: { value: 0 }, connect: vi.fn() })),
+    createDynamicsCompressor: vi.fn(() => ({
+      threshold: { value: 0 }, knee: { value: 0 }, ratio: { value: 0 },
+      attack: { value: 0 }, release: { value: 0 }, connect: vi.fn(),
+    })),
+    destination: {},
   })),
-  createGain: vi.fn(() => ({
-    gain: { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() },
-    connect: vi.fn(),
-  })),
-  createBuffer: vi.fn(() => ({ getChannelData: vi.fn(() => new Float32Array(1)) })),
-  createBufferSource: vi.fn(() => ({
-    buffer: null, connect: vi.fn(), start: vi.fn(), stop: vi.fn(),
-  })),
-  createBiquadFilter: vi.fn(() => ({
-    type: '', frequency: { value: 0 }, Q: { value: 0 }, connect: vi.fn(),
-  })),
-  destination: {},
-  sampleRate: 44100,
-})))
+  getCompressor: vi.fn(() => ({ connect: vi.fn() })),
+}))
+
+vi.mock('@/audio/transportClock.js', () => ({
+  startTransport: vi.fn(),
+  stopTransport: vi.fn(),
+  currentDrumStep: { value: 0 },
+}))
+
+vi.mock('@/audio/midiManager.js', () => ({
+  midiStatus: { value: 'idle' },
+  midiChannel: { value: 0 },
+  chordOn: vi.fn(),
+  chordOff: vi.fn(),
+  activeInputNotes: { value: new Set() },
+}))
 
 import DrumComputer from './DrumComputer.vue'
-import { pattern, bpm, isPlaying, toggleCell, INSTRUMENTS } from '@/audio/drumEngine.js'
+import { pattern, isPlaying, toggleCell, INSTRUMENTS } from '@/audio/drumEngine.js'
+import { sessionBpm } from '@/state/sessionState.js'
 
 beforeEach(() => {
-  // Reset state
-  bpm.value = 120
+  sessionBpm.value = 120
   isPlaying.value = false
   pattern.value = Array.from({ length: 9 }, () => new Array(16).fill(false))
 })
@@ -99,8 +111,8 @@ describe('DrumComputer', () => {
     expect(Number(input.element.value)).toBe(120)
   })
 
-  it('BPM can be changed via the ref', async () => {
-    bpm.value = 140
+  it('BPM can be changed via sessionBpm', async () => {
+    sessionBpm.value = 140
     const wrapper = mount(DrumComputer)
     await nextTick()
     const input = wrapper.find('.bpm-input')

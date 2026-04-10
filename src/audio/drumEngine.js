@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { getCtx, getCompressor } from '@/audio/audioContext.js'
+import { sessionBpm } from '@/state/sessionState.js'
 
 export const INSTRUMENTS = [
   'Kick', 'Snare', 'Clap', 'Hi-Hat Closed', 'Hi-Hat Open',
@@ -7,7 +8,6 @@ export const INSTRUMENTS = [
 ]
 
 export const pattern     = ref(Array.from({ length: 9 }, () => new Array(16).fill(false)))
-export const bpm         = ref(120)
 export const isPlaying   = ref(false)
 export const currentStep = ref(0)
 
@@ -170,7 +170,7 @@ let _schedulerTimer = null
 
 function _tick() {
   const ctx     = getCtx()
-  const stepDur = 60 / bpm.value / 4
+  const stepDur = 60 / sessionBpm.value / 4
 
   while (_nextStepTime < ctx.currentTime + LOOKAHEAD) {
     const step = currentStep.value

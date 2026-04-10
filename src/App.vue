@@ -32,10 +32,14 @@ const allTabs = [
 
 const activeTab      = ref('home')
 const previousTab    = ref('home')
+const previousPanel  = ref(null)
+const openPanel      = ref(null)
 const menuOpen       = ref(false)
 const drumEverPlayed = ref(false)
 
 const sessionEverStarted = ref(false)
+
+const PANEL_IDS = new Set(['jam', 'drums', 'chords'])
 
 watch(drumIsPlaying, (playing) => {
   if (playing) drumEverPlayed.value = true
@@ -68,22 +72,36 @@ const activeComponent = computed(() => allTabs.find(t => t.id === activeTab.valu
 function selectTab(id) {
   if (id === 'settings' && activeTab.value !== 'settings') {
     previousTab.value = activeTab.value
+    previousPanel.value = openPanel.value
   }
-  activeTab.value = id
+  if (PANEL_IDS.has(id)) {
+    openPanel.value = openPanel.value === id ? null : id
+    activeTab.value = 'home'
+  } else {
+    if (id === 'home') openPanel.value = null
+    activeTab.value = id
+  }
   menuOpen.value = false
   history.pushState({ tab: id }, '')
 }
 
 function closeSettings() {
-  selectTab(previousTab.value)
+  openPanel.value = previousPanel.value
+  activeTab.value = previousTab.value
+  menuOpen.value = false
 }
 
 function handlePopState(e) {
   const tab = e.state?.tab
-  if (tab && allTabs.some(t => t.id === tab)) {
+  if (!tab || !allTabs.some(t => t.id === tab)) return
+  if (PANEL_IDS.has(tab)) {
+    openPanel.value = tab
+    activeTab.value = 'home'
+  } else {
     activeTab.value = tab
-    menuOpen.value = false
+    if (tab === 'home') openPanel.value = null
   }
+  menuOpen.value = false
 }
 
 onMounted(() => {
@@ -152,18 +170,6 @@ onUnmounted(() => {
       </div>
     </header>
 
-    <nav class="desktop-tabs" aria-label="Main navigation">
-      <div class="dt-inner">
-        <button
-          v-for="tab in tabs.filter(t => ['jam', 'drums', 'chords'].includes(t.id))"
-          :key="tab.id"
-          class="dt-tab"
-          :class="{ active: activeTab === tab.id }"
-          @click="selectTab(tab.id)"
-        >{{ tab.shortLabel }}</button>
-      </div>
-    </nav>
-
     <div class="menu-overlay" :class="{ open: menuOpen }" @click="menuOpen = false"></div>
 
     <nav class="side-menu" :class="{ open: menuOpen }">
@@ -179,7 +185,12 @@ onUnmounted(() => {
     </nav>
 
     <main>
-      <component :is="activeComponent" @navigate="selectTab" @close="closeSettings" />
+      <component
+        :is="activeComponent"
+        v-bind="activeTab === 'home' ? { openPanel } : {}"
+        @navigate="selectTab"
+        @close="closeSettings"
+      />
     </main>
   </div>
 </template>
@@ -333,67 +344,10 @@ main {
   padding-top: 4rem;
 }
 
-@media (min-width: 768px) {
-  main {
-    padding-top: 7rem;
-  }
-}
-
 @media (orientation: landscape) and (max-height: 500px) {
   main {
     padding-top: 2.5rem;
   }
-}
-
-/* ── Desktop tab bar ──────────────────────────────────────────────────────── */
-.desktop-tabs {
-  display: none;
-  position: fixed;
-  top: 3.75rem;
-  left: 0;
-  right: 0;
-  z-index: 49;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-}
-
-.dt-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  display: flex;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.dt-inner::-webkit-scrollbar { display: none; }
-
-.dt-tab {
-  padding: 0.85rem 0.9rem;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text3);
-  font-size: 0.82rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  white-space: nowrap;
-  letter-spacing: 0.03em;
-  flex-shrink: 0;
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.dt-tab:hover { color: var(--text2); }
-
-.dt-tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-
-@media (min-width: 768px) {
-  .desktop-tabs { display: block; }
-  .burger-btn    { display: none; }
 }
 
 /* Overlay */

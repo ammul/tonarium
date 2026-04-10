@@ -1,9 +1,10 @@
 <script setup>
 import { ref } from 'vue'
-import { pattern, bpm, isPlaying, currentStep, play, pause, clearPattern, toggleCell, INSTRUMENTS } from '@/audio/drumEngine.js'
+import { pattern, isPlaying, currentStep, clearPattern, toggleCell, INSTRUMENTS } from '@/audio/drumEngine.js'
 import { BEAT_PATTERNS } from '@/constants/beatPatterns.js'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import { sessionBeatIdx, sessionBpm } from '@/state/sessionState.js'
+import { startTransport, stopTransport } from '@/audio/transportClock.js'
 
 const emit = defineEmits(['navigate'])
 
@@ -11,7 +12,7 @@ const GROOVE_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }
 const loadedGroove = ref(null)
 
 function loadGroove(pi) {
-  if (isPlaying.value) pause()
+  if (isPlaying.value) stopTransport()
   if (loadedGroove.value === pi) {
     loadedGroove.value = null
     clearPattern()
@@ -24,13 +25,12 @@ function loadGroove(pi) {
   }
   pattern.value = newPattern
   loadedGroove.value = pi
-  if (BEAT_PATTERNS[pi].bpm) bpm.value = BEAT_PATTERNS[pi].bpm
-  play()
+  if (BEAT_PATTERNS[pi].bpm) sessionBpm.value = BEAT_PATTERNS[pi].bpm
+  startTransport()
 }
 
 function useInJam() {
   sessionBeatIdx.value = loadedGroove.value
-  sessionBpm.value = bpm.value
   emit('navigate', 'jam')
 }
 </script>
@@ -59,13 +59,13 @@ function useInJam() {
       <button
         class="transport-btn"
         :class="{ active: isPlaying }"
-        @click="isPlaying ? pause() : play()"
+        @click="isPlaying ? stopTransport() : startTransport()"
       >{{ isPlaying ? 'Pause' : 'Play' }}</button>
       <button class="transport-btn" @click="clearPattern">Clear</button>
       <button class="transport-btn jam-btn" @click="useInJam">Use in Jam</button>
       <div class="bpm-control">
         <label>BPM</label>
-        <input type="number" v-model.number="bpm" min="60" max="200" class="bpm-input" />
+        <input type="number" v-model.number="sessionBpm" min="60" max="200" class="bpm-input" />
       </div>
     </div>
 

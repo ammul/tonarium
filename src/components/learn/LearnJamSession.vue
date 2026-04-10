@@ -4,7 +4,7 @@ import { NOTES } from '@/constants/musicConstants.js'
 import { ALL_PROGRESSIONS } from '@/constants/progressions.js'
 import { BEAT_PATTERNS } from '@/constants/beatPatterns.js'
 import { sessionProgression, sessionBeatIdx, sessionBpm, sessionKey } from '@/state/sessionState.js'
-import { pattern as drumPattern, INSTRUMENTS, bpm as drumBpm } from '@/audio/drumEngine.js'
+import { pattern as drumPattern, INSTRUMENTS } from '@/audio/drumEngine.js'
 
 const emit = defineEmits(['navigate'])
 
@@ -57,7 +57,7 @@ function launchJam() {
       if (instIdx !== undefined) newPattern[instIdx] = row.steps.map(s => s === 1)
     }
     drumPattern.value = newPattern
-    drumBpm.value = chosenBpm.value
+    sessionBpm.value = chosenBpm.value
   }
   emit('navigate', 'jam')
 }
