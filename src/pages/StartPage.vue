@@ -48,6 +48,8 @@ const panelRunning = computed(() => ({
       <p class="sub">Pick a chord progression, add a beat, and jam. The app shows you which notes sound good as each chord cycles.</p>
     </section>
 
+    <JamSessionBar class="jam-session-bar-outer" />
+
     <div class="panels">
       <div
         v-for="panel in panels"
@@ -74,8 +76,6 @@ const panelRunning = computed(() => ({
         </div>
       </div>
     </div>
-
-    <JamSessionBar class="jam-session-bar-outer" />
 
     <section v-if="!openPanel" class="about">
       <p>Built by <a href="https://github.com/ammul" target="_blank" rel="noopener">ammul</a>.</p>
@@ -227,7 +227,7 @@ const panelRunning = computed(() => ({
 }
 
 .jam-session-bar-outer {
-  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .about {

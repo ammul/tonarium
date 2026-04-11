@@ -89,7 +89,6 @@ function applyPreset(preset) {
   }
 
   selectedScaleId.value = preset.scaleId
-  startTransport()
 }
 
 function selectProgression(id) {
@@ -116,8 +115,6 @@ function selectProgression(id) {
 
   const autoScale = prog.key === 'minor' ? 'mi.p' : 'ma.p'
   if (selectedScaleId.value !== autoScale) selectedScaleId.value = autoScale
-
-  startTransport()
 }
 
 function selectBeat(idx) {
@@ -130,7 +127,6 @@ function selectBeat(idx) {
   }
   if (sessionPlaying.value) stopTransport()
   applyBeat(idx)
-  startTransport()
 }
 
 function toggleTransport() {
@@ -408,16 +404,14 @@ const activeBeatName = computed(() =>
 /* Mixer */
 .jsb-mixer {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .jsb-mix-ch {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex: 1;
-  min-width: 7rem;
 }
 
 .jsb-mix-label {

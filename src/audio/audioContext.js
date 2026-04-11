@@ -4,6 +4,12 @@ let _jamGain     = null   // manual note playing (pad / guitar / piano)
 let _beatGain    = null   // drum hits
 let _progGain    = null   // progression chord playback
 
+// Base gain levels that equalize perceived loudness across channels at slider = 1.0.
+// Drums stack multiple simultaneous hits; chords play 3-4 notes at once.
+export const JAM_GAIN_BASE  = 1.0
+export const BEAT_GAIN_BASE = 0.55
+export const PROG_GAIN_BASE = 0.35
+
 export function getCtx() {
   if (!_ctx) {
     _ctx = new AudioContext()
@@ -17,12 +23,15 @@ export function getCtx() {
     _compressor.connect(_ctx.destination)
 
     _jamGain = _ctx.createGain()
+    _jamGain.gain.value = JAM_GAIN_BASE
     _jamGain.connect(_compressor)
 
     _beatGain = _ctx.createGain()
+    _beatGain.gain.value = BEAT_GAIN_BASE
     _beatGain.connect(_compressor)
 
     _progGain = _ctx.createGain()
+    _progGain.gain.value = PROG_GAIN_BASE
     _progGain.connect(_compressor)
   }
   if (_ctx.state === 'suspended') _ctx.resume()
