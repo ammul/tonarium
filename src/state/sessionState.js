@@ -17,7 +17,7 @@ export const sessionKey             = ref(loadStr('sessionKey', 'C'))
 export const sessionProgression     = ref(null)
 export const sessionBeatIdx         = ref(loadNum('sessionBeatIdx', null))
 export const sessionBpm             = ref(loadNum('sessionBpm', 120))
-export const sessionBeatsPerChord   = ref(loadNum('sessionBeatsPerChord', 2))
+export const sessionBeatsPerChord   = ref(loadNum('sessionBeatsPerChord', 4))
 export const sessionPlaying         = ref(false)
 export const sessionCurrentChordIdx = ref(0)
 

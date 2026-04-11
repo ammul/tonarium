@@ -32,7 +32,6 @@ const PRESETS = [
 ]
 
 const activePreset = ref(null)
-const showAdvanced = ref(false)
 
 // Keep local ref in sync with externally-loaded progressions ("Jam with This")
 const selectedProgressionId = ref(sessionProgression.value?.id ?? null)
@@ -226,16 +225,17 @@ const activeBeatName = computed(() =>
         </select>
       </PickerRow>
 
-      <PickerRow v-if="showAdvanced" label="BPM">
-        <div class="jsb-bpm-row">
-          <input type="number" v-model.number="sessionBpm" min="40" max="200" class="jsb-bpm-input" />
-          <select v-model.number="sessionBeatsPerChord" class="jsb-bpc-select">
-            <option :value="1">1 beat/chord</option>
-            <option :value="2">2 beats/chord</option>
-            <option :value="4">4 beats/chord</option>
-            <option :value="8">8 beats/chord</option>
-          </select>
-        </div>
+      <PickerRow label="BPM">
+        <input type="number" v-model.number="sessionBpm" min="40" max="200" class="jsb-bpm-input" />
+      </PickerRow>
+
+      <PickerRow label="Chord">
+        <select v-model.number="sessionBeatsPerChord" class="jsb-select">
+          <option :value="1">1 beat/chord</option>
+          <option :value="2">2 beats/chord</option>
+          <option :value="4">4 beats/chord</option>
+          <option :value="8">8 beats/chord</option>
+        </select>
       </PickerRow>
     </div>
 
@@ -266,11 +266,6 @@ const activeBeatName = computed(() =>
         {{ sessionPlaying ? 'Stop' : 'Play' }}
       </button>
 
-      <div v-if="sessionBeatIdx !== null && !sessionPlaying" class="jsb-bpm-chip">
-        <input type="number" v-model.number="sessionBpm" min="40" max="200" class="jsb-bpm-inline" />
-        <span class="jsb-bpm-unit">BPM</span>
-      </div>
-
       <div v-if="currentChordName" class="jsb-chord-name">{{ currentChordName }}</div>
 
       <div v-if="sessionProgression" class="jsb-timeline">
@@ -281,10 +276,6 @@ const activeBeatName = computed(() =>
           :class="{ active: sessionPlaying && sessionCurrentChordIdx === i }"
         >{{ c.numeral }}</span>
       </div>
-
-      <button class="jsb-adv-btn" @click="showAdvanced = !showAdvanced">
-        {{ showAdvanced ? 'Less' : 'BPM' }}
-      </button>
     </div>
   </div>
 </template>
@@ -298,6 +289,7 @@ const activeBeatName = computed(() =>
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--raised);
+  overflow: hidden;
 }
 
 /* Presets */
@@ -363,8 +355,7 @@ const activeBeatName = computed(() =>
   font-size: 0.85rem;
   font-family: inherit;
   cursor: pointer;
-  min-width: 9rem;
-  max-width: 100%;
+  width: 100%;
 }
 
 .jsb-select:focus {
@@ -372,14 +363,8 @@ const activeBeatName = computed(() =>
   border-color: var(--accent);
 }
 
-.jsb-bpm-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
 .jsb-bpm-input {
-  width: 4.5rem;
+  width: 5rem;
   padding: 0.3rem 0.5rem;
   border-radius: 6px;
   border: 1px solid var(--border2);
@@ -388,17 +373,6 @@ const activeBeatName = computed(() =>
   font-size: 0.85rem;
   font-family: inherit;
   text-align: center;
-}
-
-.jsb-bpc-select {
-  padding: 0.3rem 0.5rem;
-  border-radius: 6px;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  color: var(--text3);
-  font-size: 0.8rem;
-  font-family: inherit;
-  cursor: pointer;
 }
 
 /* Mixer */
@@ -457,30 +431,6 @@ const activeBeatName = computed(() =>
 .jsb-play-btn.playing { border-color: var(--rust); background: var(--rust-bg); color: var(--rust-hi); }
 .jsb-play-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.jsb-bpm-chip {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.jsb-bpm-inline {
-  width: 3.5rem;
-  padding: 0.25rem 0.35rem;
-  border-radius: 5px;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  color: var(--text2);
-  font-size: 0.82rem;
-  font-family: inherit;
-  text-align: center;
-}
-
-.jsb-bpm-unit {
-  font-size: 0.72rem;
-  color: var(--text4);
-  letter-spacing: 0.05em;
-}
-
 .jsb-chord-name {
   font-size: 1.5rem;
   font-weight: 700;
@@ -514,19 +464,4 @@ const activeBeatName = computed(() =>
   color: var(--accent);
 }
 
-.jsb-adv-btn {
-  margin-left: auto;
-  padding: 0.2rem 0.55rem;
-  border-radius: 5px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text4);
-  font-size: 0.72rem;
-  font-family: inherit;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: color 0.12s, border-color 0.12s;
-}
-
-.jsb-adv-btn:hover { color: var(--text3); border-color: var(--border2); }
 </style>
