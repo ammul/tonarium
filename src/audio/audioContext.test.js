@@ -15,13 +15,17 @@ const MockAudioContext = vi.fn(function () {
       release:   { value: 0 },
       connect:   vi.fn(),
     })),
+    createGain: vi.fn(() => ({
+      gain: { value: 1 },
+      connect: vi.fn(),
+    })),
   }
   return capturedCtx
 })
 
 vi.stubGlobal('AudioContext', MockAudioContext)
 
-const { getCtx, getCompressor } = await import('./audioContext.js')
+const { getCtx, getCompressor, getJamDest, getBeatDest, getProgDest } = await import('./audioContext.js')
 
 describe('getCtx', () => {
   it('returns an AudioContext', () => {
@@ -53,5 +57,25 @@ describe('getCompressor', () => {
   it('compressor is connected to destination', () => {
     const comp = getCompressor()
     expect(comp.connect).toHaveBeenCalledWith(capturedCtx.destination)
+  })
+})
+
+describe('gain dest nodes', () => {
+  it('getJamDest returns a gain node', () => {
+    const n = getJamDest()
+    expect(n).toBeDefined()
+    expect(n.connect).toBeDefined()
+  })
+
+  it('getBeatDest returns a gain node', () => {
+    const n = getBeatDest()
+    expect(n).toBeDefined()
+    expect(n.connect).toBeDefined()
+  })
+
+  it('getProgDest returns a gain node', () => {
+    const n = getProgDest()
+    expect(n).toBeDefined()
+    expect(n.connect).toBeDefined()
   })
 })

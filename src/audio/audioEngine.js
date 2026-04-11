@@ -1,7 +1,7 @@
 import { midiStatus } from '@/audio/midiManager.js'
 import { soundEnabled } from '@/state/soundEnabled.js'
 import { soundStyle } from '@/state/soundStyle.js'
-import { getCtx, getCompressor } from '@/audio/audioContext.js'
+import { getCtx, getJamDest } from '@/audio/audioContext.js'
 
 let _gen = 0
 const _active = new Map() // midiNote → { gainNode, oscs, gen }
@@ -10,7 +10,7 @@ function midiToFreq(note) {
   return 440 * Math.pow(2, (note - 69) / 12)
 }
 
-export function startNote(midiNote) {
+export function startNote(midiNote, dest = null) {
   if (!soundEnabled.value || midiStatus.value === 'connected') return 0
   stopNote(midiNote)
 
@@ -20,7 +20,7 @@ export function startNote(midiNote) {
   const gen = ++_gen
 
   const gainNode = ctx.createGain()
-  gainNode.connect(getCompressor())
+  gainNode.connect(dest ?? getJamDest())
 
   const style = soundStyle.value
   let oscs

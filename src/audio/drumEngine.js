@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { getCtx, getCompressor } from '@/audio/audioContext.js'
+import { getCtx, getBeatDest } from '@/audio/audioContext.js'
 import { sessionBpm } from '@/state/sessionState.js'
 
 export const INSTRUMENTS = [
@@ -23,7 +23,7 @@ function getNoiseBuffer(ctx) {
   return buf
 }
 
-function getDest() { return getCompressor() }
+function getDest() { return getBeatDest() }
 
 function playKick(ctx, when) {
   const osc  = ctx.createOscillator()

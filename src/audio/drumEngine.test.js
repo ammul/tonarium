@@ -25,9 +25,14 @@ const mockCtx = {
   createDynamicsCompressor: vi.fn(() => mockCompressor),
 }
 
+const mockGainDest = { gain: { value: 1 }, connect: vi.fn() }
+
 vi.mock('@/audio/audioContext.js', () => ({
   getCtx: () => mockCtx,
   getCompressor: () => mockCompressor,
+  getJamDest:  () => mockGainDest,
+  getBeatDest: () => mockGainDest,
+  getProgDest: () => mockGainDest,
 }))
 
 import { pattern, isPlaying, currentStep, play, pause, clearPattern, toggleCell, INSTRUMENTS, triggerDrumHit } from './drumEngine.js'

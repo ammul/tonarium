@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { getCtx } from '@/audio/audioContext.js'
+import { getCtx, getProgDest } from '@/audio/audioContext.js'
 import { sessionBpm, sessionPlaying, sessionBeatsPerChord, sessionCurrentChordIdx, sessionProgression } from '@/state/sessionState.js'
 import { pattern, currentStep, isPlaying as drumIsPlaying, INSTRUMENTS } from '@/audio/drumEngine.js'
 import { triggerDrumHit } from '@/audio/drumEngine.js'
@@ -89,7 +89,8 @@ function _playCurrentChord() {
 
   chordOn(_currentMidis)
   const beatSec = Math.max(0.1, (60 / sessionBpm.value) * sessionBeatsPerChord.value - 0.05)
-  _currentMidis.forEach(m => startNote(m))
+  const dest = getProgDest()
+  _currentMidis.forEach(m => startNote(m, dest))
   setTimeout(() => {
     _currentMidis.forEach(m => stopNote(m))
   }, Math.round(beatSec * 1000))
