@@ -5,12 +5,11 @@ import { NOTES, CHORD_TYPES, CHORD_SUFFIX } from '@/constants/musicConstants.js'
 import { buildRows } from '@/utils/musicUtils.js'
 import { padSize } from '@/state/padSize.js'
 import ChordCardBody from '@/components/music/ChordCardBody.vue'
-import RootNotePicker from '@/components/music/RootNotePicker.vue'
 import { midiStatus, midiChannel, chordOn, chordOff } from '@/audio/midiManager.js'
 import { startNote, stopNote, stopAllNotes, playNote } from '@/audio/audioEngine.js'
 import PageHeader from '@/components/ui/PageHeader.vue'
+import PickerRow from '@/components/ui/PickerRow.vue'
 import { GENRES, ALL_PROGRESSIONS } from '@/constants/progressions.js'
-import GenreTabs from '@/components/progressions/GenreTabs.vue'
 import ProgressionSection from '@/components/progressions/ProgressionSection.vue'
 import { sessionProgression, sessionBpm, sessionKey } from '@/state/sessionState.js'
 
@@ -247,13 +246,17 @@ watch([expandedId, selectedRoot], stopLoop)
     </template>
 
     <div class="controls">
-      <div class="control-group">
-        <label>Key</label>
-        <RootNotePicker v-model="selectedRoot" />
-      </div>
+      <PickerRow label="Key">
+        <select v-model="selectedRoot" class="form-select">
+          <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
+        </select>
+      </PickerRow>
+      <PickerRow label="Genre">
+        <select v-model="selectedGenre" class="form-select">
+          <option v-for="g in GENRES" :key="g.id" :value="g.id">{{ g.label }}</option>
+        </select>
+      </PickerRow>
     </div>
-
-    <GenreTabs v-model="selectedGenre" :genres="GENRES" />
 
     <ProgressionSection
       title="Major Key Progressions"
@@ -294,22 +297,6 @@ watch([expandedId, selectedRoot], stopLoop)
   flex-direction: column;
   gap: 1.2rem;
   margin: 1.5rem 0 1.25rem;
-}
-
-.control-group {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.control-group label {
-  font-weight: 600;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.8rem;
-  min-width: 5rem;
 }
 
 /* Description */
@@ -480,14 +467,6 @@ watch([expandedId, selectedRoot], stopLoop)
 @media (max-width: 600px) {
   .chord-prog { padding: 1.25rem 1rem; }
 
-  .control-group {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .control-group label { min-width: unset; }
-
   .chord-card {
     flex: 1 1 calc(50% - 0.375rem);
     max-width: calc(50% - 0.375rem);
@@ -497,12 +476,5 @@ watch([expandedId, selectedRoot], stopLoop)
 @media (orientation: landscape) and (max-height: 500px) {
   .chord-prog { padding: 0.75rem 1rem; }
   .controls   { margin: 0.5rem 0; }
-  .control-group {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: nowrap;
-  }
-  .control-group label { min-width: unset; white-space: nowrap; }
 }
 </style>

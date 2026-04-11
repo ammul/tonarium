@@ -43,14 +43,16 @@ describe('ChordProgressions', () => {
     expect(names[0]).toBe('C')
   })
 
-  it('renders key picker', () => {
+  it('renders key picker select', () => {
     const wrapper = mount(ChordProgressions)
-    expect(wrapper.findComponent({ name: 'RootNotePicker' }).exists()).toBe(true)
+    const selects = wrapper.findAll('.controls select')
+    expect(selects.length).toBeGreaterThanOrEqual(2)
   })
 
-  it('renders genre tabs', () => {
+  it('renders genre filter select', () => {
     const wrapper = mount(ChordProgressions)
-    expect(wrapper.findComponent({ name: 'GenreTabs' }).exists()).toBe(true)
+    const selects = wrapper.findAll('.controls select')
+    expect(selects.length).toBeGreaterThanOrEqual(2)
   })
 
   it('renders major and minor progression sections', () => {
@@ -66,11 +68,11 @@ describe('ChordProgressions', () => {
     expect(chordRowPos).toBeLessThan(controlsPos)
   })
 
-  it('progression lists appear after the genre tabs', () => {
+  it('progression lists appear after the controls', () => {
     const wrapper = mount(ChordProgressions)
     const html = wrapper.html()
-    const genreTabsPos = html.indexOf('genre-tabs')
-    const sectionPos   = html.indexOf('prog-section')
-    expect(genreTabsPos).toBeLessThan(sectionPos)
+    const controlsPos = html.indexOf('controls')
+    const sectionPos  = html.indexOf('prog-section')
+    expect(controlsPos).toBeLessThan(sectionPos)
   })
 })
