@@ -120,7 +120,7 @@ function selectSoundStyle(style) {
             <span class="midi-dot connected"></span>
             <span class="midi-device-name">
               <span v-if="midiOutputs.length === 1">{{ truncate(midiOutputs[0].name) }}</span>
-              <select v-else-if="midiOutputs.length > 1" v-model="selectedDevice" class="midi-select">
+              <select v-else-if="midiOutputs.length > 1" v-model="selectedDevice" class="form-select midi-select">
                 <option v-for="o in midiOutputs" :key="o.id" :value="o.id">{{ truncate(o.name) }}</option>
               </select>
             </span>
@@ -254,18 +254,10 @@ function selectSoundStyle(style) {
 .midi-device-name.muted { color: var(--text4); }
 
 .midi-select {
-  background: var(--input);
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  color: var(--text);
-  padding: 0.2rem 0.5rem;
   font-size: 0.82rem;
-  cursor: pointer;
-  outline: none;
+  padding: 0.2rem 0.5rem;
   max-width: 220px;
 }
-
-.midi-select:focus { border-color: var(--accent); }
 
 /* unique properties not covered by .btn + .btn-xs */
 .midi-disconnect-btn { flex-shrink: 0; }

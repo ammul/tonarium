@@ -27,7 +27,7 @@ export default { name: 'ScaleSelector' }
 <template>
   <div class="scale-selector">
     <div class="scale-select-row">
-      <select :value="modelValue" @change="onSelectChange">
+      <select :value="modelValue" @change="onSelectChange" class="form-select">
         <option v-for="s in scales" :key="s.id" :value="s.id">{{ s.label }}</option>
       </select>
       <button class="btn btn-round btn-subtle info-btn" :class="{ active: showInfo }" @click="toggleInfo" aria-label="Scale info">i</button>
@@ -64,17 +64,8 @@ export default { name: 'ScaleSelector' }
   width: 100%;
 }
 
-select {
-  background: var(--input);
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  color: var(--text);
+.form-select {
   padding: 0.4rem 0.8rem;
   font-size: 0.9rem;
-  cursor: pointer;
-  outline: none;
-  max-width: 100%;
 }
-
-select:focus { border-color: var(--accent); }
 </style>

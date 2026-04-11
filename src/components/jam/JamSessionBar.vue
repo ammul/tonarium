@@ -5,7 +5,8 @@ import { NOTES, CHORD_SUFFIX } from '@/constants/musicConstants.js'
 import { JAM_SCALES as SCALES } from '@/constants/scales.js'
 import { ALL_PROGRESSIONS } from '@/constants/progressions.js'
 import { BEAT_PATTERNS } from '@/constants/beatPatterns.js'
-import { pattern as drumPattern, INSTRUMENTS } from '@/audio/drumEngine.js'
+import { pattern as drumPattern } from '@/audio/drumEngine.js'
+import { buildPatternFromBeat, createEmptyPattern } from '@/utils/beatUtils.js'
 import {
   sessionProgression, sessionBeatIdx, sessionBpm,
   sessionPlaying, sessionCurrentChordIdx, sessionBeatsPerChord,
@@ -14,8 +15,6 @@ import { startTransport, stopTransport } from '@/audio/transportClock.js'
 import { selectedRoot, selectedScaleId, pianoOctave } from '@/state/jamSettings.js'
 import { sessionKey } from '@/state/sessionState.js'
 import { jamVolume, beatVolume, progVolume } from '@/state/mixerState.js'
-
-const GROOVE_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }
 
 const GENRE_BEAT_MAP = {
   pop: 0, rock: 0, blues: 3, jazz: 7, soul: 4,
@@ -52,14 +51,8 @@ const topProgressions = computed(() => {
 
 function applyBeat(idx) {
   sessionBeatIdx.value = idx
-  const bp = BEAT_PATTERNS[idx]
-  const newPattern = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
-  for (const row of bp.rows) {
-    const instIdx = GROOVE_INST_MAP[row.name]
-    if (instIdx !== undefined) newPattern[instIdx] = row.steps.map(s => s === 1)
-  }
-  drumPattern.value = newPattern
-  sessionBpm.value = bp.bpm
+  drumPattern.value = buildPatternFromBeat(idx)
+  sessionBpm.value = BEAT_PATTERNS[idx].bpm
 }
 
 function buildProgressionChords(prog, key) {
@@ -120,7 +113,7 @@ function selectBeat(idx) {
   activePreset.value = null
   if (idx === null) {
     sessionBeatIdx.value = null
-    drumPattern.value = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
+    drumPattern.value = createEmptyPattern()
     if (sessionPlaying.value) stopTransport()
     return
   }
@@ -144,15 +137,7 @@ watch(sessionKey, key => {
 // Restore drum pattern from persisted beat index (sessionBeatIdx survives reload but pattern does not)
 onMounted(() => {
   const idx = sessionBeatIdx.value
-  if (idx !== null && BEAT_PATTERNS[idx]) {
-    const bp = BEAT_PATTERNS[idx]
-    const newPattern = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
-    for (const row of bp.rows) {
-      const instIdx = GROOVE_INST_MAP[row.name]
-      if (instIdx !== undefined) newPattern[instIdx] = row.steps.map(s => s === 1)
-    }
-    drumPattern.value = newPattern
-  }
+  if (idx !== null) drumPattern.value = buildPatternFromBeat(idx)
 })
 
 // Re-enrich progression chords when root changes
@@ -204,7 +189,7 @@ const activeBeatName = computed(() =>
       <PickerRow label="Progression">
         <select
           v-model="selectedProgressionId"
-          class="jsb-select"
+          class="form-select"
           @change="selectProgression(selectedProgressionId)"
         >
           <option :value="null">None</option>
@@ -217,7 +202,7 @@ const activeBeatName = computed(() =>
       <PickerRow label="Beat">
         <select
           v-model="sessionBeatIdx"
-          class="jsb-select"
+          class="form-select"
           @change="selectBeat(sessionBeatIdx)"
         >
           <option :value="null">None</option>
@@ -230,7 +215,7 @@ const activeBeatName = computed(() =>
       </PickerRow>
 
       <PickerRow label="Chord">
-        <select v-model.number="sessionBeatsPerChord" class="jsb-select">
+        <select v-model.number="sessionBeatsPerChord" class="form-select">
           <option :value="1">1 beat/chord</option>
           <option :value="2">2 beats/chord</option>
           <option :value="4">4 beats/chord</option>
@@ -346,22 +331,6 @@ const activeBeatName = computed(() =>
   gap: 0.75rem;
 }
 
-.jsb-select {
-  padding: 0.3rem 0.5rem;
-  border-radius: 6px;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  color: var(--text);
-  font-size: 0.85rem;
-  font-family: inherit;
-  cursor: pointer;
-  width: 100%;
-}
-
-.jsb-select:focus {
-  outline: none;
-  border-color: var(--accent);
-}
 
 .jsb-bpm-input {
   width: 5rem;

@@ -1,6 +1,5 @@
 .form-select {
   padding: var(--space-2) var(--space-3);
-  padding-right: var(--space-6);
   border: 1px solid var(--border2);
   border-radius: var(--radius-md);
   background: var(--input);
@@ -8,7 +7,7 @@
   font-size: var(--text-base);
   font-family: inherit;
   cursor: pointer;
-  appearance: none;
+  width: 100%;
 }
 
 .form-input {

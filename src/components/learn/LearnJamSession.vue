@@ -4,11 +4,10 @@ import { NOTES } from '@/constants/musicConstants.js'
 import { ALL_PROGRESSIONS } from '@/constants/progressions.js'
 import { BEAT_PATTERNS } from '@/constants/beatPatterns.js'
 import { sessionProgression, sessionBeatIdx, sessionBpm, sessionKey } from '@/state/sessionState.js'
-import { pattern as drumPattern, INSTRUMENTS } from '@/audio/drumEngine.js'
+import { pattern as drumPattern } from '@/audio/drumEngine.js'
+import { buildPatternFromBeat } from '@/utils/beatUtils.js'
 
 const emit = defineEmits(['navigate'])
-
-const GROOVE_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }
 
 const STARTER_PROGS = [
   ALL_PROGRESSIONS.find(p => p.id === 'pop-1'),
@@ -50,13 +49,7 @@ function launchJam() {
   sessionBpm.value = chosenBpm.value
   if (chosenBeat.value !== null) {
     sessionBeatIdx.value = chosenBeat.value
-    const bp = BEAT_PATTERNS[chosenBeat.value]
-    const newPattern = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
-    for (const row of bp.rows) {
-      const instIdx = GROOVE_INST_MAP[row.name]
-      if (instIdx !== undefined) newPattern[instIdx] = row.steps.map(s => s === 1)
-    }
-    drumPattern.value = newPattern
+    drumPattern.value = buildPatternFromBeat(chosenBeat.value)
     sessionBpm.value = chosenBpm.value
   }
   emit('navigate', 'jam')

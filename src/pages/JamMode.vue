@@ -180,7 +180,7 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 
     <div class="controls">
       <PickerRow label="Key">
-        <select v-model="selectedRoot" class="picker-select" @change="onKeyChange">
+        <select v-model="selectedRoot" class="form-select" @change="onKeyChange">
           <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
         </select>
       </PickerRow>
@@ -200,11 +200,11 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
 
       <PickerRow label="Chord">
         <div class="chord-dropdowns">
-          <select v-model="selectedChordType" class="picker-select" @change="onChordTypeChange">
+          <select v-model="selectedChordType" class="form-select" @change="onChordTypeChange">
             <option :value="null">off</option>
             <option v-for="[key, sfx] in CHORD_OPTIONS" :key="key" :value="key">{{ chordRoot }}{{ sfx }}</option>
           </select>
-          <select v-if="selectedChordType" v-model="selectedChordRoot" class="picker-select" @change="() => { if (sessionPlaying) stopTransport() }">
+          <select v-if="selectedChordType" v-model="selectedChordRoot" class="form-select" @change="() => { if (sessionPlaying) stopTransport() }">
             <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
           </select>
         </div>
@@ -317,22 +317,6 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
   margin: 1.5rem 0;
 }
 
-.picker-select {
-  padding: 0.3rem 0.5rem;
-  border-radius: 6px;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  color: var(--text);
-  font-size: 0.85rem;
-  font-family: inherit;
-  cursor: pointer;
-  min-width: 8rem;
-}
-
-.picker-select:focus {
-  outline: none;
-  border-color: var(--accent);
-}
 
 .chord-dropdowns {
   display: flex;

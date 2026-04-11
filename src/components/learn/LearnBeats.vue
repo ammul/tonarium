@@ -2,21 +2,12 @@
 import { ref, onUnmounted } from 'vue'
 import { pattern as drumPattern, play as drumPlay, pause as drumPause, isPlaying as drumIsPlaying, currentStep as drumCurrentStep } from '@/audio/drumEngine.js'
 import { BEAT_PATTERNS, BEAT_TIPS } from '@/constants/beatPatterns.js'
+import { buildPatternFromBeat } from '@/utils/beatUtils.js'
 
 const emit = defineEmits(['navigate'])
 
-const BEAT_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }
 const loadedPattern = ref(null)
 let _navigatingToDrums = false
-
-function buildDrumPattern(pi) {
-  const newPattern = Array.from({ length: 9 }, () => new Array(16).fill(false))
-  for (const row of BEAT_PATTERNS[pi].rows) {
-    const instIdx = BEAT_INST_MAP[row.name]
-    if (instIdx !== undefined) newPattern[instIdx] = row.steps.map(s => s === 1)
-  }
-  return newPattern
-}
 
 function loadBeat(pi) {
   if (drumIsPlaying.value) drumPause()
@@ -24,13 +15,13 @@ function loadBeat(pi) {
     loadedPattern.value = null
     return
   }
-  drumPattern.value = buildDrumPattern(pi)
+  drumPattern.value = buildPatternFromBeat(pi)
   loadedPattern.value = pi
   drumPlay()
 }
 
 function editBeat(pi) {
-  drumPattern.value = buildDrumPattern(pi)
+  drumPattern.value = buildPatternFromBeat(pi)
   loadedPattern.value = pi
   _navigatingToDrums = true
   emit('navigate', 'drums')

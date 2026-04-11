@@ -4,8 +4,9 @@ import { mount } from '@vue/test-utils'
 vi.mock('@/audio/drumEngine.js', async () => {
   const { ref } = await import('vue')
   return {
+    INSTRUMENTS: Array(9).fill(''),
     isPlaying:   ref(false),
-    pattern:     ref(Array.from({ length: 8 }, () => new Array(16).fill(false))),
+    pattern:     ref(Array.from({ length: 9 }, () => new Array(16).fill(false))),
     currentStep: ref(0),
     play:        vi.fn(),
     pause:       vi.fn(),
@@ -18,7 +19,7 @@ import { isPlaying as drumIsPlaying, pattern as drumPattern, play as drumPlay, p
 beforeEach(async () => {
   vi.clearAllMocks()
   drumIsPlaying.value = false
-  drumPattern.value = Array.from({ length: 8 }, () => new Array(16).fill(false))
+  drumPattern.value = Array.from({ length: 9 }, () => new Array(16).fill(false))
 })
 
 describe('LearnBeats', () => {

@@ -5,10 +5,10 @@ import { BEAT_PATTERNS } from '@/constants/beatPatterns.js'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import { sessionBeatIdx, sessionBpm } from '@/state/sessionState.js'
 import { startTransport, stopTransport } from '@/audio/transportClock.js'
+import { buildPatternFromBeat } from '@/utils/beatUtils.js'
 
 const emit = defineEmits(['navigate'])
 
-const GROOVE_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }
 const loadedGroove = ref(null)
 
 function loadGroove(pi) {
@@ -18,12 +18,7 @@ function loadGroove(pi) {
     clearPattern()
     return
   }
-  const newPattern = Array.from({ length: INSTRUMENTS.length }, () => new Array(16).fill(false))
-  for (const row of BEAT_PATTERNS[pi].rows) {
-    const instIdx = GROOVE_INST_MAP[row.name]
-    if (instIdx !== undefined) newPattern[instIdx] = row.steps.map(s => s === 1)
-  }
-  pattern.value = newPattern
+  pattern.value = buildPatternFromBeat(pi)
   loadedGroove.value = pi
   if (BEAT_PATTERNS[pi].bpm) sessionBpm.value = BEAT_PATTERNS[pi].bpm
   startTransport()
