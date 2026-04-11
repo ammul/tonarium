@@ -37,15 +37,21 @@ describe('PianoOctave', () => {
     expect(w.find('.octave-ctl').exists()).toBe(false)
   })
 
-  it('emits toggle on pointerdown when clickable', async () => {
+  it('emits notedown on pointerdown when clickable', async () => {
     const w = mount(PianoOctave, { props: { ...defaultProps, clickable: true } })
     await w.find('.white-key').trigger('pointerdown')
-    expect(w.emitted('toggle')).toBeTruthy()
+    expect(w.emitted('notedown')).toBeTruthy()
   })
 
-  it('does not emit toggle when not clickable', async () => {
+  it('emits noteup on pointerup when clickable', async () => {
+    const w = mount(PianoOctave, { props: { ...defaultProps, clickable: true } })
+    await w.find('.white-key').trigger('pointerup')
+    expect(w.emitted('noteup')).toBeTruthy()
+  })
+
+  it('does not emit notedown when not clickable', async () => {
     const w = mount(PianoOctave, { props: { ...defaultProps, clickable: false } })
     await w.find('.white-key').trigger('pointerdown')
-    expect(w.emitted('toggle')).toBeFalsy()
+    expect(w.emitted('notedown')).toBeFalsy()
   })
 })

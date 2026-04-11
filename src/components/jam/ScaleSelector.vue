@@ -41,7 +41,6 @@ export default { name: 'ScaleSelector' }
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex-wrap: wrap;
 }
 
 /* unique properties not covered by .btn + .btn-round + .btn-subtle */
@@ -67,5 +66,8 @@ export default { name: 'ScaleSelector' }
 .form-select {
   padding: 0.4rem 0.8rem;
   font-size: 0.9rem;
+  flex: 1;
+  width: auto;
+  min-width: 0;
 }
 </style>

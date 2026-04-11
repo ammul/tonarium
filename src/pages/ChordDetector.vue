@@ -98,7 +98,7 @@ const subtitle = computed(() => {
               :activeIndices="selected"
               v-model:octave="pianoOctave"
               :clickable="true"
-              @toggle="toggleNote"
+              @notedown="toggleNote"
             />
           </template>
 

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
+import KnobControl from '@/components/ui/KnobControl.vue'
 import { NOTES, CHORD_SUFFIX } from '@/constants/musicConstants.js'
 import { JAM_SCALES as SCALES } from '@/constants/scales.js'
 import { ALL_PROGRESSIONS } from '@/constants/progressions.js'
@@ -226,18 +227,9 @@ const activeBeatName = computed(() =>
 
     <!-- Mixer -->
     <div class="jsb-mixer">
-      <div class="jsb-mix-ch">
-        <span class="jsb-mix-label">Jam</span>
-        <input type="range" v-model.number="jamVolume" min="0" max="1" step="0.05" class="jsb-slider" />
-      </div>
-      <div class="jsb-mix-ch">
-        <span class="jsb-mix-label">Beat</span>
-        <input type="range" v-model.number="beatVolume" min="0" max="1" step="0.05" class="jsb-slider" />
-      </div>
-      <div class="jsb-mix-ch">
-        <span class="jsb-mix-label">Chord</span>
-        <input type="range" v-model.number="progVolume" min="0" max="1" step="0.05" class="jsb-slider" />
-      </div>
+      <KnobControl v-model="jamVolume"  label="Jam" />
+      <KnobControl v-model="beatVolume" label="Beat" />
+      <KnobControl v-model="progVolume" label="Chord" />
     </div>
 
     <!-- Transport row -->
@@ -347,31 +339,9 @@ const activeBeatName = computed(() =>
 /* Mixer */
 .jsb-mixer {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.jsb-mix-ch {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.jsb-mix-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--text4);
-  flex-shrink: 0;
-  width: 2.8rem;
-}
-
-.jsb-slider {
-  flex: 1;
-  height: 3px;
-  accent-color: var(--accent);
-  cursor: pointer;
+  flex-direction: row;
+  gap: 1.5rem;
+  padding: 0.25rem 0;
 }
 
 /* Transport row */

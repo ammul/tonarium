@@ -65,7 +65,7 @@ const guitarNeck = computed(() =>
 )
 
 const STRING_BASE_MIDI = [40, 45, 50, 55, 59, 64]
-const { pressDown, pressUp, pressToggle } = useNotePlayback()
+const { pressDown, pressUp } = useNotePlayback()
 
 function onPadDown(noteIndex, octaveOffset = 0) { pressDown(12 * (5 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
 function onPadUp(noteIndex, octaveOffset = 0)   { pressUp(12 * (5 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
@@ -73,7 +73,8 @@ function onPadUp(noteIndex, octaveOffset = 0)   { pressUp(12 * (5 + octaveOffset
 function onCellDown(stringIdx, fret) { pressDown(STRING_BASE_MIDI[stringIdx] + fret) }
 function onCellUp(stringIdx, fret)   { pressUp(STRING_BASE_MIDI[stringIdx] + fret) }
 
-function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx)) }
+function onPianoDown(noteIdx) { pressDown(padMidi(noteIdx)) }
+function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx)) }
 
 const subtitle = computed(() => {
   if (displayMode.value === 'pad') return 'see which pads are active for any scale'
@@ -140,7 +141,8 @@ const subtitle = computed(() => {
           v-model:octave="pianoOctave"
           :dimInactive="true"
           :clickable="true"
-          @toggle="onPianoToggle"
+          @notedown="onPianoDown"
+          @noteup="onPianoUp"
         />
       </template>
 

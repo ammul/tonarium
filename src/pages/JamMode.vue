@@ -159,7 +159,7 @@ const scaleNotes = computed(() =>
 )
 
 const STRING_BASE_MIDI = [40, 45, 50, 55, 59, 64]
-const { pressDown, pressUp, pressToggle } = useNotePlayback()
+const { pressDown, pressUp } = useNotePlayback()
 
 function padMidi(noteIndex, oct) {
   return 12 * (oct + 1) + NOTE_TO_SEMI[noteIndex]
@@ -171,7 +171,8 @@ function onPadUp(noteIndex, octaveOffset = 0)   { pressUp(12 * (pianoOctave.valu
 function onCellDown(stringIdx, fret) { pressDown(STRING_BASE_MIDI[stringIdx] + fret) }
 function onCellUp(stringIdx, fret)   { pressUp(STRING_BASE_MIDI[stringIdx] + fret) }
 
-function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value)) }
+function onPianoDown(noteIdx) { pressDown(padMidi(noteIdx, pianoOctave.value)) }
+function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
 </script>
 
 <template>
@@ -259,7 +260,8 @@ function onPianoToggle(noteIdx) { pressToggle(padMidi(noteIdx, pianoOctave.value
           :showOctaveSelector="false"
           :dimInactive="true"
           :clickable="true"
-          @toggle="onPianoToggle"
+          @notedown="onPianoDown"
+          @noteup="onPianoUp"
         />
       </template>
 

@@ -11,7 +11,7 @@ const props = defineProps({
   dimInactive:        { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['toggle', 'update:octave'])
+const emit = defineEmits(['notedown', 'noteup', 'update:octave'])
 
 const whiteKeys = computed(() =>
   PIANO_WHITE.map(noteIdx => ({
@@ -34,8 +34,11 @@ const blackKeys = computed(() =>
   }))
 )
 
-function onToggle(noteIdx) {
-  if (props.clickable) emit('toggle', noteIdx)
+function onNoteDown(noteIdx) {
+  if (props.clickable) emit('notedown', noteIdx)
+}
+function onNoteUp(noteIdx) {
+  if (props.clickable) emit('noteup', noteIdx)
 }
 </script>
 
@@ -54,7 +57,10 @@ function onToggle(noteIdx) {
         :key="key.noteIdx"
         class="white-key"
         :class="{ active: key.isActive, root: key.isRoot }"
-        @pointerdown.prevent="onToggle(key.noteIdx)"
+        @pointerdown.prevent="onNoteDown(key.noteIdx)"
+        @pointerup="onNoteUp(key.noteIdx)"
+        @pointerleave="onNoteUp(key.noteIdx)"
+        @pointercancel="onNoteUp(key.noteIdx)"
       >
         <span class="key-label">{{ key.note }}</span>
       </button>
@@ -65,7 +71,10 @@ function onToggle(noteIdx) {
         class="black-key"
         :class="{ active: key.isActive, root: key.isRoot }"
         :style="key.style"
-        @pointerdown.stop.prevent="onToggle(key.noteIdx)"
+        @pointerdown.stop.prevent="onNoteDown(key.noteIdx)"
+        @pointerup="onNoteUp(key.noteIdx)"
+        @pointerleave="onNoteUp(key.noteIdx)"
+        @pointercancel="onNoteUp(key.noteIdx)"
       >
         <span class="key-label">{{ key.note }}</span>
       </button>
