@@ -2,7 +2,7 @@
 import { ref, onUnmounted } from 'vue'
 import { pattern as drumPattern, play as drumPlay, pause as drumPause, isPlaying as drumIsPlaying, currentStep as drumCurrentStep } from '@/audio/drumEngine.js'
 import { stopTransport } from '@/audio/transportClock.js'
-import { sessionPlaying } from '@/state/sessionState.js'
+import { sessionPlaying, sessionBpm, sessionBeatIdx } from '@/state/sessionState.js'
 import { BEAT_PATTERNS } from '@tonarium/core'
 import { BEAT_TIPS } from '../constants/beatPatterns.js'
 import { buildPatternFromBeat } from '@/utils/beatUtils.js'
@@ -20,6 +20,8 @@ function loadBeat(pi) {
     return
   }
   drumPattern.value = buildPatternFromBeat(pi)
+  sessionBeatIdx.value = pi
+  sessionBpm.value = BEAT_PATTERNS[pi].bpm
   loadedPattern.value = pi
   drumPlay()
 }

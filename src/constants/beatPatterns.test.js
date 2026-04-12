@@ -3,8 +3,8 @@ import { BEAT_PATTERNS } from '@tonarium/core'
 import { BEAT_TIPS } from '@tonarium/learn'
 
 describe('BEAT_PATTERNS', () => {
-  it('contains 10 patterns', () => {
-    expect(BEAT_PATTERNS).toHaveLength(10)
+  it('contains 11 patterns', () => {
+    expect(BEAT_PATTERNS).toHaveLength(11)
   })
 
   it('each pattern has required fields', () => {

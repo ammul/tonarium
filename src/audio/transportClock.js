@@ -1,8 +1,7 @@
 import { ref } from 'vue'
 import { getCtx, getProgDest } from '@/audio/audioContext.js'
 import { sessionBpm, sessionPlaying, sessionBeatsPerChord, sessionCurrentChordIdx, sessionProgression } from '@/state/sessionState.js'
-import { pattern, currentStep, isPlaying as drumIsPlaying, INSTRUMENTS } from '@/audio/drumEngine.js'
-import { triggerDrumHit } from '@/audio/drumEngine.js'
+import { pattern, currentStep, isPlaying as drumIsPlaying, INSTRUMENTS, triggerDrumHit, pause as drumPause } from '@/audio/drumEngine.js'
 import { startNote, stopNote } from '@/audio/audioEngine.js'
 import { CHORD_TYPES } from '@tonarium/core'
 import { chordOn, chordOff } from '@/audio/midiManager.js'
@@ -19,6 +18,7 @@ export const currentDrumStep = ref(0)
 
 export function startTransport() {
   if (sessionPlaying.value) return
+  drumPause()  // stop any standalone drum engine loop before taking over
   const ctx = getCtx()
   sessionPlaying.value = true
   drumIsPlaying.value = true

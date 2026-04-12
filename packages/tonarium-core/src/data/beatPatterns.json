@@ -708,5 +708,76 @@
         ]
       }
     ]
+  },
+  {
+    "name": "Drum and bass",
+    "genre": "DnB / Jungle",
+    "bpm": 170,
+    "desc": "Kick on beat 1 and the \"and\" of 3, snare on 2 and 4. The rolling tempo and displaced kick are what make DnB unmistakable.",
+    "rows": [
+      {
+        "name": "Kick",
+        "steps": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Snare",
+        "steps": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Hi-Hat",
+        "steps": [
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0
+        ]
+      }
+    ]
   }
 ]
