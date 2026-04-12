@@ -23,9 +23,9 @@ const hiddenCount = computed(() => props.progressions.length - INITIAL_COUNT)
 </script>
 
 <template>
-  <section v-if="progressions.length" class="prog-section">
-    <h3 class="prog-section-title">{{ title }}</h3>
-    <div class="prog-section-list">
+  <section v-if="progressions.length" class="tc-prog-section">
+    <h3 class="tc-prog-section-title">{{ title }}</h3>
+    <div class="tc-prog-section-list">
       <ProgressionCard
         v-for="p in visibleProgressions"
         :key="p.id"
@@ -39,21 +39,21 @@ const hiddenCount = computed(() => props.progressions.length - INITIAL_COUNT)
         @jam="$emit('jam', p.id)"
       />
     </div>
-    <button v-if="!showAll && hiddenCount > 0" class="btn btn-xs btn-subtle show-more-btn" @click="showAll = true">
+    <button v-if="!showAll && hiddenCount > 0" class="btn btn-xs btn-subtle tc-prog-section-show-more" @click="showAll = true">
       Show {{ hiddenCount }} more
     </button>
-    <button v-else-if="showAll && progressions.length > INITIAL_COUNT" class="btn btn-xs btn-subtle show-more-btn" @click="showAll = false">
+    <button v-else-if="showAll && progressions.length > INITIAL_COUNT" class="btn btn-xs btn-subtle tc-prog-section-show-more" @click="showAll = false">
       Show less
     </button>
   </section>
 </template>
 
 <style scoped>
-.prog-section {
+.tc-prog-section {
   margin-bottom: 1.25rem;
 }
 
-.prog-section-title {
+.tc-prog-section-title {
   font-size: 0.78rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -63,13 +63,13 @@ const hiddenCount = computed(() => props.progressions.length - INITIAL_COUNT)
   padding: 0 0.1rem;
 }
 
-.prog-section-list {
+.tc-prog-section-list {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
 }
 
-.show-more-btn {
+.tc-prog-section-show-more {
   margin-top: 0.4rem;
   color: var(--text3);
 }

@@ -1,0 +1,33 @@
+.tc-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.tc-page-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.tc-page-header-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--text);
+  margin: 0;
+}
+
+.tc-page-header-subtitle {
+  font-size: var(--text-base);
+  color: var(--text3);
+  margin: 0;
+}
+
+.tc-page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}

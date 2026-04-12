@@ -31,44 +31,44 @@ beforeEach(async () => {
 describe('step navigation', () => {
   it('renders 9 step buttons', () => {
     const wrapper = mount(LearnMode)
-    expect(wrapper.findAll('.step-btn')).toHaveLength(9)
+    expect(wrapper.findAll('.tc-step-nav-btn')).toHaveLength(9)
   })
 
   it('step labels match the expected order', () => {
     const wrapper = mount(LearnMode)
-    const labels = wrapper.findAll('.step-label').map(el => el.text())
+    const labels = wrapper.findAll('.tc-step-nav-label').map(el => el.text())
     expect(labels).toEqual(['Root Notes', 'Intervals', 'Scales', 'Chords', 'Progressions', 'Improvising', 'Beats', 'Song Structure', 'Jam Session'])
   })
 
   it('first step is active by default', () => {
     const wrapper = mount(LearnMode)
-    expect(wrapper.findAll('.step-btn')[0].classes()).toContain('active')
+    expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('active')
   })
 
   it('clicking a step marks it active and prior steps as done', async () => {
     const wrapper = mount(LearnMode)
-    await wrapper.findAll('.step-btn')[2].trigger('click')
-    expect(wrapper.findAll('.step-btn')[2].classes()).toContain('active')
-    expect(wrapper.findAll('.step-btn')[0].classes()).toContain('done')
-    expect(wrapper.findAll('.step-btn')[1].classes()).toContain('done')
+    await wrapper.findAll('.tc-step-nav-btn')[2].trigger('click')
+    expect(wrapper.findAll('.tc-step-nav-btn')[2].classes()).toContain('active')
+    expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('done')
+    expect(wrapper.findAll('.tc-step-nav-btn')[1].classes()).toContain('done')
   })
 
   it('Next button advances the step', async () => {
     const wrapper = mount(LearnMode)
-    await wrapper.find('.nav-btn:last-child').trigger('click')
-    expect(wrapper.findAll('.step-btn')[1].classes()).toContain('active')
+    await wrapper.find('.tc-step-footer-nav-btn:last-child').trigger('click')
+    expect(wrapper.findAll('.tc-step-nav-btn')[1].classes()).toContain('active')
   })
 
   it('Back button is disabled on the first step', () => {
     const wrapper = mount(LearnMode)
-    expect(wrapper.find('.nav-btn').attributes('disabled')).toBeDefined()
+    expect(wrapper.find('.tc-step-footer-nav-btn').attributes('disabled')).toBeDefined()
   })
 
   it('step counter reflects current position', async () => {
     const wrapper = mount(LearnMode)
-    expect(wrapper.find('.step-counter').text()).toBe('1 / 9')
-    await wrapper.findAll('.step-btn')[3].trigger('click')
-    expect(wrapper.find('.step-counter').text()).toBe('4 / 9')
+    expect(wrapper.find('.tc-step-footer-counter').text()).toBe('1 / 9')
+    await wrapper.findAll('.tc-step-nav-btn')[3].trigger('click')
+    expect(wrapper.find('.tc-step-footer-counter').text()).toBe('4 / 9')
   })
 })
 
@@ -82,37 +82,37 @@ describe('step components', () => {
 
   it('renders LearnIntervals at step 1', async () => {
     const wrapper = mount(LearnMode)
-    await wrapper.findAll('.step-btn')[1].trigger('click')
+    await wrapper.findAll('.tc-step-nav-btn')[1].trigger('click')
     expect(wrapper.findComponent({ name: 'LearnIntervals' }).exists()).toBe(true)
   })
 
   it('renders LearnScales at step 2', async () => {
     const wrapper = mount(LearnMode)
-    await wrapper.findAll('.step-btn')[2].trigger('click')
+    await wrapper.findAll('.tc-step-nav-btn')[2].trigger('click')
     expect(wrapper.findComponent({ name: 'LearnScales' }).exists()).toBe(true)
   })
 
   it('renders LearnChords at step 3', async () => {
     const wrapper = mount(LearnMode)
-    await wrapper.findAll('.step-btn')[3].trigger('click')
+    await wrapper.findAll('.tc-step-nav-btn')[3].trigger('click')
     expect(wrapper.findComponent({ name: 'LearnChords' }).exists()).toBe(true)
   })
 
   it('renders LearnProgressions at step 4', async () => {
     const wrapper = mount(LearnMode)
-    await wrapper.findAll('.step-btn')[4].trigger('click')
+    await wrapper.findAll('.tc-step-nav-btn')[4].trigger('click')
     expect(wrapper.findComponent({ name: 'LearnProgressions' }).exists()).toBe(true)
   })
 
   it('renders LearnImprovising at step 5', async () => {
     const wrapper = mount(LearnMode)
-    await wrapper.findAll('.step-btn')[5].trigger('click')
+    await wrapper.findAll('.tc-step-nav-btn')[5].trigger('click')
     expect(wrapper.findComponent({ name: 'LearnImprovising' }).exists()).toBe(true)
   })
 
   it('renders LearnBeats at step 6', async () => {
     const wrapper = mount(LearnMode)
-    await wrapper.findAll('.step-btn')[6].trigger('click')
+    await wrapper.findAll('.tc-step-nav-btn')[6].trigger('click')
     expect(wrapper.findComponent({ name: 'LearnBeats' }).exists()).toBe(true)
   })
 })
@@ -123,8 +123,8 @@ describe('beats integration', () => {
   it('navigating away from beats step pauses drums if playing', async () => {
     drumIsPlaying.value = true
     const wrapper = mount(LearnMode)
-    await wrapper.findAll('.step-btn')[6].trigger('click')
-    await wrapper.findAll('.step-btn')[0].trigger('click')
+    await wrapper.findAll('.tc-step-nav-btn')[6].trigger('click')
+    await wrapper.findAll('.tc-step-nav-btn')[0].trigger('click')
     expect(drumPause).toHaveBeenCalled()
   })
 })

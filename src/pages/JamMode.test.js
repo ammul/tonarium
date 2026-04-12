@@ -37,25 +37,25 @@ describe('JamMode', () => {
 
   it('defaults to C root - scale notes strip contains C', () => {
     const wrapper = mount(JamMode)
-    const noteLabels = wrapper.findAll('.scale-note').map(n => n.text())
+    const noteLabels = wrapper.findAll('.tc-jam-scale-note').map(n => n.text())
     expect(noteLabels).toContain('C')
   })
 
   it('renders pad grid in pad mode', () => {
     const wrapper = mount(JamMode)
-    expect(wrapper.find('.pad-grid').exists()).toBe(true)
-    expect(wrapper.findAll('.pad').length).toBeGreaterThan(0)
+    expect(wrapper.find('.tc-jam-pad-grid').exists()).toBe(true)
+    expect(wrapper.findAll('.tc-jam-pad').length).toBeGreaterThan(0)
   })
 
   it('scale legend renders', () => {
     const wrapper = mount(JamMode)
-    expect(wrapper.find('.legend').exists()).toBe(true)
+    expect(wrapper.find('.tc-scale-legend').exists()).toBe(true)
   })
 
   it('scale notes strip renders', () => {
     const wrapper = mount(JamMode)
-    expect(wrapper.find('.scale-notes').exists()).toBe(true)
-    expect(wrapper.findAll('.scale-note').length).toBeGreaterThan(0)
+    expect(wrapper.find('.tc-jam-scale-notes').exists()).toBe(true)
+    expect(wrapper.findAll('.tc-jam-scale-note').length).toBeGreaterThan(0)
   })
 
   it('shows octave control in pad mode', () => {
@@ -74,7 +74,7 @@ describe('JamMode', () => {
     displayMode.value = 'guitar'
     const wrapper = mount(JamMode)
     await nextTick()
-    expect(wrapper.find('.guitar-neck').exists()).toBe(true)
+    expect(wrapper.find('.tc-jam-guitar-neck').exists()).toBe(true)
   })
 
   it('renders piano in piano mode', async () => {

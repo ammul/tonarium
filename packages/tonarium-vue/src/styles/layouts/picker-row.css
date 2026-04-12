@@ -1,0 +1,19 @@
+.picker-row,
+.tc-picker-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.picker-label,
+.tc-picker-row-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text3);
+  min-width: 3rem;
+}
+
+.picker-control,
+.tc-picker-row-control {
+  flex: 1;
+}

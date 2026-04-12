@@ -1,0 +1,38 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   TAB GROUP — container for a row of tab buttons (genre filter, etc.)
+   ───────────────────────────────────────────────────────────────────────────── */
+.tc-genre-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TAB BUTTON — filled pill, hover accents text, active fills with accent
+   ───────────────────────────────────────────────────────────────────────────── */
+.tc-genre-tabs-btn {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border2);
+  background: var(--input);
+  color: var(--text3);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--transition-fast),
+              border-color var(--transition-fast),
+              background var(--transition-fast);
+}
+
+.tc-genre-tabs-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.tc-genre-tabs-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}

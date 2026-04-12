@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { GENRES, ALL_PROGRESSIONS } from './progressions.js'
+import { GENRES, ALL_PROGRESSIONS } from '@tonarium/core'
 
 describe('GENRES', () => {
   it('first genre is "all"', () => {

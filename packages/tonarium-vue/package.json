@@ -1,0 +1,22 @@
+{
+  "name": "@tonarium/vue",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles": "./src/styles/index.css"
+  },
+  "scripts": {
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "peerDependencies": {
+    "vue": "^3"
+  },
+  "devDependencies": {
+    "@vue/language-core": "^2.2.10",
+    "typescript": "^5.8.3",
+    "vue": "^3.5.31",
+    "vue-tsc": "^2.2.10"
+  }
+}

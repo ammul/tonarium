@@ -1,4 +1,4 @@
-import { BEAT_PATTERNS } from '@/constants/beatPatterns.js'
+import { BEAT_PATTERNS } from '@tonarium/core'
 import { INSTRUMENTS } from '@/audio/drumEngine.js'
 
 export const GROOVE_INST_MAP = { 'Kick': 0, 'Snare': 1, 'Hi-Hat': 3 }

@@ -1,4 +1,4 @@
-import { NOTE_TO_SEMI, SEMI_TO_NAME, CHORD_DETECT_TYPES } from '@/constants/musicConstants.js'
+import { NOTE_TO_SEMI, SEMI_TO_NAME, CHORD_DETECT_TYPES } from '@tonarium/core'
 
 export function detectChord(noteIndices) {
   if (noteIndices.length < 2) return null

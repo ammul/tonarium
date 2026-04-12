@@ -25,12 +25,12 @@ describe('LearnSongStructure', () => {
 
   it('renders 3 song templates', () => {
     const w = mount(LearnSongStructure)
-    expect(w.findAll('.tmpl-card')).toHaveLength(3)
+    expect(w.findAll('.tc-learn-song-tmpl-card')).toHaveLength(3)
   })
 
   it('renders section buttons for each template', () => {
     const w = mount(LearnSongStructure)
-    const sections = w.findAll('.section-btn')
+    const sections = w.findAll('.tc-learn-song-section-btn')
     expect(sections.length).toBeGreaterThanOrEqual(9)
   })
 

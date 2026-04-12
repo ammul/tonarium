@@ -4,7 +4,7 @@ vi.mock('@/audio/drumEngine.js', () => ({
   INSTRUMENTS: Array(9).fill(''),
 }))
 
-vi.mock('@/constants/beatPatterns.js', () => ({
+vi.mock('@tonarium/core', () => ({
   BEAT_PATTERNS: [
     {
       name: 'Test Beat',

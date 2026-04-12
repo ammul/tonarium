@@ -14,34 +14,34 @@ defineEmits(['toggle-expand', 'play', 'stop', 'jam'])
 </script>
 
 <template>
-  <div class="prog-card" :class="{ expanded: isExpanded, playing: isPlaying }">
-    <div class="prog-card-header" @click="$emit('toggle-expand')">
-      <div class="prog-card-meta">
-        <span class="prog-card-label">{{ progression.label }}</span>
-        <span class="prog-card-numeral">{{ progression.numeral }}</span>
+  <div class="tc-prog-card" :class="{ expanded: isExpanded, playing: isPlaying }">
+    <div class="tc-prog-card-header" @click="$emit('toggle-expand')">
+      <div class="tc-prog-card-meta">
+        <span class="tc-prog-card-label">{{ progression.label }}</span>
+        <span class="tc-prog-card-numeral">{{ progression.numeral }}</span>
       </div>
-      <div class="prog-card-controls" @click.stop>
+      <div class="tc-prog-card-controls" @click.stop>
         <button
-          class="btn btn-xs btn-subtle btn-icon btn-toggle ctrl-btn"
+          class="btn btn-xs btn-subtle btn-icon btn-toggle tc-prog-card-ctrl-btn"
           :class="{ active: isPlaying }"
           :aria-label="isPlaying ? 'Stop' : 'Play'"
           @click="isPlaying ? $emit('stop') : $emit('play')"
         >{{ isPlaying ? '■' : '▶' }}</button>
         <button
-          class="btn btn-xs btn-subtle ctrl-btn jam-btn"
+          class="btn btn-xs btn-subtle tc-prog-card-ctrl-btn tc-prog-card-jam-btn"
           aria-label="Jam with this"
           @click="$emit('jam')"
         >Jam</button>
       </div>
     </div>
 
-    <div v-if="isExpanded" class="prog-card-body">
-      <p class="prog-card-examples">{{ progression.examples }}</p>
-      <div class="prog-card-chords">
+    <div v-if="isExpanded" class="tc-prog-card-body">
+      <p class="tc-prog-card-examples">{{ progression.examples }}</p>
+      <div class="tc-prog-card-chords">
         <span
           v-for="chord in progression.chords"
           :key="chord.numeral"
-          class="chord-pill"
+          class="tc-prog-card-chord-pill"
         >{{ chord.numeral }}</span>
       </div>
     </div>
@@ -49,7 +49,7 @@ defineEmits(['toggle-expand', 'play', 'stop', 'jam'])
 </template>
 
 <style scoped>
-.prog-card {
+.tc-prog-card {
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--input);
@@ -57,10 +57,10 @@ defineEmits(['toggle-expand', 'play', 'stop', 'jam'])
   transition: border-color 0.15s;
 }
 
-.prog-card:hover     { border-color: var(--accent-mid); }
-.prog-card.playing   { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
+.tc-prog-card:hover     { border-color: var(--accent-mid); }
+.tc-prog-card.playing   { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
 
-.prog-card-header {
+.tc-prog-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -70,14 +70,14 @@ defineEmits(['toggle-expand', 'play', 'stop', 'jam'])
   user-select: none;
 }
 
-.prog-card-meta {
+.tc-prog-card-meta {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
   min-width: 0;
 }
 
-.prog-card-label {
+.tc-prog-card-label {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text);
@@ -86,47 +86,47 @@ defineEmits(['toggle-expand', 'play', 'stop', 'jam'])
   text-overflow: ellipsis;
 }
 
-.prog-card.playing .prog-card-label { color: var(--accent); }
+.tc-prog-card.playing .tc-prog-card-label { color: var(--accent); }
 
-.prog-card-numeral {
+.tc-prog-card-numeral {
   font-size: 0.78rem;
   color: var(--text3);
   font-variant-numeric: tabular-nums;
 }
 
-.prog-card-controls {
+.tc-prog-card-controls {
   display: flex;
   align-items: center;
   gap: 0.3rem;
   flex-shrink: 0;
 }
 
-.prog-card-body {
+.tc-prog-card-body {
   padding: 0.5rem 0.75rem 0.65rem;
   border-top: 1px solid var(--border3);
 }
 
-.prog-card-examples {
+.tc-prog-card-examples {
   font-size: 0.78rem;
   color: var(--text3);
   font-style: italic;
   margin-bottom: 0.5rem;
 }
 
-.prog-card-chords {
+.tc-prog-card-chords {
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem;
 }
 
-.jam-btn {
+.tc-prog-card-jam-btn {
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.chord-pill {
+.tc-prog-card-chord-pill {
   font-size: 0.72rem;
   font-weight: 700;
   padding: 0.15rem 0.45rem;

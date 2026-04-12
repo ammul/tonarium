@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { BEAT_PATTERNS, BEAT_TIPS } from './beatPatterns.js'
+import { BEAT_PATTERNS } from '@tonarium/core'
+import { BEAT_TIPS } from '@tonarium/learn'
 
 describe('BEAT_PATTERNS', () => {
   it('contains 10 patterns', () => {

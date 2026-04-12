@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { CHORD_TYPES, IMPROV_CHORD_TYPES, IMPROV_EXAMPLES } from './chordTypes.js'
+import { CHORD_TYPES, IMPROV_CHORD_TYPES, IMPROV_EXAMPLES } from '@tonarium/learn'
 
 describe('CHORD_TYPES', () => {
   it('has at least 3 chord types', () => {

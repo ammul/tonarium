@@ -2,10 +2,10 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
 import KnobControl from '@/components/ui/KnobControl.vue'
-import { NOTES, CHORD_SUFFIX } from '@/constants/musicConstants.js'
-import { JAM_SCALES as SCALES } from '@/constants/scales.js'
-import { ALL_PROGRESSIONS } from '@/constants/progressions.js'
-import { BEAT_PATTERNS } from '@/constants/beatPatterns.js'
+import { NOTES, CHORD_SUFFIX } from '@tonarium/core'
+import { JAM_SCALES as SCALES } from '@tonarium/core'
+import { ALL_PROGRESSIONS } from '@tonarium/core'
+import { BEAT_PATTERNS } from '@tonarium/core'
 import { pattern as drumPattern } from '@/audio/drumEngine.js'
 import { buildPatternFromBeat, createEmptyPattern } from '@/utils/beatUtils.js'
 import {
@@ -170,15 +170,15 @@ const activeBeatName = computed(() =>
 </script>
 
 <template>
-  <div class="jsb">
+  <div class="tc-jam-bar">
     <!-- Preset row -->
-    <div class="jsb-presets">
-      <span class="jsb-presets-label">Quick start</span>
-      <div class="jsb-preset-btns">
+    <div class="tc-jam-bar-presets">
+      <span class="tc-jam-bar-presets-label">Quick start</span>
+      <div class="tc-jam-bar-preset-btns">
         <button
           v-for="preset in PRESETS"
           :key="preset.label"
-          class="jsb-preset-btn"
+          class="tc-jam-bar-preset-btn"
           :class="{ active: activePreset?.label === preset.label }"
           @click="applyPreset(preset)"
         >{{ preset.label }}</button>
@@ -186,7 +186,7 @@ const activeBeatName = computed(() =>
     </div>
 
     <!-- Controls -->
-    <div class="jsb-controls">
+    <div class="tc-jam-bar-controls">
       <PickerRow label="Progression">
         <select
           v-model="selectedProgressionId"
@@ -212,7 +212,7 @@ const activeBeatName = computed(() =>
       </PickerRow>
 
       <PickerRow label="BPM">
-        <input type="number" v-model.number="sessionBpm" min="40" max="200" class="jsb-bpm-input" />
+        <input type="number" v-model.number="sessionBpm" min="40" max="200" class="tc-jam-bar-bpm-input" />
       </PickerRow>
 
       <PickerRow label="Chord">
@@ -226,16 +226,16 @@ const activeBeatName = computed(() =>
     </div>
 
     <!-- Mixer -->
-    <div class="jsb-mixer">
+    <div class="tc-jam-bar-mixer">
       <KnobControl v-model="jamVolume"  label="Jam" />
       <KnobControl v-model="beatVolume" label="Beat" />
       <KnobControl v-model="progVolume" label="Chord" />
     </div>
 
     <!-- Transport row -->
-    <div class="jsb-transport-row">
+    <div class="tc-jam-bar-transport">
       <button
-        class="jsb-play-btn"
+        class="tc-jam-bar-play-btn"
         :class="{ playing: sessionPlaying }"
         :disabled="!canPlay"
         @click="toggleTransport"
@@ -243,13 +243,13 @@ const activeBeatName = computed(() =>
         {{ sessionPlaying ? 'Stop' : 'Play' }}
       </button>
 
-      <div v-if="currentChordName" class="jsb-chord-name">{{ currentChordName }}</div>
+      <div v-if="currentChordName" class="tc-jam-bar-chord-name">{{ currentChordName }}</div>
 
-      <div v-if="sessionProgression" class="jsb-timeline">
+      <div v-if="sessionProgression" class="tc-jam-bar-timeline">
         <span
           v-for="(c, i) in sessionProgression.chords"
           :key="i"
-          class="jsb-pill"
+          class="tc-jam-bar-chord-pill"
           :class="{ active: sessionPlaying && sessionCurrentChordIdx === i }"
         >{{ c.numeral }}</span>
       </div>
@@ -258,7 +258,7 @@ const activeBeatName = computed(() =>
 </template>
 
 <style scoped>
-.jsb {
+.tc-jam-bar {
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -270,14 +270,14 @@ const activeBeatName = computed(() =>
 }
 
 /* Presets */
-.jsb-presets {
+.tc-jam-bar-presets {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
 }
 
-.jsb-presets-label {
+.tc-jam-bar-presets-label {
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -286,13 +286,13 @@ const activeBeatName = computed(() =>
   flex-shrink: 0;
 }
 
-.jsb-preset-btns {
+.tc-jam-bar-preset-btns {
   display: flex;
   gap: 0.35rem;
   flex-wrap: wrap;
 }
 
-.jsb-preset-btn {
+.tc-jam-bar-preset-btn {
   padding: 0.3rem 0.75rem;
   border-radius: 20px;
   border: 1px solid var(--border2);
@@ -305,26 +305,26 @@ const activeBeatName = computed(() =>
   transition: border-color 0.12s, background 0.12s, color 0.12s;
 }
 
-.jsb-preset-btn:hover {
+.tc-jam-bar-preset-btn:hover {
   border-color: var(--accent);
   color: var(--text);
 }
 
-.jsb-preset-btn.active {
+.tc-jam-bar-preset-btn.active {
   border-color: var(--accent);
   background: var(--accent-bg);
   color: var(--accent);
 }
 
 /* Controls */
-.jsb-controls {
+.tc-jam-bar-controls {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
 
-.jsb-bpm-input {
+.tc-jam-bar-bpm-input {
   width: 5rem;
   padding: 0.3rem 0.5rem;
   border-radius: 6px;
@@ -337,7 +337,7 @@ const activeBeatName = computed(() =>
 }
 
 /* Mixer */
-.jsb-mixer {
+.tc-jam-bar-mixer {
   display: flex;
   flex-direction: row;
   gap: 1.5rem;
@@ -345,14 +345,14 @@ const activeBeatName = computed(() =>
 }
 
 /* Transport row */
-.jsb-transport-row {
+.tc-jam-bar-transport {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
 }
 
-.jsb-play-btn {
+.tc-jam-bar-play-btn {
   padding: 0.45rem 1.4rem;
   border-radius: 8px;
   border: 1px solid var(--border2);
@@ -366,11 +366,11 @@ const activeBeatName = computed(() =>
   flex-shrink: 0;
 }
 
-.jsb-play-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
-.jsb-play-btn.playing { border-color: var(--rust); background: var(--rust-bg); color: var(--rust-hi); }
-.jsb-play-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.tc-jam-bar-play-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+.tc-jam-bar-play-btn.playing { border-color: var(--rust); background: var(--rust-bg); color: var(--rust-hi); }
+.tc-jam-bar-play-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.jsb-chord-name {
+.tc-jam-bar-chord-name {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--accent);
@@ -379,14 +379,14 @@ const activeBeatName = computed(() =>
   min-width: 3rem;
 }
 
-.jsb-timeline {
+.tc-jam-bar-timeline {
   display: flex;
   gap: 0.3rem;
   flex-wrap: wrap;
   flex: 1;
 }
 
-.jsb-pill {
+.tc-jam-bar-chord-pill {
   padding: 0.2rem 0.45rem;
   border-radius: 4px;
   border: 1px solid var(--border2);
@@ -397,7 +397,7 @@ const activeBeatName = computed(() =>
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.jsb-pill.active {
+.tc-jam-bar-chord-pill.active {
   border-color: var(--accent);
   background: var(--accent-bg);
   color: var(--accent);

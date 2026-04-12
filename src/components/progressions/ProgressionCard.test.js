@@ -20,24 +20,24 @@ describe('ProgressionCard', () => {
     const wrapper = mount(ProgressionCard, {
       props: { progression: PROGRESSION, rootNote: 'A', isExpanded: false, isPlaying: false },
     })
-    expect(wrapper.find('.prog-card-label').text()).toBe('Pop anthem')
-    expect(wrapper.find('.prog-card-numeral').text()).toBe('I – V – vi – IV')
+    expect(wrapper.find('.tc-prog-card-label').text()).toBe('Pop anthem')
+    expect(wrapper.find('.tc-prog-card-numeral').text()).toBe('I – V – vi – IV')
   })
 
   it('does not show body when collapsed', () => {
     const wrapper = mount(ProgressionCard, {
       props: { progression: PROGRESSION, rootNote: 'A', isExpanded: false, isPlaying: false },
     })
-    expect(wrapper.find('.prog-card-body').exists()).toBe(false)
+    expect(wrapper.find('.tc-prog-card-body').exists()).toBe(false)
   })
 
   it('shows body with examples and chord pills when expanded', () => {
     const wrapper = mount(ProgressionCard, {
       props: { progression: PROGRESSION, rootNote: 'A', isExpanded: true, isPlaying: false },
     })
-    expect(wrapper.find('.prog-card-body').exists()).toBe(true)
-    expect(wrapper.find('.prog-card-examples').text()).toBe('Let It Be · No Woman No Cry')
-    const pills = wrapper.findAll('.chord-pill')
+    expect(wrapper.find('.tc-prog-card-body').exists()).toBe(true)
+    expect(wrapper.find('.tc-prog-card-examples').text()).toBe('Let It Be · No Woman No Cry')
+    const pills = wrapper.findAll('.tc-prog-card-chord-pill')
     expect(pills).toHaveLength(4)
     expect(pills[0].text()).toBe('I')
   })
@@ -46,14 +46,14 @@ describe('ProgressionCard', () => {
     const wrapper = mount(ProgressionCard, {
       props: { progression: PROGRESSION, rootNote: 'A', isExpanded: false, isPlaying: true },
     })
-    expect(wrapper.find('.prog-card').classes()).toContain('playing')
+    expect(wrapper.find('.tc-prog-card').classes()).toContain('playing')
   })
 
   it('emits toggle-expand when header is clicked', async () => {
     const wrapper = mount(ProgressionCard, {
       props: { progression: PROGRESSION, rootNote: 'A', isExpanded: false, isPlaying: false },
     })
-    await wrapper.find('.prog-card-header').trigger('click')
+    await wrapper.find('.tc-prog-card-header').trigger('click')
     expect(wrapper.emitted('toggle-expand')).toBeTruthy()
   })
 
@@ -61,7 +61,7 @@ describe('ProgressionCard', () => {
     const wrapper = mount(ProgressionCard, {
       props: { progression: PROGRESSION, rootNote: 'A', isExpanded: false, isPlaying: false },
     })
-    await wrapper.find('.ctrl-btn').trigger('click')
+    await wrapper.find('.tc-prog-card-ctrl-btn').trigger('click')
     expect(wrapper.emitted('play')).toBeTruthy()
   })
 
@@ -69,7 +69,7 @@ describe('ProgressionCard', () => {
     const wrapper = mount(ProgressionCard, {
       props: { progression: PROGRESSION, rootNote: 'A', isExpanded: false, isPlaying: true },
     })
-    await wrapper.find('.ctrl-btn').trigger('click')
+    await wrapper.find('.tc-prog-card-ctrl-btn').trigger('click')
     expect(wrapper.emitted('stop')).toBeTruthy()
   })
 })

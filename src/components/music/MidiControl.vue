@@ -13,28 +13,28 @@ const selectedDevice = computed({
 </script>
 
 <template>
-  <div v-if="midiStatus !== 'unsupported'" class="midi-control">
-    <button v-if="midiStatus === 'idle'" class="btn btn-sm midi-btn" @click="initMidi">MIDI</button>
+  <div v-if="midiStatus !== 'unsupported'" class="tc-midi">
+    <button v-if="midiStatus === 'idle'" class="btn btn-sm tc-midi-btn" @click="initMidi">MIDI</button>
 
     <template v-else-if="midiStatus === 'connected'">
-      <span class="midi-dot connected"></span>
-      <span v-if="midiOutputs.length === 1" class="midi-name">{{ truncate(midiOutputs[0].name) }}</span>
-      <select v-else-if="midiOutputs.length > 1" v-model="selectedDevice" class="form-select midi-select">
+      <span class="tc-midi-dot connected"></span>
+      <span v-if="midiOutputs.length === 1" class="tc-midi-name">{{ truncate(midiOutputs[0].name) }}</span>
+      <select v-else-if="midiOutputs.length > 1" v-model="selectedDevice" class="form-select tc-midi-select">
         <option v-for="o in midiOutputs" :key="o.id" :value="o.id">{{ truncate(o.name) }}</option>
       </select>
-      <button class="midi-disconnect" @click="disconnectMidi" aria-label="Disconnect MIDI">&#x2715;</button>
+      <button class="tc-midi-disconnect" @click="disconnectMidi" aria-label="Disconnect MIDI">&#x2715;</button>
     </template>
 
     <template v-else-if="midiStatus === 'error'">
-      <span class="midi-dot error"></span>
-      <span class="midi-name muted">MIDI error</span>
-      <button class="midi-disconnect" @click="disconnectMidi" aria-label="Dismiss">&#x2715;</button>
+      <span class="tc-midi-dot error"></span>
+      <span class="tc-midi-name muted">MIDI error</span>
+      <button class="tc-midi-disconnect" @click="disconnectMidi" aria-label="Dismiss">&#x2715;</button>
     </template>
   </div>
 </template>
 
 <style scoped>
-.midi-control {
+.tc-midi {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -42,22 +42,22 @@ const selectedDevice = computed({
 }
 
 /* unique properties not covered by .btn + .btn-sm */
-.midi-btn {
+.tc-midi-btn {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.midi-dot {
+.tc-midi-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.midi-dot.connected { background: var(--midi-ok); }
-.midi-dot.error     { background: var(--midi-err); }
+.tc-midi-dot.connected { background: var(--midi-ok); }
+.tc-midi-dot.error     { background: var(--midi-err); }
 
-.midi-name {
+.tc-midi-name {
   font-size: 0.78rem;
   color: var(--text2);
   white-space: nowrap;
@@ -66,15 +66,15 @@ const selectedDevice = computed({
   text-overflow: ellipsis;
 }
 
-.midi-name.muted { color: var(--text4); }
+.tc-midi-name.muted { color: var(--text4); }
 
-.midi-select {
+.tc-midi-select {
   font-size: 0.78rem;
   padding: 0.2rem 0.5rem;
   max-width: 130px;
 }
 
-.midi-disconnect {
+.tc-midi-disconnect {
   width: 20px;
   height: 20px;
   background: transparent;
@@ -88,5 +88,5 @@ const selectedDevice = computed({
   flex-shrink: 0;
 }
 
-.midi-disconnect:hover { color: var(--text); }
+.tc-midi-disconnect:hover { color: var(--text); }
 </style>

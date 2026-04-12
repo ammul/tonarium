@@ -25,21 +25,21 @@ beforeEach(async () => {
 describe('LearnBeats', () => {
   it('renders all beat pattern cards', () => {
     const wrapper = mount(LearnBeats)
-    expect(wrapper.findAll('.beat-pattern').length).toBeGreaterThanOrEqual(3)
+    expect(wrapper.findAll('.tc-learn-beats-pattern').length).toBeGreaterThanOrEqual(3)
   })
 
   it('each beat pattern has Play and Edit buttons', () => {
     const wrapper = mount(LearnBeats)
-    const cards = wrapper.findAll('.beat-pattern')
+    const cards = wrapper.findAll('.tc-learn-beats-pattern')
     for (const card of cards) {
-      expect(card.find('.bp-play-btn').exists()).toBe(true)
-      expect(card.find('.bp-edit-btn').exists()).toBe(true)
+      expect(card.find('.tc-learn-beats-bp-play-btn').exists()).toBe(true)
+      expect(card.find('.tc-learn-beats-bp-edit-btn').exists()).toBe(true)
     }
   })
 
   it('loadBeat sets the drum pattern correctly for basic rock beat', async () => {
     const wrapper = mount(LearnBeats)
-    await wrapper.findAll('.bp-play-btn')[0].trigger('click')
+    await wrapper.findAll('.tc-learn-beats-bp-play-btn')[0].trigger('click')
     expect(drumPattern.value[0][0]).toBe(true)   // kick beat 1
     expect(drumPattern.value[0][8]).toBe(true)   // kick beat 3
     expect(drumPattern.value[0][4]).toBe(false)  // no kick on beat 2
@@ -52,7 +52,7 @@ describe('LearnBeats', () => {
 
   it('rows 4–8 are all silent in built drum pattern', async () => {
     const wrapper = mount(LearnBeats)
-    await wrapper.findAll('.bp-play-btn')[0].trigger('click')
+    await wrapper.findAll('.tc-learn-beats-bp-play-btn')[0].trigger('click')
     for (let r = 4; r < 9; r++) {
       expect(drumPattern.value[r].every(s => s === false)).toBe(true)
     }
@@ -60,27 +60,27 @@ describe('LearnBeats', () => {
 
   it('loadBeat starts drum playback', async () => {
     const wrapper = mount(LearnBeats)
-    await wrapper.findAll('.bp-play-btn')[0].trigger('click')
+    await wrapper.findAll('.tc-learn-beats-bp-play-btn')[0].trigger('click')
     expect(drumPlay).toHaveBeenCalled()
   })
 
   it('loading the same pattern twice unloads it without calling play again', async () => {
     const wrapper = mount(LearnBeats)
-    await wrapper.findAll('.bp-play-btn')[0].trigger('click')
-    await wrapper.findAll('.bp-play-btn')[0].trigger('click')
+    await wrapper.findAll('.tc-learn-beats-bp-play-btn')[0].trigger('click')
+    await wrapper.findAll('.tc-learn-beats-bp-play-btn')[0].trigger('click')
     expect(drumPlay).toHaveBeenCalledTimes(1)
   })
 
   it('editBeat emits navigate event with drums', async () => {
     const wrapper = mount(LearnBeats)
-    await wrapper.findAll('.bp-edit-btn')[0].trigger('click')
+    await wrapper.findAll('.tc-learn-beats-bp-edit-btn')[0].trigger('click')
     expect(wrapper.emitted('navigate')).toBeTruthy()
     expect(wrapper.emitted('navigate')[0]).toEqual(['drums'])
   })
 
   it('four-on-the-floor pattern has kick on all 4 beats', async () => {
     const wrapper = mount(LearnBeats)
-    await wrapper.findAll('.bp-play-btn')[1].trigger('click')
+    await wrapper.findAll('.tc-learn-beats-bp-play-btn')[1].trigger('click')
     expect(drumPattern.value[0][0]).toBe(true)
     expect(drumPattern.value[0][4]).toBe(true)
     expect(drumPattern.value[0][8]).toBe(true)

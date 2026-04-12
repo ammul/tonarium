@@ -10,7 +10,7 @@ vi.mock('@/audio/audioEngine.js', () => ({
 
 import ScaleVisualizer from './ScaleVisualizer.vue'
 import { displayMode } from '@/state/displayMode.js'
-import { NOTES } from '@/constants/musicConstants.js'
+import { NOTES } from '@tonarium/core'
 
 beforeEach(() => {
   displayMode.value = 'pad'
@@ -38,7 +38,7 @@ describe('ScaleVisualizer', () => {
   describe('pad mode', () => {
     it('renders 4 rows of 3 pads', () => {
       const wrapper = mount(ScaleVisualizer)
-      const rows = wrapper.findAll('.pad-row')
+      const rows = wrapper.findAll('.tc-scale-viz-pad-row')
       expect(rows.length).toBeGreaterThanOrEqual(4)
     })
 
@@ -46,7 +46,7 @@ describe('ScaleVisualizer', () => {
       const wrapper = mount(ScaleVisualizer)
       await nextTick()
       // default is C major - 7 active pads
-      const activePads = wrapper.findAll('.pad.active')
+      const activePads = wrapper.findAll('.tc-scale-viz-pad.active')
       expect(activePads).toHaveLength(7)
     })
 
@@ -61,7 +61,7 @@ describe('ScaleVisualizer', () => {
       if (selectEl.exists()) {
         await selectEl.setValue('12t')
         await nextTick()
-        const activePads = wrapper.findAll('.pad.active')
+        const activePads = wrapper.findAll('.tc-scale-viz-pad.active')
         expect(activePads).toHaveLength(12)
       }
     })

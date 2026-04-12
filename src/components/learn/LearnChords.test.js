@@ -17,12 +17,12 @@ beforeEach(() => {
 describe('LearnChords', () => {
   it('renders 3 chord type cards', () => {
     const wrapper = mount(LearnChords)
-    expect(wrapper.findAll('.chord-type-card')).toHaveLength(3)
+    expect(wrapper.findAll('.tc-learn-chords-card')).toHaveLength(3)
   })
 
   it('each card has a Hear it button', () => {
     const wrapper = mount(LearnChords)
-    const btns = wrapper.findAll('.ctc-play')
+    const btns = wrapper.findAll('.tc-learn-chords-play')
     expect(btns).toHaveLength(3)
     for (const btn of btns) {
       expect(btn.text()).toBe('Hear it')
@@ -31,7 +31,7 @@ describe('LearnChords', () => {
 
   it('displays interval pills for each chord', () => {
     const wrapper = mount(LearnChords)
-    const pills = wrapper.findAll('.ctc-interval-pill')
+    const pills = wrapper.findAll('.tc-learn-chords-interval-pill')
     // major (3) + minor (3) + dom7 (4) = 10 pills
     expect(pills.length).toBe(10)
   })

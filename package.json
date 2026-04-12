@@ -3,11 +3,17 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run",
+    "typecheck": "npm run typecheck -w @tonarium/core",
+    "test": "npm run typecheck && vitest run && npm run test -w @tonarium/core",
+    "test:app": "vitest run",
+    "test:lib": "npm run test -w @tonarium/core",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "npx playwright test"

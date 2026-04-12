@@ -1,0 +1,22 @@
+[
+  {
+    "noteIdx": 4,
+    "after": 1
+  },
+  {
+    "noteIdx": 6,
+    "after": 2
+  },
+  {
+    "noteIdx": 9,
+    "after": 4
+  },
+  {
+    "noteIdx": 11,
+    "after": 5
+  },
+  {
+    "noteIdx": 1,
+    "after": 6
+  }
+]

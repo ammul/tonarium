@@ -1,0 +1,132 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   PAD GRID
+   Used by: JamMode (tc-jam), ScaleVisualizer (tc-scale-viz), ChordDetector (tc-detector)
+   Component-specific pad states (.active, .root, .sharp, .selected) remain scoped.
+   ───────────────────────────────────────────────────────────────────────────── */
+.tc-jam-pad-grid,
+.tc-scale-viz-pad-grid,
+.tc-detector-pad-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.tc-jam-pad-row,
+.tc-scale-viz-pad-row,
+.tc-detector-pad-row {
+  display: grid;
+  gap: 0.6rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   GUITAR NECK
+   JamMode and ScaleVisualizer share the same base structure.
+   ChordDetector has full overrides in scoped CSS (different height, borders, bg).
+   ───────────────────────────────────────────────────────────────────────────── */
+.tc-jam-guitar-neck-wrap,
+.tc-scale-viz-guitar-neck-wrap,
+.tc-detector-neck-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 0.5rem;
+}
+
+.tc-jam-guitar-neck,
+.tc-scale-viz-guitar-neck {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 380px;
+}
+
+/* ChordDetector overrides min-width in scoped CSS, but needs the flex base */
+.tc-detector-neck {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tc-jam-neck-row,
+.tc-scale-viz-neck-row,
+.tc-detector-neck-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border2);
+}
+
+.tc-jam-string-name,
+.tc-scale-viz-string-name,
+.tc-detector-string-name {
+  width: 1.8rem;
+  font-size: 0.7rem;
+  color: var(--text4);
+  font-weight: 600;
+  text-align: right;
+  padding-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.tc-jam-string-name-spacer,
+.tc-scale-viz-string-name-spacer,
+.tc-detector-fret-num-spacer {
+  width: 1.8rem;
+  flex-shrink: 0;
+}
+
+.tc-jam-neck-cell,
+.tc-scale-viz-neck-cell {
+  flex: 1;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--border2);
+  position: relative;
+  user-select: none;
+  touch-action: pan-x;
+  cursor: pointer;
+}
+
+/* ChordDetector neck cell is fully defined in scoped CSS (different height/border/bg) */
+.tc-detector-neck-cell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  user-select: none;
+}
+
+.tc-jam-neck-cell.open,
+.tc-scale-viz-neck-cell.open {
+  border-right: 3px solid var(--border2);
+}
+
+/* Dot — color set per-component in scoped CSS */
+.tc-jam-neck-dot,
+.tc-scale-viz-neck-dot,
+.tc-detector-neck-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: block;
+}
+
+.tc-jam-fret-numbers,
+.tc-scale-viz-fret-numbers,
+.tc-detector-fret-numbers {
+  display: flex;
+  align-items: center;
+  margin-top: 0.3rem;
+}
+
+.tc-jam-fret-num,
+.tc-scale-viz-fret-num,
+.tc-detector-fret-num {
+  flex: 1;
+  font-size: 0.6rem;
+  color: var(--text5);
+  text-align: center;
+}

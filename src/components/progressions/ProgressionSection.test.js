@@ -24,28 +24,28 @@ describe('ProgressionSection', () => {
     const wrapper = mount(ProgressionSection, {
       props: { title: 'Major Key Progressions', progressions: PROGRESSIONS, rootNote: 'A', expandedId: null, playingId: null },
     })
-    expect(wrapper.find('.prog-section-title').text()).toBe('Major Key Progressions')
+    expect(wrapper.find('.tc-prog-section-title').text()).toBe('Major Key Progressions')
   })
 
   it('renders a ProgressionCard for each progression', () => {
     const wrapper = mount(ProgressionSection, {
       props: { title: 'Major Key Progressions', progressions: PROGRESSIONS, rootNote: 'A', expandedId: null, playingId: null },
     })
-    expect(wrapper.findAll('.prog-card')).toHaveLength(2)
+    expect(wrapper.findAll('.tc-prog-card')).toHaveLength(2)
   })
 
   it('does not render section when progressions is empty', () => {
     const wrapper = mount(ProgressionSection, {
       props: { title: 'Major Key Progressions', progressions: [], rootNote: 'A', expandedId: null, playingId: null },
     })
-    expect(wrapper.find('.prog-section').exists()).toBe(false)
+    expect(wrapper.find('.tc-prog-section').exists()).toBe(false)
   })
 
   it('passes isExpanded=true to the matching card', () => {
     const wrapper = mount(ProgressionSection, {
       props: { title: 'Major', progressions: PROGRESSIONS, rootNote: 'A', expandedId: 'pop-1', playingId: null },
     })
-    const cards = wrapper.findAll('.prog-card')
+    const cards = wrapper.findAll('.tc-prog-card')
     expect(cards[0].classes()).toContain('expanded')
     expect(cards[1].classes()).not.toContain('expanded')
   })
@@ -54,7 +54,7 @@ describe('ProgressionSection', () => {
     const wrapper = mount(ProgressionSection, {
       props: { title: 'Major', progressions: PROGRESSIONS, rootNote: 'A', expandedId: null, playingId: 'pop-2' },
     })
-    const cards = wrapper.findAll('.prog-card')
+    const cards = wrapper.findAll('.tc-prog-card')
     expect(cards[0].classes()).not.toContain('playing')
     expect(cards[1].classes()).toContain('playing')
   })
@@ -63,7 +63,7 @@ describe('ProgressionSection', () => {
     const wrapper = mount(ProgressionSection, {
       props: { title: 'Major', progressions: PROGRESSIONS, rootNote: 'A', expandedId: null, playingId: null },
     })
-    await wrapper.findAll('.prog-card-header')[0].trigger('click')
+    await wrapper.findAll('.tc-prog-card-header')[0].trigger('click')
     expect(wrapper.emitted('toggle-expand')).toBeTruthy()
     expect(wrapper.emitted('toggle-expand')[0]).toEqual(['pop-1'])
   })

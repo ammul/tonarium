@@ -21,20 +21,20 @@ describe('ChordDetector', () => {
 
   it('renders pad grid in pad mode', () => {
     const wrapper = mount(ChordDetector)
-    expect(wrapper.find('.pad-grid').exists()).toBe(true)
-    expect(wrapper.findAll('.pad').length).toBeGreaterThan(0)
+    expect(wrapper.find('.tc-detector-pad-grid').exists()).toBe(true)
+    expect(wrapper.findAll('.tc-detector-pad').length).toBeGreaterThan(0)
   })
 
   it('shows hint when no notes are selected', () => {
     const wrapper = mount(ChordDetector)
-    expect(wrapper.find('.hint').exists()).toBe(true)
+    expect(wrapper.find('.tc-detector-hint').exists()).toBe(true)
   })
 
   it('renders guitar neck in guitar mode', async () => {
     displayMode.value = 'guitar'
     const wrapper = mount(ChordDetector)
     await nextTick()
-    expect(wrapper.find('.guitar-neck').exists()).toBe(true)
+    expect(wrapper.find('.tc-detector-neck').exists()).toBe(true)
   })
 
   it('renders piano in piano mode', async () => {

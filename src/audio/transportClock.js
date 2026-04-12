@@ -4,7 +4,7 @@ import { sessionBpm, sessionPlaying, sessionBeatsPerChord, sessionCurrentChordId
 import { pattern, currentStep, isPlaying as drumIsPlaying, INSTRUMENTS } from '@/audio/drumEngine.js'
 import { triggerDrumHit } from '@/audio/drumEngine.js'
 import { startNote, stopNote } from '@/audio/audioEngine.js'
-import { CHORD_TYPES } from '@/constants/musicConstants.js'
+import { CHORD_TYPES } from '@tonarium/core'
 import { chordOn, chordOff } from '@/audio/midiManager.js'
 
 const LOOKAHEAD = 0.1

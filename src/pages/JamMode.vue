@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { displayMode } from '@/state/displayMode.js'
 import { padSize } from '@/state/padSize.js'
-import { NOTES, SHARPS, FRET_COUNT, NOTE_TO_SEMI, CHORD_TYPES, CHORD_SUFFIX } from '@/constants/musicConstants.js'
+import { NOTES, SHARPS, FRET_COUNT, NOTE_TO_SEMI, CHORD_TYPES, CHORD_SUFFIX } from '@tonarium/core'
 import { buildGuitarNeck, sliceRows } from '@/utils/musicUtils.js'
 import { activeInputNotes, midiStatus } from '@/audio/midiManager.js'
 import { useNotePlayback } from '@/composables/useNotePlayback.js'
@@ -13,7 +13,7 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
 import ScaleSelector from '@/components/jam/ScaleSelector.vue'
 import OctaveControl from '@/components/jam/OctaveControl.vue'
-import { JAM_SCALES as SCALES } from '@/constants/scales.js'
+import { JAM_SCALES as SCALES } from '@tonarium/core'
 import { sessionProgression, sessionPlaying, sessionCurrentChordIdx } from '@/state/sessionState.js'
 import { stopTransport } from '@/audio/transportClock.js'
 import { selectedRoot, selectedScaleId, pianoOctave } from '@/state/jamSettings.js'
@@ -176,10 +176,10 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
 </script>
 
 <template>
-  <div class="jam-mode">
+  <div class="tc-jam">
     <PageHeader title="Jam Mode" :subtitle="subtitle" />
 
-    <div class="controls">
+    <div class="tc-jam-controls">
       <PickerRow label="Key">
         <select v-model="selectedRoot" class="form-select" @change="onKeyChange">
           <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
@@ -200,7 +200,7 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
       </PickerRow>
 
       <PickerRow label="Chord">
-        <div class="chord-dropdowns">
+        <div class="tc-jam-chord-dropdowns">
           <select v-model="selectedChordType" class="form-select" @change="onChordTypeChange">
             <option :value="null">off</option>
             <option v-for="[key, sfx] in CHORD_OPTIONS" :key="key" :value="key">{{ chordRoot }}{{ sfx }}</option>
@@ -214,24 +214,24 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
 
     <ScaleLegend />
 
-    <div class="scale-notes">
-      <span class="scale-label">Notes</span>
+    <div class="tc-jam-scale-notes">
+      <span class="tc-jam-scale-label">Notes</span>
       <span
         v-for="n in scaleNotes"
         :key="n.note"
-        class="scale-note"
+        class="tc-jam-scale-note"
         :class="{ root: n.isRoot, anchor: n.isAnchor && !n.isRoot }"
       >{{ n.note }}</span>
     </div>
 
     <ModeLayout>
       <template #pad>
-        <div class="pad-grid">
-          <div class="pad-row" v-for="(row, ri) in rows" :key="ri" :style="{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
+        <div class="tc-jam-pad-grid">
+          <div class="tc-jam-pad-row" v-for="(row, ri) in rows" :key="ri" :style="{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
             <div
               v-for="pad in row"
               :key="pad.number"
-              class="pad"
+              class="tc-jam-pad"
               :class="{
                 active:   pad.isActive && !pad.isAnchor && !pad.isRoot,
                 anchor:   pad.isAnchor && !pad.isRoot,
@@ -244,9 +244,9 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
               @pointerleave="onPadUp(pad.noteIndex, pad.octaveOffset)"
               @pointercancel="onPadUp(pad.noteIndex, pad.octaveOffset)"
             >
-              <span class="pad-label">{{ pad.label }}</span>
-              <span class="pad-note">{{ pad.note }}</span>
-              <span v-if="midiStatus === 'connected'" class="pad-midi">{{ pad.midi }}</span>
+              <span class="tc-jam-pad-label">{{ pad.label }}</span>
+              <span class="tc-jam-pad-note">{{ pad.note }}</span>
+              <span v-if="midiStatus === 'connected'" class="tc-jam-pad-midi">{{ pad.midi }}</span>
             </div>
           </div>
         </div>
@@ -266,14 +266,14 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
       </template>
 
       <template #guitar>
-        <div class="guitar-neck-wrap">
-          <div class="guitar-neck">
-            <div v-for="(string, si) in guitarNeck" :key="si" class="neck-row">
-              <div class="string-name">{{ string.name }}</div>
+        <div class="tc-jam-guitar-neck-wrap">
+          <div class="tc-jam-guitar-neck">
+            <div v-for="(string, si) in guitarNeck" :key="si" class="tc-jam-neck-row">
+              <div class="tc-jam-string-name">{{ string.name }}</div>
               <div
                 v-for="cell in string.cells"
                 :key="cell.fret"
-                class="neck-cell"
+                class="tc-jam-neck-cell"
                 :class="{
                   active: cell.isActive,
                   root:   cell.isRoot,
@@ -286,14 +286,14 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
               >
                 <span
                   v-if="cell.isActive"
-                  class="neck-dot"
+                  class="tc-jam-neck-dot"
                   :class="{ root: cell.isRoot, anchor: cell.isAnchor && !cell.isRoot }"
                 ></span>
               </div>
             </div>
-            <div class="fret-numbers">
-              <div class="string-name-spacer"></div>
-              <div v-for="f in FRET_COUNT + 1" :key="f" class="fret-num">
+            <div class="tc-jam-fret-numbers">
+              <div class="tc-jam-string-name-spacer"></div>
+              <div v-for="f in FRET_COUNT + 1" :key="f" class="tc-jam-fret-num">
                 {{ f - 1 === 0 ? '' : f - 1 }}
               </div>
             </div>
@@ -305,14 +305,14 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
 </template>
 
 <style scoped>
-.jam-mode {
+.tc-jam {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
 }
 
-.controls {
+.tc-jam-controls {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
@@ -320,13 +320,13 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
 }
 
 
-.chord-dropdowns {
+.tc-jam-chord-dropdowns {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
 }
 
-.pad {
+.tc-jam-pad {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -342,29 +342,29 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
   cursor: pointer;
 }
 
-.pad.inactive { background: var(--bg); opacity: 0.35; }
-.pad.active   { background: var(--raised); border-color: var(--border2); }
-.pad.anchor   { background: var(--accent-bg); border-color: var(--accent-mid); }
-.pad.root     { background: var(--rust-bg); border-color: var(--rust); }
-.pad.pressed  { background: var(--accent-bg); border-color: var(--accent); opacity: 1; }
+.tc-jam-pad.inactive { background: var(--bg); opacity: 0.35; }
+.tc-jam-pad.active   { background: var(--raised); border-color: var(--border2); }
+.tc-jam-pad.anchor   { background: var(--accent-bg); border-color: var(--accent-mid); }
+.tc-jam-pad.root     { background: var(--rust-bg); border-color: var(--rust); }
+.tc-jam-pad.pressed  { background: var(--accent-bg); border-color: var(--accent); opacity: 1; }
 
-.pad-label { font-size: 0.7rem; color: var(--text4); font-weight: 600; letter-spacing: 0.1em; }
-.pad-note  { font-size: 1.5rem; font-weight: 700; line-height: 1; }
-.pad-midi  { font-size: 0.6rem; color: var(--text5); letter-spacing: 0.03em; }
+.tc-jam-pad-label { font-size: 0.7rem; color: var(--text4); font-weight: 600; letter-spacing: 0.1em; }
+.tc-jam-pad-note  { font-size: 1.5rem; font-weight: 700; line-height: 1; }
+.tc-jam-pad-midi  { font-size: 0.6rem; color: var(--text5); letter-spacing: 0.03em; }
 
-.pad.inactive .pad-note { color: var(--text5); }
-.pad.active   .pad-note { color: var(--text2); }
-.pad.anchor   .pad-note { color: var(--accent); }
-.pad.root     .pad-note { color: var(--rust-hi); }
-.pad.pressed  .pad-note { color: var(--accent); }
+.tc-jam-pad.inactive .tc-jam-pad-note { color: var(--text5); }
+.tc-jam-pad.active   .tc-jam-pad-note { color: var(--text2); }
+.tc-jam-pad.anchor   .tc-jam-pad-note { color: var(--accent); }
+.tc-jam-pad.root     .tc-jam-pad-note { color: var(--rust-hi); }
+.tc-jam-pad.pressed  .tc-jam-pad-note { color: var(--accent); }
 
-.neck-dot { background: var(--text3); }
-.neck-dot.anchor { background: var(--accent-lo); }
-.neck-dot.root { background: var(--dot-root); box-shadow: 0 0 4px var(--rust-glow); }
+.tc-jam-neck-dot { background: var(--text3); }
+.tc-jam-neck-dot.anchor { background: var(--accent-lo); }
+.tc-jam-neck-dot.root { background: var(--dot-root); box-shadow: 0 0 4px var(--rust-glow); }
 
 :deep(.legend) { margin-top: 0; }
 
-.scale-notes {
+.tc-jam-scale-notes {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -373,7 +373,7 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
   flex-wrap: wrap;
 }
 
-.scale-label {
+.tc-jam-scale-label {
   font-size: 0.75rem;
   color: var(--text4);
   text-transform: uppercase;
@@ -381,7 +381,7 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
   margin-right: 0.25rem;
 }
 
-.scale-note {
+.tc-jam-scale-note {
   padding: 0.25rem 0.6rem;
   border-radius: 4px;
   background: var(--raised);
@@ -391,39 +391,39 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
   color: var(--text2);
 }
 
-.scale-note.anchor {
+.tc-jam-scale-note.anchor {
   background: var(--accent-bg);
   border-color: var(--accent-mid);
   color: var(--accent);
 }
 
-.scale-note.root {
+.tc-jam-scale-note.root {
   background: var(--rust-bg);
   border-color: var(--rust);
   color: var(--rust-hi);
 }
 
 @media (max-width: 600px) {
-  .jam-mode {
+  .tc-jam {
     padding: 1.25rem 1rem;
   }
 
-  .pad-note {
+  .tc-jam-pad-note {
     font-size: 1.2rem;
   }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .jam-mode {
+  .tc-jam {
     padding: 0.75rem 1rem;
   }
 
-  .controls {
+  .tc-jam-controls {
     margin: 0.5rem 0;
     gap: 0.5rem;
   }
 
-  .scale-notes {
+  .tc-jam-scale-notes {
     margin-top: 0.5rem;
     margin-bottom: 0.75rem;
   }

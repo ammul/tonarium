@@ -25,32 +25,32 @@ export default { name: 'ScaleSelector' }
 </script>
 
 <template>
-  <div class="scale-selector">
-    <div class="scale-select-row">
+  <div class="tc-scale-sel">
+    <div class="tc-scale-sel-row">
       <select :value="modelValue" @change="onSelectChange" class="form-select">
         <option v-for="s in scales" :key="s.id" :value="s.id">{{ s.label }}</option>
       </select>
-      <button class="btn btn-round btn-subtle info-btn" :class="{ active: showInfo }" @click="toggleInfo" aria-label="Scale info">i</button>
+      <button class="btn btn-round btn-subtle tc-scale-sel-info-btn" :class="{ active: showInfo }" @click="toggleInfo" aria-label="Scale info">i</button>
     </div>
-    <p v-if="showInfo && selectedScale" class="scale-info">{{ selectedScale.description }}</p>
+    <p v-if="showInfo && selectedScale" class="tc-scale-sel-info">{{ selectedScale.description }}</p>
   </div>
 </template>
 
 <style scoped>
-.scale-select-row {
+.tc-scale-sel-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
 /* unique properties not covered by .btn + .btn-round + .btn-subtle */
-.info-btn {
+.tc-scale-sel-info-btn {
   font-style: italic;
   font-weight: 700;
   flex-shrink: 0;
 }
 
-.scale-info {
+.tc-scale-sel-info {
   margin-top: 0.6rem;
   padding: 0.65rem 0.85rem;
   background: var(--input);

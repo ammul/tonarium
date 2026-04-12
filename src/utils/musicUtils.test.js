@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { buildRows, sliceRows, buildGuitarNeck } from '@/utils/musicUtils.js'
-import { NOTES, OPEN_STRINGS, FRET_COUNT } from '@/constants/musicConstants.js'
+import { NOTES, OPEN_STRINGS, FRET_COUNT } from '@tonarium/core'
 
 describe('buildRows', () => {
   it('returns 4 rows', () => {

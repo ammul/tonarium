@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { JAM_SCALES, VISUALIZER_SCALES } from './scales.js'
+import { JAM_SCALES, VISUALIZER_SCALES } from '@tonarium/core'
 
 describe('JAM_SCALES', () => {
   it('has at least 5 scales', () => {

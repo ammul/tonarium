@@ -20,34 +20,34 @@ beforeEach(() => {
 describe('ChordCardBody - pad mode', () => {
   it('renders the mini pad grid', () => {
     const wrapper = mount(ChordCardBody, { props: baseProps })
-    expect(wrapper.find('.mini-grid').exists()).toBe(true)
+    expect(wrapper.find('.tc-chord-card-grid').exists()).toBe(true)
   })
 
   it('renders 4 rows of 3 pads each', () => {
     const wrapper = mount(ChordCardBody, { props: baseProps })
-    const rows = wrapper.findAll('.mini-row')
+    const rows = wrapper.findAll('.tc-chord-card-row')
     expect(rows).toHaveLength(4)
     for (const row of rows) {
-      expect(row.findAll('.mini-pad')).toHaveLength(3)
+      expect(row.findAll('.tc-chord-card-pad')).toHaveLength(3)
     }
   })
 
   it('renders press labels', () => {
     const wrapper = mount(ChordCardBody, { props: baseProps })
-    expect(wrapper.find('.press-labels').exists()).toBe(true)
-    const badges = wrapper.findAll('.press-badge')
+    expect(wrapper.find('.tc-chord-card-press-labels').exists()).toBe(true)
+    const badges = wrapper.findAll('.tc-chord-card-press-badge')
     expect(badges).toHaveLength(baseProps.pressLabels.length)
   })
 
   it('active pads have the active class', () => {
     const wrapper = mount(ChordCardBody, { props: baseProps })
-    const activePads = wrapper.findAll('.mini-pad.active')
+    const activePads = wrapper.findAll('.tc-chord-card-pad.active')
     expect(activePads.length).toBe(3)
   })
 
   it('root pad has the root class', () => {
     const wrapper = mount(ChordCardBody, { props: baseProps })
-    const rootPads = wrapper.findAll('.mini-pad.root')
+    const rootPads = wrapper.findAll('.tc-chord-card-pad.root')
     expect(rootPads.length).toBe(1)
   })
 })
@@ -57,8 +57,8 @@ describe('ChordCardBody - display mode switching', () => {
     displayMode.value = 'guitar'
     const wrapper = mount(ChordCardBody, { props: baseProps })
     await nextTick()
-    expect(wrapper.find('.mini-grid').exists()).toBe(false)
-    expect(wrapper.find('.note-badges').exists()).toBe(false)
+    expect(wrapper.find('.tc-chord-card-grid').exists()).toBe(false)
+    expect(wrapper.find('.tc-chord-card-press-labels').exists()).toBe(false)
     // GuitarChordDiagram should be rendered
     expect(wrapper.findComponent({ name: 'GuitarChordDiagram' }).exists()).toBe(true)
   })
@@ -67,8 +67,8 @@ describe('ChordCardBody - display mode switching', () => {
     displayMode.value = 'piano'
     const wrapper = mount(ChordCardBody, { props: baseProps })
     await nextTick()
-    expect(wrapper.find('.mini-grid').exists()).toBe(false)
-    expect(wrapper.find('.note-badges').exists()).toBe(false)
+    expect(wrapper.find('.tc-chord-card-grid').exists()).toBe(false)
+    expect(wrapper.find('.tc-chord-card-press-labels').exists()).toBe(false)
     expect(wrapper.findComponent({ name: 'PianoOctave' }).exists()).toBe(true)
   })
 })

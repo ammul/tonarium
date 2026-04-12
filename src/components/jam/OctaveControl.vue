@@ -21,29 +21,29 @@ export default { name: 'OctaveControl' }
 </script>
 
 <template>
-  <div class="octave-control">
-    <button class="btn btn-round octave-btn" :disabled="modelValue <= min" @click="decrement" aria-label="Octave down">−</button>
-    <span class="octave-value">{{ modelValue }}</span>
-    <button class="btn btn-round octave-btn" :disabled="modelValue >= max" @click="increment" aria-label="Octave up">+</button>
+  <div class="tc-octave">
+    <button class="btn btn-round tc-octave-btn" :disabled="modelValue <= min" @click="decrement" aria-label="Octave down">−</button>
+    <span class="tc-octave-value">{{ modelValue }}</span>
+    <button class="btn btn-round tc-octave-btn" :disabled="modelValue >= max" @click="increment" aria-label="Octave up">+</button>
   </div>
 </template>
 
 <style scoped>
-.octave-control {
+.tc-octave {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
 /* unique properties not covered by .btn + .btn-round */
-.octave-btn {
+.tc-octave-btn {
   background: var(--input);
   color: var(--text);
   font-size: 1rem;
   font-weight: 700;
 }
 
-.octave-value {
+.tc-octave-value {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text);

@@ -5,7 +5,7 @@ import AboutPage from './AboutPage.vue'
 describe('AboutPage', () => {
   it('renders the about page', () => {
     const w = mount(AboutPage)
-    expect(w.find('.about-page').exists()).toBe(true)
+    expect(w.find('.tc-about').exists()).toBe(true)
   })
 
   it('contains a GitHub link', () => {

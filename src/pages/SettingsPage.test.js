@@ -34,28 +34,28 @@ describe('SettingsPage', () => {
 
   it('emits close when close button is clicked', async () => {
     const wrapper = mount(SettingsPage)
-    await wrapper.find('.close-btn').trigger('click')
+    await wrapper.find('.tc-settings-close-btn').trigger('click')
     expect(wrapper.emitted('close')).toBeTruthy()
   })
 
   describe('display mode buttons', () => {
     it('renders three display mode options', () => {
       const wrapper = mount(SettingsPage)
-      const displaySection = wrapper.find('.settings-section')
-      const buttons = displaySection.findAll('.option-btn')
+      const displaySection = wrapper.find('.tc-settings-section')
+      const buttons = displaySection.findAll('.tc-settings-option-btn')
       expect(buttons.length).toBeGreaterThanOrEqual(3)
     })
 
     it('pad button is active by default', () => {
       const wrapper = mount(SettingsPage)
-      const buttons = wrapper.findAll('.option-btn')
+      const buttons = wrapper.findAll('.tc-settings-option-btn')
       const activeLabels = buttons.filter(b => b.classes('active')).map(b => b.text())
       expect(activeLabels).toContain('Pad')
     })
 
     it('clicking Guitar updates displayMode', async () => {
       const wrapper = mount(SettingsPage)
-      const guitarBtn = wrapper.findAll('.option-btn').find(b => b.text() === 'Guitar')
+      const guitarBtn = wrapper.findAll('.tc-settings-option-btn').find(b => b.text() === 'Guitar')
       expect(guitarBtn).toBeDefined()
       await guitarBtn.trigger('click')
       expect(displayMode.value).toBe('guitar')
@@ -66,9 +66,9 @@ describe('SettingsPage', () => {
     it('On button is active when sound is enabled', () => {
       soundEnabled.value = true
       const wrapper = mount(SettingsPage)
-      const sections = wrapper.findAll('.settings-section')
+      const sections = wrapper.findAll('.tc-settings-section')
       const audioSection = sections.find(s => s.find('h3').text() === 'Audio')
-      const onBtn = audioSection.findAll('.option-btn').find(b => b.text() === 'On')
+      const onBtn = audioSection.findAll('.tc-settings-option-btn').find(b => b.text() === 'On')
       expect(onBtn.classes()).toContain('active')
     })
 
@@ -76,17 +76,17 @@ describe('SettingsPage', () => {
       soundEnabled.value = false
       const wrapper = mount(SettingsPage)
       await nextTick()
-      const sections = wrapper.findAll('.settings-section')
+      const sections = wrapper.findAll('.tc-settings-section')
       const audioSection = sections.find(s => s.find('h3').text() === 'Audio')
-      const offBtn = audioSection.findAll('.option-btn').find(b => b.text() === 'Off')
+      const offBtn = audioSection.findAll('.tc-settings-option-btn').find(b => b.text() === 'Off')
       expect(offBtn.classes()).toContain('active')
     })
 
     it('clicking Off disables sound', async () => {
       const wrapper = mount(SettingsPage)
-      const sections = wrapper.findAll('.settings-section')
+      const sections = wrapper.findAll('.tc-settings-section')
       const audioSection = sections.find(s => s.find('h3').text() === 'Audio')
-      const offBtn = audioSection.findAll('.option-btn').find(b => b.text() === 'Off')
+      const offBtn = audioSection.findAll('.tc-settings-option-btn').find(b => b.text() === 'Off')
       await offBtn.trigger('click')
       expect(soundEnabled.value).toBe(false)
     })
@@ -95,7 +95,7 @@ describe('SettingsPage', () => {
   describe('octave control', () => {
     it('is not visible when MIDI is not connected', () => {
       const wrapper = mount(SettingsPage)
-      expect(wrapper.find('.octave-row').exists()).toBe(false)
+      expect(wrapper.find('.tc-settings-octave-row').exists()).toBe(false)
     })
 
     it('is visible when MIDI is connected', async () => {
@@ -103,7 +103,7 @@ describe('SettingsPage', () => {
       midiStatus.value = 'connected'
       const wrapper = mount(SettingsPage)
       await nextTick()
-      expect(wrapper.find('.octave-row').exists()).toBe(true)
+      expect(wrapper.find('.tc-settings-octave-row').exists()).toBe(true)
       midiStatus.value = 'unavailable'
     })
 
@@ -113,7 +113,7 @@ describe('SettingsPage', () => {
       octave.value = 4
       const wrapper = mount(SettingsPage)
       await nextTick()
-      const buttons = wrapper.find('.octave-row').findAll('.octave-btn')
+      const buttons = wrapper.find('.tc-settings-octave-row').findAll('.tc-settings-octave-btn')
       await buttons[1].trigger('click')
       expect(octave.value).toBe(5)
       midiStatus.value = 'unavailable'
@@ -125,7 +125,7 @@ describe('SettingsPage', () => {
       octave.value = 4
       const wrapper = mount(SettingsPage)
       await nextTick()
-      const buttons = wrapper.find('.octave-row').findAll('.octave-btn')
+      const buttons = wrapper.find('.tc-settings-octave-row').findAll('.tc-settings-octave-btn')
       await buttons[0].trigger('click')
       expect(octave.value).toBe(3)
       midiStatus.value = 'unavailable'
@@ -137,7 +137,7 @@ describe('SettingsPage', () => {
       octave.value = 0
       const wrapper = mount(SettingsPage)
       await nextTick()
-      const buttons = wrapper.find('.octave-row').findAll('.octave-btn')
+      const buttons = wrapper.find('.tc-settings-octave-row').findAll('.tc-settings-octave-btn')
       await buttons[0].trigger('click')
       expect(octave.value).toBe(0)
       midiStatus.value = 'unavailable'
@@ -149,7 +149,7 @@ describe('SettingsPage', () => {
       octave.value = 9
       const wrapper = mount(SettingsPage)
       await nextTick()
-      const buttons = wrapper.find('.octave-row').findAll('.octave-btn')
+      const buttons = wrapper.find('.tc-settings-octave-row').findAll('.tc-settings-octave-btn')
       await buttons[1].trigger('click')
       expect(octave.value).toBe(9)
       midiStatus.value = 'unavailable'

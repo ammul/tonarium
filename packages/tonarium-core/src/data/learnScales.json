@@ -1,0 +1,76 @@
+[
+  {
+    "name": "Major",
+    "steps": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      9,
+      11
+    ],
+    "feel": "Bright and resolved"
+  },
+  {
+    "name": "Natural Minor",
+    "steps": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      8,
+      10
+    ],
+    "feel": "Dark and emotional"
+  },
+  {
+    "name": "Minor Pent.",
+    "steps": [
+      0,
+      3,
+      5,
+      7,
+      10
+    ],
+    "feel": "5 notes - easy to improvise over"
+  },
+  {
+    "name": "Major Pent.",
+    "steps": [
+      0,
+      2,
+      4,
+      7,
+      9
+    ],
+    "feel": "5 notes - always sounds positive"
+  },
+  {
+    "name": "Dorian",
+    "steps": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      9,
+      10
+    ],
+    "feel": "Soulful, funky minor"
+  },
+  {
+    "name": "Mixolydian",
+    "steps": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      9,
+      10
+    ],
+    "feel": "Bluesy, rock feel"
+  }
+]

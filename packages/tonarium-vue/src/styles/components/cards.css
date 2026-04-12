@@ -1,0 +1,29 @@
+/* Base card — used directly as class="card" throughout the app */
+.card {
+  background: var(--raised);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+}
+
+.card-sm {
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+}
+
+/* Interactive card — adds pointer, transition, hover/active accent states */
+.card-interactive {
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card-interactive:hover {
+  background: var(--border);
+  border-color: var(--accent);
+}
+
+.card-interactive.active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}

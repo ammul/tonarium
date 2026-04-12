@@ -1,14 +1,3 @@
-<script setup>
-defineProps({
-  label: { type: String, required: true },
-})
+<script>
+export { default } from '../../../packages/tonarium-vue/src/components/ui/PickerRow.vue'
 </script>
-
-<template>
-  <div class="picker-row">
-    <span class="picker-label">{{ label }}</span>
-    <div class="picker-control">
-      <slot />
-    </div>
-  </div>
-</template>

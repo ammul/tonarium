@@ -53,36 +53,36 @@ describe('ScaleSelector', () => {
     const wrapper = mount(ScaleSelector, {
       props: { modelValue: 'mi.p', scales, showInfo: false },
     })
-    expect(wrapper.find('.info-btn').exists()).toBe(true)
+    expect(wrapper.find('.tc-scale-sel-info-btn').exists()).toBe(true)
   })
 
   it('info button has active class when showInfo is true', () => {
     const wrapper = mount(ScaleSelector, {
       props: { modelValue: 'mi.p', scales, showInfo: true },
     })
-    expect(wrapper.find('.info-btn').classes()).toContain('active')
+    expect(wrapper.find('.tc-scale-sel-info-btn').classes()).toContain('active')
   })
 
   it('does not show description when showInfo is false', () => {
     const wrapper = mount(ScaleSelector, {
       props: { modelValue: 'mi.p', scales, showInfo: false },
     })
-    expect(wrapper.find('.scale-info').exists()).toBe(false)
+    expect(wrapper.find('.tc-scale-sel-info').exists()).toBe(false)
   })
 
   it('shows scale description when showInfo is true', () => {
     const wrapper = mount(ScaleSelector, {
       props: { modelValue: 'mi.p', scales, showInfo: true },
     })
-    expect(wrapper.find('.scale-info').exists()).toBe(true)
-    expect(wrapper.find('.scale-info').text()).toBe('Great for improv.')
+    expect(wrapper.find('.tc-scale-sel-info').exists()).toBe(true)
+    expect(wrapper.find('.tc-scale-sel-info').text()).toBe('Great for improv.')
   })
 
   it('toggles showInfo on info button click', async () => {
     const wrapper = mount(ScaleSelector, {
       props: { modelValue: 'mi.p', scales, showInfo: false },
     })
-    await wrapper.find('.info-btn').trigger('click')
+    await wrapper.find('.tc-scale-sel-info-btn').trigger('click')
     const emitted = wrapper.emitted('update:showInfo')
     expect(emitted).toBeTruthy()
     expect(emitted[0]).toEqual([true])

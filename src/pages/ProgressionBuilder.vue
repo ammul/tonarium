@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onUnmounted } from 'vue'
 import { displayMode } from '@/state/displayMode.js'
-import { NOTES, LABELS, SHARPS, CHORD_TYPES, CHORD_SUFFIX, FLAT_MAP, NOTE_TO_SEMI } from '@/constants/musicConstants.js'
+import { NOTES, LABELS, SHARPS, CHORD_TYPES, CHORD_SUFFIX, FLAT_MAP, NOTE_TO_SEMI } from '@tonarium/core'
 import { buildRows } from '@/utils/musicUtils.js'
 import { padSize } from '@/state/padSize.js'
 import { startNote, stopNote } from '@/audio/audioEngine.js'
@@ -89,44 +89,44 @@ const chordCards = computed(() =>
 </script>
 
 <template>
-  <div class="prog-builder">
+  <div class="tc-prog-builder">
     <PageHeader title="Progression Builder" subtitle="type chords separated by spaces" />
 
-    <div class="input-row">
+    <div class="tc-prog-builder-input-row">
       <input
         v-model="input"
-        class="chord-input"
+        class="tc-prog-builder-chord-input"
         placeholder="e.g. D f#m E D"
         spellcheck="false"
         autocomplete="off"
       />
     </div>
 
-    <p class="hint">
-      Supported: <span class="mono">C D# Gb Am Em7 Fmaj7 Bdim Caug Asus4</span>
+    <p class="tc-prog-builder-hint">
+      Supported: <span class="tc-prog-builder-mono">C D# Gb Am Em7 Fmaj7 Bdim Caug Asus4</span>
     </p>
 
-    <div v-if="parseErrors.length" class="parse-errors">
+    <div v-if="parseErrors.length" class="tc-prog-builder-parse-errors">
       Unrecognised:
-      <span v-for="e in parseErrors" :key="e" class="error-token">{{ e }}</span>
+      <span v-for="e in parseErrors" :key="e" class="tc-prog-builder-error-token">{{ e }}</span>
     </div>
 
     <template v-if="chordCards.length">
-      <div class="chord-row" :class="{ 'piano-mode': displayMode === 'piano' }">
+      <div class="tc-prog-builder-chord-row" :class="{ 'piano-mode': displayMode === 'piano' }">
         <div
           v-for="card in chordCards"
           :key="card.idx"
-          class="chord-card"
+          class="tc-prog-builder-chord-card"
           :class="{ 'piano-mode': displayMode === 'piano' }"
           @pointerdown.prevent="onCardDown(card)"
           @pointerup="onCardUp"
           @pointerleave="onCardUp"
           @pointercancel="onCardUp"
         >
-          <div class="chord-info">
-            <div class="chord-name">{{ card.name }}</div>
+          <div class="tc-prog-builder-chord-info">
+            <div class="tc-prog-builder-chord-name">{{ card.name }}</div>
           </div>
-          <div class="chord-body-wrap">
+          <div class="tc-prog-builder-chord-body-wrap">
             <ChordCardBody
               :rows="card.rows"
               :pressLabels="card.pressLabels"
@@ -140,21 +140,21 @@ const chordCards = computed(() =>
 
     </template>
 
-    <p v-else-if="input.trim()" class="empty-hint">No valid chords recognised yet.</p>
+    <p v-else-if="input.trim()" class="tc-prog-builder-empty-hint">No valid chords recognised yet.</p>
   </div>
 </template>
 
 <style scoped>
-.prog-builder {
+.tc-prog-builder {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
 }
 
-.input-row { margin: 1.5rem 0 0.6rem; }
+.tc-prog-builder-input-row { margin: 1.5rem 0 0.6rem; }
 
-.chord-input {
+.tc-prog-builder-chord-input {
   width: 100%;
   box-sizing: border-box;
   background: var(--input);
@@ -169,13 +169,13 @@ const chordCards = computed(() =>
   transition: border-color 0.15s;
 }
 
-.chord-input:focus { border-color: var(--accent); }
-.chord-input::placeholder { color: var(--text5); }
+.tc-prog-builder-chord-input:focus { border-color: var(--accent); }
+.tc-prog-builder-chord-input::placeholder { color: var(--text5); }
 
-.hint { font-size: 0.78rem; color: var(--text4); margin-bottom: 0.5rem; }
-.mono { font-family: monospace; color: var(--text3); }
+.tc-prog-builder-hint { font-size: 0.78rem; color: var(--text4); margin-bottom: 0.5rem; }
+.tc-prog-builder-mono { font-family: monospace; color: var(--text3); }
 
-.parse-errors {
+.tc-prog-builder-parse-errors {
   font-size: 0.8rem;
   color: var(--error-text2);
   margin-bottom: 0.75rem;
@@ -185,7 +185,7 @@ const chordCards = computed(() =>
   flex-wrap: wrap;
 }
 
-.error-token {
+.tc-prog-builder-error-token {
   background: var(--error-bg);
   border: 1px solid var(--error-bd);
   border-radius: 4px;
@@ -194,21 +194,21 @@ const chordCards = computed(() =>
   color: var(--error-text);
 }
 
-.empty-hint { font-size: 0.85rem; color: var(--text4); font-style: italic; margin-top: 1rem; }
+.tc-prog-builder-empty-hint { font-size: 0.85rem; color: var(--text4); font-style: italic; margin-top: 1rem; }
 
-.chord-row {
+.tc-prog-builder-chord-row {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
   margin-top: 1.25rem;
 }
 
-.chord-row.piano-mode {
+.tc-prog-builder-chord-row.piano-mode {
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.chord-card {
+.tc-prog-builder-chord-card {
   flex: 1 1 120px;
   max-width: 160px;
   background: var(--input);
@@ -225,7 +225,7 @@ const chordCards = computed(() =>
   touch-action: none;
 }
 
-.chord-card.piano-mode {
+.tc-prog-builder-chord-card.piano-mode {
   flex-direction: row;
   align-items: center;
   max-width: 100%;
@@ -234,15 +234,15 @@ const chordCards = computed(() =>
   gap: 1rem;
 }
 
-.chord-card:hover { background: var(--hover); border-color: var(--accent-mid); }
+.tc-prog-builder-chord-card:hover { background: var(--hover); border-color: var(--accent-mid); }
 
-.chord-card.active {
+.tc-prog-builder-chord-card.active {
   border-color: var(--accent);
   background: var(--accent-bg);
   box-shadow: 0 0 0 1px var(--accent-glow);
 }
 
-.chord-info {
+.tc-prog-builder-chord-info {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -250,24 +250,24 @@ const chordCards = computed(() =>
   gap: 0.15rem;
 }
 
-.chord-card.piano-mode .chord-info {
+.tc-prog-builder-chord-card.piano-mode .tc-prog-builder-chord-info {
   width: 4.5rem;
 }
 
-.chord-body-wrap {
+.tc-prog-builder-chord-body-wrap {
   flex: 1;
   min-width: 0;
 }
 
-.chord-name { font-size: 1.1rem; font-weight: 700; color: var(--rust); line-height: 1; }
+.tc-prog-builder-chord-name { font-size: 1.1rem; font-weight: 700; color: var(--rust); line-height: 1; }
 
 @media (max-width: 600px) {
-  .prog-builder { padding: 1.25rem 1rem; }
-  .chord-card { flex: 1 1 calc(50% - 0.375rem); max-width: calc(50% - 0.375rem); }
+  .tc-prog-builder { padding: 1.25rem 1rem; }
+  .tc-prog-builder-chord-card { flex: 1 1 calc(50% - 0.375rem); max-width: calc(50% - 0.375rem); }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .prog-builder { padding: 0.75rem 1rem; }
-  .chord-row { margin-top: 0.5rem; }
+  .tc-prog-builder { padding: 0.75rem 1rem; }
+  .tc-prog-builder-chord-row { margin-top: 0.5rem; }
 }
 </style>

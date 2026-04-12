@@ -6,19 +6,19 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="legend">
-    <span class="legend-item root">root</span>
+  <div class="tc-scale-legend">
+    <span class="tc-scale-legend-item root">root</span>
     <template v-if="showAnchor">
-      <span class="legend-sep">·</span>
-      <span class="legend-item anchor">anchor - land here</span>
+      <span class="tc-scale-legend-sep">·</span>
+      <span class="tc-scale-legend-item anchor">anchor - land here</span>
     </template>
-    <span class="legend-sep">·</span>
-    <span class="legend-item safe">{{ activeLabel }}</span>
+    <span class="tc-scale-legend-sep">·</span>
+    <span class="tc-scale-legend-item safe">{{ activeLabel }}</span>
   </div>
 </template>
 
 <style scoped>
-.legend {
+.tc-scale-legend {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -26,19 +26,19 @@ const props = defineProps({
   flex-wrap: wrap;
 }
 
-.legend-sep {
+.tc-scale-legend-sep {
   color: var(--text5);
   font-size: 0.75rem;
 }
 
-.legend-item {
+.tc-scale-legend-item {
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--text3);
   letter-spacing: 0.03em;
 }
 
-.legend-item::before {
+.tc-scale-legend-item::before {
   content: '';
   display: inline-block;
   width: 8px;
@@ -48,12 +48,12 @@ const props = defineProps({
   vertical-align: middle;
 }
 
-.legend-item.root::before   { background: var(--rust); }
-.legend-item.anchor::before { background: var(--accent-mid); }
-.legend-item.safe::before   { background: var(--border2); }
+.tc-scale-legend-item.root::before   { background: var(--rust); }
+.tc-scale-legend-item.anchor::before { background: var(--accent-mid); }
+.tc-scale-legend-item.safe::before   { background: var(--border2); }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .legend {
+  .tc-scale-legend {
     margin-top: 0.5rem;
   }
 }

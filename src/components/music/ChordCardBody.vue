@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { displayMode } from '@/state/displayMode.js'
-import { NOTES } from '@/constants/musicConstants.js'
+import { NOTES } from '@tonarium/core'
 import GuitarChordDiagram from '@/components/music/GuitarChordDiagram.vue'
 import PianoOctave from '@/components/music/PianoOctave.vue'
 
@@ -21,12 +21,12 @@ const pianoActiveIndices = computed(() =>
 <template>
   <!-- Pad mode: mini pad grid + press labels -->
   <template v-if="displayMode === 'pad'">
-    <div class="mini-grid">
-      <div class="mini-row" v-for="(row, ri) in rows" :key="ri" :style="{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
+    <div class="tc-chord-card-grid">
+      <div class="tc-chord-card-row" v-for="(row, ri) in rows" :key="ri" :style="{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
         <div
           v-for="pad in row"
           :key="pad.label"
-          class="mini-pad"
+          class="tc-chord-card-pad"
           :class="{
             active:   pad.isActive,
             root:     pad.isRoot,
@@ -34,14 +34,14 @@ const pianoActiveIndices = computed(() =>
             inactive: !pad.isActive,
           }"
         >
-          <span class="mini-label">{{ pad.label }}</span>
-          <span class="mini-note" v-if="pad.isActive">{{ pad.note }}</span>
+          <span class="tc-chord-card-label">{{ pad.label }}</span>
+          <span class="tc-chord-card-note" v-if="pad.isActive">{{ pad.note }}</span>
         </div>
       </div>
     </div>
-    <div class="press-labels">
-      <span class="press-hint">press</span>
-      <span v-for="lbl in pressLabels" :key="lbl" class="press-badge">{{ lbl }}</span>
+    <div class="tc-chord-card-press-labels">
+      <span class="tc-chord-card-press-hint">press</span>
+      <span v-for="lbl in pressLabels" :key="lbl" class="tc-chord-card-press-badge">{{ lbl }}</span>
     </div>
   </template>
 
@@ -63,10 +63,10 @@ const pianoActiveIndices = computed(() =>
 
 <style scoped>
 /* Mini grid */
-.mini-grid { display: flex; flex-direction: column; gap: 3px; margin: 0.25rem 0; }
-.mini-row  { display: grid; gap: 3px; }
+.tc-chord-card-grid { display: flex; flex-direction: column; gap: 3px; margin: 0.25rem 0; }
+.tc-chord-card-row  { display: grid; gap: 3px; }
 
-.mini-pad {
+.tc-chord-card-pad {
   width: 36px;
   height: 36px;
   border-radius: 4px;
@@ -79,21 +79,21 @@ const pianoActiveIndices = computed(() =>
   transition: background 0.12s;
 }
 
-.mini-pad.inactive { background: var(--bg); opacity: 0.3; }
-.mini-pad.active   { background: var(--raised); border-color: var(--accent-mid); }
-.mini-pad.root     { background: var(--rust-bg); border-color: var(--rust); }
+.tc-chord-card-pad.inactive { background: var(--bg); opacity: 0.3; }
+.tc-chord-card-pad.active   { background: var(--raised); border-color: var(--accent-mid); }
+.tc-chord-card-pad.root     { background: var(--rust-bg); border-color: var(--rust); }
 
-.mini-label { font-size: 0.6rem; font-weight: 700; color: var(--text5); line-height: 1; }
-.mini-pad.active .mini-label { color: var(--accent-dim); }
-.mini-pad.root   .mini-label { color: var(--rust); }
+.tc-chord-card-label { font-size: 0.6rem; font-weight: 700; color: var(--text5); line-height: 1; }
+.tc-chord-card-pad.active .tc-chord-card-label { color: var(--accent-dim); }
+.tc-chord-card-pad.root   .tc-chord-card-label { color: var(--rust); }
 
-.mini-note { font-size: 0.62rem; font-weight: 700; line-height: 1; color: var(--accent); }
-.mini-pad.root .mini-note { color: var(--rust-hi); }
+.tc-chord-card-note { font-size: 0.62rem; font-weight: 700; line-height: 1; color: var(--accent); }
+.tc-chord-card-pad.root .tc-chord-card-note { color: var(--rust-hi); }
 
 /* Press labels */
-.press-labels { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; justify-content: center; }
-.press-hint   { font-size: 0.65rem; color: var(--text5); margin-right: 2px; }
-.press-badge  { background: var(--raised); border: 1px solid var(--border2); border-radius: 3px; padding: 1px 5px; font-size: 0.7rem; font-weight: 700; color: var(--accent); }
+.tc-chord-card-press-labels { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; justify-content: center; }
+.tc-chord-card-press-hint   { font-size: 0.65rem; color: var(--text5); margin-right: 2px; }
+.tc-chord-card-press-badge  { background: var(--raised); border: 1px solid var(--border2); border-radius: 3px; padding: 1px 5px; font-size: 0.7rem; font-weight: 700; color: var(--accent); }
 
 /* Note badges */
 .note-badges { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 0.25rem 0; }
@@ -111,6 +111,6 @@ const pianoActiveIndices = computed(() =>
 .note-badge.root  { background: var(--rust-bg); border-color: var(--rust); color: var(--rust-hi); }
 
 @media (max-width: 600px) {
-  .mini-pad { width: 30px; height: 30px; }
+  .tc-chord-card-pad { width: 30px; height: 30px; }
 }
 </style>

@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { displayMode } from '@/state/displayMode.js'
 import { padSize } from '@/state/padSize.js'
-import { NOTES, SHARPS, NOTE_TO_SEMI, FRET_COUNT } from '@/constants/musicConstants.js'
+import { NOTES, SHARPS, NOTE_TO_SEMI, FRET_COUNT } from '@tonarium/core'
 import { playNote } from '@/audio/audioEngine.js'
 import { buildGuitarNeck, sliceRows } from '@/utils/musicUtils.js'
 import { detectChord } from '@/utils/chordDetect.js'
@@ -69,25 +69,25 @@ const subtitle = computed(() => {
 </script>
 
 <template>
-  <div class="chord-detector">
+  <div class="tc-detector">
 
     <PageHeader title="Chord Detector" :subtitle="subtitle" />
 
-    <div class="detector-body">
-      <div class="input-col">
+    <div class="tc-detector-body">
+      <div class="tc-detector-input-col">
         <ModeLayout>
           <template #pad>
-            <div class="pad-grid">
-              <div class="pad-row" v-for="(row, ri) in rows" :key="ri" :style="{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
+            <div class="tc-detector-pad-grid">
+              <div class="tc-detector-pad-row" v-for="(row, ri) in rows" :key="ri" :style="{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }">
                 <button
                   v-for="pad in row"
                   :key="pad.padIdx"
-                  class="pad"
+                  class="tc-detector-pad"
                   :class="{ sharp: pad.isSharp, selected: pad.isSelected }"
                   @pointerdown.prevent="toggleNote(pad.noteIndex)"
                 >
-                  <span class="pad-label">{{ pad.label }}</span>
-                  <span class="pad-note">{{ pad.note }}</span>
+                  <span class="tc-detector-pad-label">{{ pad.label }}</span>
+                  <span class="tc-detector-pad-note">{{ pad.note }}</span>
                 </button>
               </div>
             </div>
@@ -103,14 +103,14 @@ const subtitle = computed(() => {
           </template>
 
           <template #guitar>
-            <div class="guitar-neck-wrap">
-              <div class="guitar-neck">
-                <div v-for="(string, si) in guitarNeck" :key="si" class="neck-row">
-                  <div class="string-name">{{ string.name }}</div>
+            <div class="tc-detector-neck-wrap">
+              <div class="tc-detector-neck">
+                <div v-for="(string, si) in guitarNeck" :key="si" class="tc-detector-neck-row">
+                  <div class="tc-detector-string-name">{{ string.name }}</div>
                   <button
                     v-for="cell in string.cells"
                     :key="cell.fret"
-                    class="neck-cell"
+                    class="tc-detector-neck-cell"
                     :class="{
                       selected: cell.isSelected,
                       sharp: cell.isSharp,
@@ -118,13 +118,13 @@ const subtitle = computed(() => {
                     }"
                     @pointerdown.prevent="toggleNote(cell.noteIdx)"
                   >
-                    <span v-if="cell.isSelected" class="neck-dot"></span>
-                    <span v-else class="neck-note">{{ cell.note }}</span>
+                    <span v-if="cell.isSelected" class="tc-detector-neck-dot"></span>
+                    <span v-else class="tc-detector-neck-note">{{ cell.note }}</span>
                   </button>
                 </div>
-                <div class="fret-numbers">
-                  <div class="string-name-spacer"></div>
-                  <div v-for="f in FRET_COUNT + 1" :key="f" class="fret-num">
+                <div class="tc-detector-fret-numbers">
+                  <div class="tc-detector-fret-num-spacer"></div>
+                  <div v-for="f in FRET_COUNT + 1" :key="f" class="tc-detector-fret-num">
                     {{ f - 1 === 0 ? '' : f - 1 }}
                   </div>
                 </div>
@@ -133,24 +133,24 @@ const subtitle = computed(() => {
           </template>
         </ModeLayout>
 
-        <button class="btn btn-sm clear-btn" @click="clearAll" :disabled="selected.size === 0">
+        <button class="btn btn-sm tc-detector-clear-btn" @click="clearAll" :disabled="selected.size === 0">
           Clear
         </button>
       </div>
 
-      <div class="result" :class="{ empty: selected.size === 0 }">
+      <div class="tc-detector-result" :class="{ empty: selected.size === 0 }">
         <template v-if="selected.size === 0">
-          <p class="hint">Select two or more notes</p>
+          <p class="tc-detector-hint">Select two or more notes</p>
         </template>
         <template v-else-if="chord">
-          <div class="chord-name">{{ chord.display }}</div>
-          <div class="chord-quality">{{ chord.name }}<span v-if="chord.inversion" class="inversion-label"> · inversion</span></div>
-          <div class="chord-notes">{{ selectedNames.join('  ·  ') }}</div>
+          <div class="tc-detector-chord-name">{{ chord.display }}</div>
+          <div class="tc-detector-chord-quality">{{ chord.name }}<span v-if="chord.inversion" class="tc-detector-inversion"> · inversion</span></div>
+          <div class="tc-detector-chord-notes">{{ selectedNames.join('  ·  ') }}</div>
         </template>
         <template v-else>
-          <div class="chord-name unknown">?</div>
-          <div class="chord-quality">No matching chord</div>
-          <div class="chord-notes">{{ selectedNames.join('  ·  ') }}</div>
+          <div class="tc-detector-chord-name unknown">?</div>
+          <div class="tc-detector-chord-quality">No matching chord</div>
+          <div class="tc-detector-chord-notes">{{ selectedNames.join('  ·  ') }}</div>
         </template>
       </div>
     </div>
@@ -159,7 +159,7 @@ const subtitle = computed(() => {
 </template>
 
 <style scoped>
-.chord-detector {
+.tc-detector {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -169,13 +169,13 @@ const subtitle = computed(() => {
   gap: 1.5rem;
 }
 
-.detector-body {
+.tc-detector-body {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.input-col {
+.tc-detector-input-col {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -183,7 +183,7 @@ const subtitle = computed(() => {
 }
 
 /* Pad grid — base layout from display-modes.css (.pad-grid, .pad-row) */
-.pad {
+.tc-detector-pad {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -201,26 +201,26 @@ const subtitle = computed(() => {
   -webkit-tap-highlight-color: transparent;
 }
 
-.pad:hover { background: var(--border); }
-.pad:active { transform: scale(0.95); }
-.pad.sharp { background: var(--input); border-color: var(--border); }
-.pad.sharp:hover { background: var(--border3); }
-.pad.selected { background: var(--selected); border-color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
-.pad.selected.sharp { background: var(--sharp-sel); }
+.tc-detector-pad:hover { background: var(--border); }
+.tc-detector-pad:active { transform: scale(0.95); }
+.tc-detector-pad.sharp { background: var(--input); border-color: var(--border); }
+.tc-detector-pad.sharp:hover { background: var(--border3); }
+.tc-detector-pad.selected { background: var(--selected); border-color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+.tc-detector-pad.selected.sharp { background: var(--sharp-sel); }
 
-.pad-label { font-size: 0.65rem; color: var(--text4); font-weight: 600; letter-spacing: 0.1em; }
-.pad.selected .pad-label { color: var(--accent-dim); }
-.pad-note { font-size: 1.4rem; font-weight: 700; color: var(--accent); line-height: 1; }
-.pad.sharp .pad-note { color: var(--accent-lo); }
-.pad.selected .pad-note { color: var(--accent-hi); }
+.tc-detector-pad-label { font-size: 0.65rem; color: var(--text4); font-weight: 600; letter-spacing: 0.1em; }
+.tc-detector-pad.selected .tc-detector-pad-label { color: var(--accent-dim); }
+.tc-detector-pad-note { font-size: 1.4rem; font-weight: 700; color: var(--accent); line-height: 1; }
+.tc-detector-pad.sharp .tc-detector-pad-note { color: var(--accent-lo); }
+.tc-detector-pad.selected .tc-detector-pad-note { color: var(--accent-hi); }
 
 /* Guitar neck — overrides display-modes.css base where ChordDetector differs */
-.guitar-neck-wrap { overflow-x: auto; }
-.guitar-neck { min-width: 600px; }
-.neck-row { align-items: stretch; }
-.string-name { display: flex; align-items: center; justify-content: flex-end; }
+.tc-detector-neck-wrap { overflow-x: auto; }
+.tc-detector-neck { min-width: 600px; }
+.tc-detector-neck-row { align-items: stretch; }
+.tc-detector-string-name { display: flex; align-items: center; justify-content: flex-end; }
 
-.neck-cell {
+.tc-detector-neck-cell {
   height: 2.4rem;
   border: none;
   background: var(--input);
@@ -230,31 +230,31 @@ const subtitle = computed(() => {
   -webkit-tap-highlight-color: transparent;
 }
 
-.neck-cell:hover { background: var(--border3); }
-.neck-cell.sharp { background: var(--sharp); }
-.neck-cell.sharp:hover { background: var(--border3); }
-.neck-cell.open { border-right: 3px solid var(--border2); background: var(--surface); }
-.neck-cell.open:hover { background: var(--raised); }
-.neck-cell.selected { background: var(--selected); }
-.neck-cell.selected.sharp { background: var(--sharp-sel); }
+.tc-detector-neck-cell:hover { background: var(--border3); }
+.tc-detector-neck-cell.sharp { background: var(--sharp); }
+.tc-detector-neck-cell.sharp:hover { background: var(--border3); }
+.tc-detector-neck-cell.open { border-right: 3px solid var(--border2); background: var(--surface); }
+.tc-detector-neck-cell.open:hover { background: var(--raised); }
+.tc-detector-neck-cell.selected { background: var(--selected); }
+.tc-detector-neck-cell.selected.sharp { background: var(--sharp-sel); }
 
-.neck-dot { background: var(--accent); box-shadow: 0 0 4px var(--accent-glow); }
+.tc-detector-neck-dot { background: var(--accent); box-shadow: 0 0 4px var(--accent-glow); }
 
-.neck-note {
+.tc-detector-neck-note {
   font-size: 0.6rem;
   color: var(--border);
   font-weight: 600;
   pointer-events: none;
 }
 
-.neck-cell.open .neck-note { color: var(--text5); }
-.fret-numbers { margin-top: 0.25rem; }
+.tc-detector-neck-cell.open .tc-detector-neck-note { color: var(--text5); }
+.tc-detector-fret-numbers { margin-top: 0.25rem; }
 
 /* unique properties not covered by .btn + .btn-sm */
-.clear-btn { align-self: flex-start; letter-spacing: 0.05em; }
+.tc-detector-clear-btn { align-self: flex-start; letter-spacing: 0.05em; }
 
 /* Result */
-.result {
+.tc-detector-result {
   border-top: 1px solid var(--border);
   padding-top: 1.5rem;
   display: flex;
@@ -265,17 +265,17 @@ const subtitle = computed(() => {
 }
 
 @media (min-width: 600px) {
-  .detector-body {
+  .tc-detector-body {
     flex-direction: row;
     align-items: flex-start;
     gap: 2rem;
   }
 
-  .input-col {
+  .tc-detector-input-col {
     flex-shrink: 0;
   }
 
-  .result {
+  .tc-detector-result {
     flex: 1;
     border-top: none;
     border-left: 1px solid var(--border);
@@ -285,10 +285,10 @@ const subtitle = computed(() => {
   }
 }
 
-.result.empty { opacity: 0.4; }
-.hint { font-size: 0.9rem; color: var(--text4); margin-top: 0.5rem; }
+.tc-detector-result.empty { opacity: 0.4; }
+.tc-detector-hint { font-size: 0.9rem; color: var(--text4); margin-top: 0.5rem; }
 
-.chord-name {
+.tc-detector-chord-name {
   font-size: clamp(2.5rem, 12vw, 4rem);
   font-weight: 700;
   color: var(--accent);
@@ -296,28 +296,28 @@ const subtitle = computed(() => {
   letter-spacing: 0.03em;
 }
 
-.chord-name.unknown { color: var(--text4); }
-.chord-quality { font-size: 0.95rem; color: var(--accent-lo); letter-spacing: 0.04em; }
-.inversion-label { color: var(--accent-mid); font-size: 0.85rem; }
-.chord-notes { font-size: 0.8rem; color: var(--text4); letter-spacing: 0.08em; margin-top: 0.2rem; }
+.tc-detector-chord-name.unknown { color: var(--text4); }
+.tc-detector-chord-quality { font-size: 0.95rem; color: var(--accent-lo); letter-spacing: 0.04em; }
+.tc-detector-inversion { color: var(--accent-mid); font-size: 0.85rem; }
+.tc-detector-chord-notes { font-size: 0.8rem; color: var(--text4); letter-spacing: 0.08em; margin-top: 0.2rem; }
 
 @media (max-width: 600px) {
-  .chord-detector { padding: 1.25rem 1rem; }
-  .pad-note { font-size: 1.2rem; }
+  .tc-detector { padding: 1.25rem 1rem; }
+  .tc-detector-pad-note { font-size: 1.2rem; }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .chord-detector {
+  .tc-detector {
     padding: 0.75rem 1rem;
     gap: 0.75rem;
   }
 
-  .result {
+  .tc-detector-result {
     padding-top: 0.75rem;
     min-height: 60px;
   }
 
-  .chord-name {
+  .tc-detector-chord-name {
     font-size: clamp(1.8rem, 8vw, 2.5rem);
   }
 }

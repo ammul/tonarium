@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { INTERVALS } from './intervals.js'
+import { INTERVALS } from '@tonarium/learn'
 
 describe('INTERVALS', () => {
   it('has 11 intervals (semitones 1-11)', () => {

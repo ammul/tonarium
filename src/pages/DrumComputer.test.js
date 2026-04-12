@@ -55,21 +55,21 @@ beforeEach(() => {
 describe('DrumComputer', () => {
   it('renders 9 instrument rows', () => {
     const wrapper = mount(DrumComputer)
-    const rows = wrapper.findAll('.inst-row')
+    const rows = wrapper.findAll('.tc-drum-inst-row')
     expect(rows).toHaveLength(9)
   })
 
   it('renders 16 step buttons per instrument row', () => {
     const wrapper = mount(DrumComputer)
-    const rows = wrapper.findAll('.inst-row')
+    const rows = wrapper.findAll('.tc-drum-inst-row')
     for (const row of rows) {
-      expect(row.findAll('.step-btn')).toHaveLength(16)
+      expect(row.findAll('.tc-drum-step-btn')).toHaveLength(16)
     }
   })
 
   it('renders instrument names', () => {
     const wrapper = mount(DrumComputer)
-    const names = wrapper.findAll('.inst-name').map(el => el.text())
+    const names = wrapper.findAll('.tc-drum-inst-name').map(el => el.text())
     for (const inst of INSTRUMENTS) {
       expect(names).toContain(inst)
     }
@@ -77,7 +77,7 @@ describe('DrumComputer', () => {
 
   it('all step buttons start as off', () => {
     const wrapper = mount(DrumComputer)
-    const onButtons = wrapper.findAll('.step-btn.on')
+    const onButtons = wrapper.findAll('.tc-drum-step-btn.on')
     expect(onButtons).toHaveLength(0)
   })
 
@@ -103,14 +103,14 @@ describe('DrumComputer', () => {
     toggleCell(0, 0)
     const wrapper = mount(DrumComputer)
     await nextTick()
-    const firstRow = wrapper.findAll('.inst-row')[0]
-    const firstBtn = firstRow.findAll('.step-btn')[0]
+    const firstRow = wrapper.findAll('.tc-drum-inst-row')[0]
+    const firstBtn = firstRow.findAll('.tc-drum-step-btn')[0]
     expect(firstBtn.classes()).toContain('on')
   })
 
   it('BPM defaults to 120', () => {
     const wrapper = mount(DrumComputer)
-    const input = wrapper.find('.bpm-input')
+    const input = wrapper.find('.tc-drum-bpm-input')
     expect(Number(input.element.value)).toBe(120)
   })
 
@@ -118,19 +118,19 @@ describe('DrumComputer', () => {
     sessionBpm.value = 140
     const wrapper = mount(DrumComputer)
     await nextTick()
-    const input = wrapper.find('.bpm-input')
+    const input = wrapper.find('.tc-drum-bpm-input')
     expect(Number(input.element.value)).toBe(140)
   })
 
   it('shows Play button when not playing', () => {
     const wrapper = mount(DrumComputer)
-    expect(wrapper.find('.transport-btn').text()).toBe('Play')
+    expect(wrapper.find('.tc-drum-transport-btn').text()).toBe('Play')
   })
 
   it('shows Pause button when playing', async () => {
     isPlaying.value = true
     const wrapper = mount(DrumComputer)
     await nextTick()
-    expect(wrapper.find('.transport-btn').text()).toBe('Pause')
+    expect(wrapper.find('.tc-drum-transport-btn').text()).toBe('Pause')
   })
 })

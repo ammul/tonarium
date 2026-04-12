@@ -5,7 +5,7 @@ import OctaveControl from './OctaveControl.vue'
 describe('OctaveControl', () => {
   it('displays the current octave value', () => {
     const wrapper = mount(OctaveControl, { props: { modelValue: 4, min: 1, max: 7 } })
-    expect(wrapper.find('.octave-value').text()).toBe('4')
+    expect(wrapper.find('.tc-octave-value').text()).toBe('4')
   })
 
   it('emits update:modelValue incremented on + click', async () => {

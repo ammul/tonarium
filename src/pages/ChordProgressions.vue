@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { displayMode } from '@/state/displayMode.js'
-import { NOTES, CHORD_TYPES, CHORD_SUFFIX } from '@/constants/musicConstants.js'
+import { NOTES, CHORD_TYPES, CHORD_SUFFIX } from '@tonarium/core'
 import { buildRows } from '@/utils/musicUtils.js'
 import { padSize } from '@/state/padSize.js'
 import ChordCardBody from '@/components/music/ChordCardBody.vue'
@@ -9,7 +9,7 @@ import { midiStatus, midiChannel, chordOn, chordOff } from '@/audio/midiManager.
 import { startNote, stopNote, stopAllNotes, playNote } from '@/audio/audioEngine.js'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
-import { GENRES, ALL_PROGRESSIONS } from '@/constants/progressions.js'
+import { GENRES, ALL_PROGRESSIONS } from '@tonarium/core'
 import ProgressionSection from '@/components/progressions/ProgressionSection.vue'
 import { sessionProgression, sessionBpm, sessionKey } from '@/state/sessionState.js'
 
@@ -167,27 +167,27 @@ watch([expandedId, selectedRoot], stopLoop)
 </script>
 
 <template>
-  <div class="chord-prog">
+  <div class="tc-progressions">
     <PageHeader title="Chord Progressions" subtitle="explore chord sequences by genre - transposed to any key" />
 
     <!-- Chord cards for selected progression -->
     <template v-if="expandedId">
-      <p class="prog-examples">{{ selectedProgression.examples }}</p>
+      <p class="tc-progressions-prog-examples">{{ selectedProgression.examples }}</p>
 
       <!-- MIDI toolbar -->
-      <div v-if="midiStatus === 'connected'" class="midi-toolbar">
-        <button class="btn btn-sm btn-subtle btn-toggle play-btn" :class="{ active: loopPlaying }" @click="loopPlaying ? stopLoop() : playLoop(expandedId)">
+      <div v-if="midiStatus === 'connected'" class="tc-progressions-midi-toolbar">
+        <button class="btn btn-sm btn-subtle btn-toggle tc-progressions-play-btn" :class="{ active: loopPlaying }" @click="loopPlaying ? stopLoop() : playLoop(expandedId)">
           {{ loopPlaying ? 'Stop' : 'Play' }}
         </button>
-        <span class="midi-divider"></span>
-        <span class="midi-lbl">Oct</span>
+        <span class="tc-progressions-midi-divider"></span>
+        <span class="tc-progressions-midi-lbl">Oct</span>
         <button class="btn btn-xs btn-subtle btn-icon" @click="chordOctave = Math.max(2, chordOctave - 1)">−</button>
-        <span class="midi-val">{{ chordOctave }}</span>
+        <span class="tc-progressions-midi-val">{{ chordOctave }}</span>
         <button class="btn btn-xs btn-subtle btn-icon" @click="chordOctave = Math.min(6, chordOctave + 1)">+</button>
-        <span class="midi-divider"></span>
-        <input type="number" v-model.number="bpm" min="40" max="200" class="bpm-input" />
-        <span class="midi-lbl">BPM</span>
-        <span class="midi-divider"></span>
+        <span class="tc-progressions-midi-divider"></span>
+        <input type="number" v-model.number="bpm" min="40" max="200" class="tc-progressions-bpm-input" />
+        <span class="tc-progressions-midi-lbl">BPM</span>
+        <span class="tc-progressions-midi-divider"></span>
         <button
           v-for="b in [1, 2, 4, 8]"
           :key="b"
@@ -195,8 +195,8 @@ watch([expandedId, selectedRoot], stopLoop)
           :class="{ active: beatsPerChord === b }"
           @click="beatsPerChord = b"
         >{{ b }}</button>
-        <span class="midi-divider"></span>
-        <span class="midi-lbl">Lane</span>
+        <span class="tc-progressions-midi-divider"></span>
+        <span class="tc-progressions-midi-lbl">Lane</span>
         <button
           v-for="(lane, i) in ['A','B','C','D']"
           :key="lane"
@@ -207,22 +207,22 @@ watch([expandedId, selectedRoot], stopLoop)
       </div>
 
       <!-- Chord cards -->
-      <div class="chord-row" :class="{ 'piano-mode': displayMode === 'piano' }">
+      <div class="tc-progressions-chord-row" :class="{ 'piano-mode': displayMode === 'piano' }">
         <div
           v-for="card in chordCards"
           :key="card.idx"
-          class="chord-card"
+          class="tc-progressions-chord-card"
           :class="{ 'piano-mode': displayMode === 'piano', active: loopActiveIdx === card.idx }"
           @pointerdown.prevent="previewChord(card)"
           @pointerup="stopPreview(card)"
           @pointerleave="stopPreview(card)"
           @pointercancel="stopPreview(card)"
         >
-          <div class="chord-info">
-            <div class="chord-numeral">{{ card.numeral }}</div>
-            <div class="chord-name">{{ card.name }}</div>
+          <div class="tc-progressions-chord-info">
+            <div class="tc-progressions-chord-numeral">{{ card.numeral }}</div>
+            <div class="tc-progressions-chord-name">{{ card.name }}</div>
           </div>
-          <div class="chord-body-wrap">
+          <div class="tc-progressions-chord-body-wrap">
             <ChordCardBody
               :rows="card.rows"
               :pressLabels="card.pressLabels"
@@ -232,20 +232,20 @@ watch([expandedId, selectedRoot], stopLoop)
             />
           </div>
           <button
-            class="btn btn-round btn-subtle card-info-btn"
+            class="btn btn-round btn-subtle tc-progressions-card-info-btn"
             :class="{ active: showInfoIdx === card.idx }"
             @click.stop="showInfoIdx = showInfoIdx === card.idx ? null : card.idx"
             aria-label="Solo tip"
           >i</button>
-          <div v-if="showInfoIdx === card.idx" class="solo-info">
-            <span class="solo-scale">{{ SOLO_ADVICE[card.type].scale }}</span>
+          <div v-if="showInfoIdx === card.idx" class="tc-progressions-solo-info">
+            <span class="tc-progressions-solo-scale">{{ SOLO_ADVICE[card.type].scale }}</span>
             - {{ SOLO_ADVICE[card.type].why }}
           </div>
         </div>
       </div>
     </template>
 
-    <div class="controls">
+    <div class="tc-progressions-controls">
       <PickerRow label="Key">
         <select v-model="selectedRoot" class="form-select">
           <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
@@ -285,14 +285,14 @@ watch([expandedId, selectedRoot], stopLoop)
 </template>
 
 <style scoped>
-.chord-prog {
+.tc-progressions {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
 }
 
-.controls {
+.tc-progressions-controls {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
@@ -300,7 +300,7 @@ watch([expandedId, selectedRoot], stopLoop)
 }
 
 /* Description */
-.prog-examples {
+.tc-progressions-prog-examples {
   font-size: 0.82rem;
   color: var(--text3);
   margin: 1.5rem 0 1rem;
@@ -309,7 +309,7 @@ watch([expandedId, selectedRoot], stopLoop)
 }
 
 /* MIDI toolbar */
-.midi-toolbar {
+.tc-progressions-midi-toolbar {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -322,7 +322,7 @@ watch([expandedId, selectedRoot], stopLoop)
   font-size: 0.82rem;
 }
 
-.midi-lbl {
+.tc-progressions-midi-lbl {
   font-weight: 600;
   color: var(--accent);
   text-transform: uppercase;
@@ -330,14 +330,14 @@ watch([expandedId, selectedRoot], stopLoop)
   font-size: 0.72rem;
 }
 
-.midi-val {
+.tc-progressions-midi-val {
   min-width: 1.2rem;
   text-align: center;
   font-weight: 700;
   color: var(--text);
 }
 
-.midi-divider {
+.tc-progressions-midi-divider {
   width: 1px;
   height: 1.2rem;
   background: var(--border2);
@@ -345,7 +345,7 @@ watch([expandedId, selectedRoot], stopLoop)
   flex-shrink: 0;
 }
 
-.bpm-input {
+.tc-progressions-bpm-input {
   width: 3.5rem;
   background: var(--input);
   border: 1px solid var(--border2);
@@ -357,25 +357,25 @@ watch([expandedId, selectedRoot], stopLoop)
   outline: none;
 }
 
-.bpm-input:focus { border-color: var(--accent); }
+.tc-progressions-bpm-input:focus { border-color: var(--accent); }
 
 /* unique properties not covered by .btn + .btn-sm + .btn-subtle + .btn-toggle */
-.play-btn { letter-spacing: 0.05em; text-transform: uppercase; }
+.tc-progressions-play-btn { letter-spacing: 0.05em; text-transform: uppercase; }
 
 /* Chord row */
-.chord-row {
+.tc-progressions-chord-row {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
   margin-bottom: 0.5rem;
 }
 
-.chord-row.piano-mode {
+.tc-progressions-chord-row.piano-mode {
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.chord-card {
+.tc-progressions-chord-card {
   flex: 1 1 120px;
   max-width: 160px;
   background: var(--input);
@@ -393,7 +393,7 @@ watch([expandedId, selectedRoot], stopLoop)
   position: relative;
 }
 
-.chord-card.piano-mode {
+.tc-progressions-chord-card.piano-mode {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
@@ -403,11 +403,11 @@ watch([expandedId, selectedRoot], stopLoop)
   gap: 1rem;
 }
 
-.chord-card:hover  { background: var(--hover); border-color: var(--accent-mid); }
-.chord-card.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
+.tc-progressions-chord-card:hover  { background: var(--hover); border-color: var(--accent-mid); }
+.tc-progressions-chord-card.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
 
 /* unique properties not covered by .btn + .btn-round + .btn-subtle */
-.card-info-btn {
+.tc-progressions-card-info-btn {
   position: absolute;
   top: 0.45rem;
   right: 0.45rem;
@@ -420,9 +420,9 @@ watch([expandedId, selectedRoot], stopLoop)
   font-weight: 700;
 }
 
-.card-info-btn:hover { color: var(--text); }
+.tc-progressions-card-info-btn:hover { color: var(--text); }
 
-.solo-info {
+.tc-progressions-solo-info {
   font-size: 0.78rem;
   color: var(--text2);
   line-height: 1.5;
@@ -434,12 +434,12 @@ watch([expandedId, selectedRoot], stopLoop)
   flex-basis: 100%;
 }
 
-.solo-scale {
+.tc-progressions-solo-scale {
   font-weight: 700;
   color: var(--accent);
 }
 
-.chord-info {
+.tc-progressions-chord-info {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -447,17 +447,17 @@ watch([expandedId, selectedRoot], stopLoop)
   gap: 0.15rem;
 }
 
-.chord-card.piano-mode .chord-info { width: 4.5rem; }
-.chord-body-wrap { flex: 1; min-width: 0; }
+.tc-progressions-chord-card.piano-mode .tc-progressions-chord-info { width: 4.5rem; }
+.tc-progressions-chord-body-wrap { flex: 1; min-width: 0; }
 
-.chord-numeral {
+.tc-progressions-chord-numeral {
   font-size: 0.7rem;
   color: var(--accent-mid);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.chord-name {
+.tc-progressions-chord-name {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--rust);
@@ -465,16 +465,16 @@ watch([expandedId, selectedRoot], stopLoop)
 }
 
 @media (max-width: 600px) {
-  .chord-prog { padding: 1.25rem 1rem; }
+  .tc-progressions { padding: 1.25rem 1rem; }
 
-  .chord-card {
+  .tc-progressions-chord-card {
     flex: 1 1 calc(50% - 0.375rem);
     max-width: calc(50% - 0.375rem);
   }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .chord-prog { padding: 0.75rem 1rem; }
-  .controls   { margin: 0.5rem 0; }
+  .tc-progressions { padding: 0.75rem 1rem; }
+  .tc-progressions-controls   { margin: 0.5rem 0; }
 }
 </style>
