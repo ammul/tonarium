@@ -1,660 +1,483 @@
 # Architecture Guide
 
-> **Purpose:** This document defines patterns, APIs, and conventions for the tonarium codebase. Following these patterns reduces context needed for AI-assisted development and ensures consistency.
+> **Purpose:** This document defines patterns, APIs, and conventions for the Tonarium codebase. Following these patterns reduces context needed for AI-assisted development and ensures consistency.
 
 ---
 
 ## Table of Contents
-1. [CSS Architecture](#1-css-architecture)
-2. [Component API Contracts](#2-component-api-contracts)
-3. [Quick Reference](#quick-reference)
+1. [Monorepo Structure](#1-monorepo-structure)
+2. [Packages](#2-packages)
+3. [App Source (`src/`)](#3-app-source-src)
+4. [Audio Architecture](#4-audio-architecture)
+5. [State Management](#5-state-management)
+6. [Import Patterns](#6-import-patterns)
+7. [CSS Architecture](#7-css-architecture)
+8. [Component API Contracts](#8-component-api-contracts)
 
 ---
 
-## 1. CSS Architecture
+## 1. Monorepo Structure
 
-### 1.1 Design Tokens
-
-All magic values are replaced with CSS custom properties:
-
-```css
-/* src/styles/base/tokens.css */
-
-:root {
-  /* ══════════════════════════════════════════════════════════════════════════
-     SPACING SCALE (based on 0.25rem = 4px)
-     ══════════════════════════════════════════════════════════════════════════ */
-  --space-0: 0;
-  --space-1: 0.25rem;   /*  4px */
-  --space-2: 0.5rem;    /*  8px */
-  --space-3: 0.75rem;   /* 12px */
-  --space-4: 1rem;      /* 16px */
-  --space-5: 1.25rem;   /* 20px */
-  --space-6: 1.5rem;    /* 24px */
-  --space-8: 2rem;      /* 32px */
-
-  /* ══════════════════════════════════════════════════════════════════════════
-     TYPOGRAPHY SCALE (based on analysis of actual usage)
-     ══════════════════════════════════════════════════════════════════════════ */
-  --text-2xs: 0.65rem;  /* 10.4px - tiny labels */
-  --text-xs: 0.72rem;   /* 11.5px - badges, hints */
-  --text-sm: 0.78rem;   /* 12.5px - secondary text (16 uses) */
-  --text-base: 0.82rem; /* 13.1px - body text (21 uses) */
-  --text-md: 0.85rem;   /* 13.6px - emphasized (17 uses) */
-  --text-lg: 0.9rem;    /* 14.4px - subheadings */
-  --text-xl: 1rem;      /* 16px - headings */
-  --text-2xl: 1.1rem;   /* 17.6px - page titles */
-
-  /* ══════════════════════════════════════════════════════════════════════════
-     BORDER RADIUS SCALE
-     ══════════════════════════════════════════════════════════════════════════ */
-  --radius-sm: 4px;     /* small buttons, inputs */
-  --radius-md: 6px;     /* standard buttons */
-  --radius-lg: 8px;     /* cards, panels */
-  --radius-xl: 10px;    /* large cards */
-  --radius-full: 9999px; /* pills, circles */
-
-  /* ══════════════════════════════════════════════════════════════════════════
-     FONT WEIGHTS
-     ══════════════════════════════════════════════════════════════════════════ */
-  --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-
-  /* ══════════════════════════════════════════════════════════════════════════
-     TRANSITIONS
-     ══════════════════════════════════════════════════════════════════════════ */
-  --transition-fast: 0.1s;
-  --transition-base: 0.15s;
-  --transition-slow: 0.25s;
-}
-```
-
-### 1.2 Button System
-
-One base class, modifiers for variants:
-
-```css
-/* src/styles/components/buttons.css */
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   BASE BUTTON
-   All buttons extend this. Never style raw <button> elements.
-   ───────────────────────────────────────────────────────────────────────────── */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border2);
-  background: transparent;
-  color: var(--text3);
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  font-family: inherit;
-  cursor: pointer;
-  transition: color var(--transition-base), 
-              border-color var(--transition-base), 
-              background var(--transition-base);
-}
-
-.btn:hover:not(:disabled) {
-  color: var(--accent);
-  border-color: var(--accent-mid);
-  background: var(--accent-bg);
-}
-
-.btn:disabled {
-  opacity: 0.25;
-  cursor: default;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   SIZE VARIANTS
-   ───────────────────────────────────────────────────────────────────────────── */
-.btn-xs {
-  padding: var(--space-1) var(--space-2);
-  font-size: var(--text-xs);
-  border-radius: var(--radius-sm);
-}
-
-.btn-sm {
-  padding: var(--space-1) var(--space-3);
-  font-size: var(--text-sm);
-}
-
-.btn-lg {
-  padding: var(--space-3) var(--space-5);
-  font-size: var(--text-md);
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   STYLE VARIANTS
-   ───────────────────────────────────────────────────────────────────────────── */
-.btn-primary {
-  background: var(--accent-bg);
-  border-color: var(--accent-mid);
-  color: var(--accent);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-}
-
-.btn-ghost {
-  border-color: transparent;
-  background: transparent;
-}
-
-.btn-ghost:hover:not(:disabled) {
-  background: var(--hover);
-  border-color: transparent;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   STATE VARIANTS
-   ───────────────────────────────────────────────────────────────────────────── */
-.btn.active,
-.btn[aria-pressed="true"] {
-  background: var(--accent-bg);
-  border-color: var(--accent-mid);
-  color: var(--accent);
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   LAYOUT VARIANTS
-   ───────────────────────────────────────────────────────────────────────────── */
-.btn-block {
-  width: 100%;
-}
-
-.btn-icon {
-  padding: var(--space-2);
-  min-width: 2rem;
-  min-height: 2rem;
-}
-```
-
-**Usage:**
-```html
-<button class="btn">Default</button>
-<button class="btn btn-primary">Primary</button>
-<button class="btn btn-sm btn-ghost">Small Ghost</button>
-<button class="btn btn-icon" aria-label="Close">✕</button>
-<button class="btn" :class="{ active: isActive }">Toggle</button>
-```
-
-### 1.3 Card System
-
-```css
-/* src/styles/components/cards.css */
-
-.card {
-  background: var(--raised);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius-xl);
-  padding: var(--space-4);
-}
-
-.card-sm {
-  padding: var(--space-3);
-  border-radius: var(--radius-lg);
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin-bottom: var(--space-3);
-}
-
-.card-title {
-  font-size: var(--text-md);
-  font-weight: var(--font-bold);
-  color: var(--accent);
-}
-
-.card-subtitle {
-  font-size: var(--text-sm);
-  color: var(--text3);
-}
-
-.card-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.card-footer {
-  margin-top: var(--space-3);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--border);
-}
-```
-
-### 1.4 Form Controls
-
-```css
-/* src/styles/components/forms.css */
-
-.form-select {
-  padding: var(--space-2) var(--space-3);
-  padding-right: var(--space-6);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius-md);
-  background: var(--input);
-  color: var(--text);
-  font-size: var(--text-base);
-  font-family: inherit;
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,..."); /* chevron */
-  background-repeat: no-repeat;
-  background-position: right var(--space-2) center;
-}
-
-.form-input {
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius-md);
-  background: var(--input);
-  color: var(--text);
-  font-size: var(--text-base);
-  font-family: inherit;
-}
-
-.form-input:focus,
-.form-select:focus {
-  outline: none;
-  border-color: var(--accent-mid);
-}
-
-.form-label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: var(--text3);
-}
-```
-
-### 1.5 Layout Utilities
-
-```css
-/* src/styles/utilities/layout.css */
-
-/* Flex */
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.flex-wrap { flex-wrap: wrap; }
-.items-center { align-items: center; }
-.items-start { align-items: flex-start; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-
-/* Gap */
-.gap-1 { gap: var(--space-1); }
-.gap-2 { gap: var(--space-2); }
-.gap-3 { gap: var(--space-3); }
-.gap-4 { gap: var(--space-4); }
-.gap-5 { gap: var(--space-5); }
-.gap-6 { gap: var(--space-6); }
-
-/* Width */
-.w-full { width: 100%; }
-```
-
-### 1.6 File Structure
+npm workspaces monorepo. All packages under `packages/` are private, resolved locally via Vite aliases — no publishing or symlinking required.
 
 ```
-src/styles/
-├── index.css              ← imports all, used in main.js
+ep1320/
+├── packages/
+│   ├── tonarium-core/     # @tonarium/core  — music constants + types (TypeScript)
+│   ├── tonarium-vue/      # @tonarium/vue   — reusable Vue components + global CSS
+│   └── tonarium-learn/    # @tonarium/learn — learn curriculum components + constants
+├── src/                   # Main app (Vue 3, Vite)
+├── vite.config.js
+└── package.json
+```
+
+**Vite aliases** (order matters — more specific first):
+
+```js
+{ find: '@tonarium/vue/styles', replacement: '…/packages/tonarium-vue/src/styles/index.css' },
+{ find: '@tonarium/vue',        replacement: '…/packages/tonarium-vue/src/index.ts' },
+{ find: '@tonarium/learn',      replacement: '…/packages/tonarium-learn/src/index.ts' },
+{ find: '@tonarium/core',       replacement: '…/packages/tonarium-core/src/index.ts' },
+{ find: '@',                    replacement: '…/src' },
+```
+
+`src/components/` and `src/pages/` files that have been extracted to packages are kept as 3-line re-export shims so existing import paths throughout the app don't need updating:
+
+```vue
+<!-- src/components/ui/Card.vue -->
+<script>
+export { default } from '../../../packages/tonarium-vue/src/components/ui/Card.vue'
+</script>
+```
+
+---
+
+## 2. Packages
+
+### 2.1 `@tonarium/core`
+
+Pure TypeScript. No Vue, no runtime dependencies. Exports all music data and types.
+
+**Location:** `packages/tonarium-core/src/`
+
+**Exports:**
+
+| Export | Type | Description |
+|--------|------|-------------|
+| `NOTES` | `string[]` | 12 chromatic notes, A-based (index 0 = A) |
+| `LABELS` | `string[]` | Display labels (uses flats where conventional) |
+| `SHARPS` | `Set<number>` | Indices of sharp/black notes |
+| `NOTE_TO_SEMI` | `Record<string,number>` | Note name → semitone offset from C |
+| `SEMI_TO_NAME` | `Record<number,string>` | Semitone → note name |
+| `FLAT_MAP` | `Record<string,string>` | Enharmonic flat equivalents |
+| `CHORD_TYPES` | `number[][]` | Interval sets for maj/min/dom7/etc. |
+| `CHORD_SUFFIX` | `string[]` | Display suffixes per chord type |
+| `CHORD_DETECT_TYPES` | | Chord types used for detection |
+| `OPEN_STRINGS` | `number[]` | Guitar open strings (A-based, low→high) |
+| `STRING_NAMES` | `string[]` | Guitar string names |
+| `FRET_COUNT` | `number` | Number of frets displayed |
+| `PIANO_WHITE` | | Piano white key layout |
+| `PIANO_BLACK` | | Piano black key layout |
+| `JAM_SCALES` | `JamScale[]` | Scales available in Jam Mode |
+| `LEARN_SCALES` | `LearnScale[]` | Scales for the Learn curriculum |
+| `VISUALIZER_SCALES` | | Scales for Scale Visualizer |
+| `GENRES` | `Genre[]` | Chord progression genres |
+| `PROGRESSIONS` | `Progression[]` | All progressions, grouped by genre |
+| `ALL_PROGRESSIONS` | `Progression[]` | Flat list of all progressions |
+| `BEAT_PATTERNS` | `BeatPattern[]` | 11 drum patterns (JSON data) |
+
+**Notes:** A-based note indexing throughout. Guitar open strings as A-based indices: `[7,0,5,10,2,7]` = E2 A2 D3 G3 B3 E4. Chord detection uses C-based semitones internally via `NOTE_TO_SEMI` / `SEMI_TO_NAME`.
+
+---
+
+### 2.2 `@tonarium/vue`
+
+Vue 3 components and global CSS. TypeScript with strict mode (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`).
+
+**Location:** `packages/tonarium-vue/src/`
+
+**Exports:**
+
+| Export | Description |
+|--------|-------------|
+| `Card` | Generic card container |
+| `PageHeader` | Page header with title, subtitle, actions slot |
+| `PickerRow` | Label + control row layout |
+| `KnobControl` | Rotary knob for continuous values |
+| `NoteStripPicker` | 12-note chromatic strip picker |
+| `PianoOctave` | One octave piano keyboard |
+| `GuitarChordDiagram` | Chord diagram with voicing cycling |
+
+**CSS** is imported separately: `import '@tonarium/vue/styles'` (done once in `src/main.js`).
+
+```
+packages/tonarium-vue/src/styles/
+├── index.css              ← imports all, entry point
 ├── base/
-│   ├── reset.css          ← box-sizing, margin reset
-│   ├── tokens.css         ← spacing, typography, radius scales
-│   └── colors.css         ← color scheme variables (from style.css)
+│   ├── reset.css
+│   ├── tokens.css         ← spacing, typography, radius, transition scales
+│   └── colors.css         ← color scheme custom properties
 ├── components/
 │   ├── buttons.css        ← .btn and variants
 │   ├── cards.css          ← .card and variants
-│   ├── forms.css          ← inputs, selects, toggles
-│   ├── pills.css          ← .note-pill, .scale-tab
-│   └── page-header.css    ← .page-header styles
-├── layouts/
-│   └── picker-row.css     ← .picker-row, .picker-label
-└── utilities/
-    └── layout.css         ← flex, gap, width utilities
-```
-
-**index.css:**
-```css
-/* Base (order matters) */
-@import './base/reset.css';
-@import './base/tokens.css';
-@import './base/colors.css';
-
-/* Components */
-@import './components/buttons.css';
-@import './components/cards.css';
-@import './components/forms.css';
-@import './components/pills.css';
-@import './components/page-header.css';
-
-/* Layouts */
-@import './layouts/picker-row.css';
-
-/* Utilities (last, highest specificity) */
-@import './utilities/layout.css';
+│   ├── forms.css          ← .form-select, .form-input
+│   ├── pills.css
+│   ├── tabs.css
+│   ├── page-header.css
+│   ├── display-modes.css
+│   └── learn.css          ← .step-content, .step-intro, .step-bridge, .numbered-badge
+└── layouts/
+    └── picker-row.css     ← .picker-row, .picker-label
 ```
 
 ---
 
-## 2. Component API Contracts
+### 2.3 `@tonarium/learn`
 
-### 2.1 PageHeader
+All 9 learn step components, navigation, and learn-specific data constants. Uses `@tonarium/core`, `@tonarium/vue`, and app infrastructure via `@/` alias.
 
-**File:** `src/components/ui/PageHeader.vue`
+**Location:** `packages/tonarium-learn/src/`
 
-**Purpose:** Consistent page header with title, optional subtitle, optional action slot.
+**Component exports:**
+
+| Export | Step | Description |
+|--------|------|-------------|
+| `LearnMode` | — | Orchestrator: step nav, routing, drum pause on exit |
+| `LearnStepNav` | — | Tab bar for stepping between lessons |
+| `LearnStepFooter` | — | Prev/Next navigation footer |
+| `LearnRootNotes` | 1 | Introduces root notes and octaves |
+| `LearnIntervals` | 2 | Interval picker with reference table |
+| `LearnScales` | 3 | Scale pattern explorer with playback |
+| `LearnChords` | 4 | Three chord types with playback |
+| `LearnProgressions` | 5 | Diatonic chords and common progressions |
+| `LearnImprovising` | 6 | Scale-to-chord matching and examples |
+| `LearnBeats` | 7 | Beat patterns with live playback |
+| `LearnSongStructure` | 8 | Song section templates |
+| `LearnJamSession` | 9 | Guided jam setup, launches JamMode |
+
+**Constant exports:**
+
+| Export | Description |
+|--------|-------------|
+| `INTERVALS` | 11 intervals with semitone, name, feel |
+| `CHORD_TYPES` | 3 basic chord types for LearnChords |
+| `IMPROV_CHORD_TYPES` | Chord types with scale recommendations |
+| `IMPROV_EXAMPLES` | Good/bad note examples per chord type |
+| `BEAT_TIPS` | 4 drum fundamentals tips |
+| `LEARN_PROGS` | 4 common progressions for LearnProgressions |
+
+**Cross-package dependencies:** Learn components reach into the app via `@/audio/`, `@/state/`, and `@/utils/`. This is intentional — audio engines and session state live in the app and are shared.
+
+---
+
+## 3. App Source (`src/`)
+
+Only app-specific code lives here. Everything extracted to a package becomes a 3-line shim.
+
+### Pages (real implementations)
+
+| Page | Description |
+|------|-------------|
+| `StartPage.vue` | Landing / dashboard |
+| `JamMode.vue` | Performance surface with pad/guitar/piano + transport |
+| `ChordProgressions.vue` | Browse and load progressions |
+| `ProgressionBuilder.vue` | Custom progression builder |
+| `ChordDetector.vue` | Detect chords from played notes |
+| `ScaleVisualizer.vue` | Explore scales visually |
+| `DrumComputer.vue` | 16-step drum sequencer UI |
+| `SettingsPage.vue` | App settings, MIDI config |
+| `AboutPage.vue` | Static about page |
+| `LearnMode.vue` | **Shim** → `@tonarium/learn` |
+
+### Components (real implementations)
+
+```
+src/components/
+├── jam/
+│   ├── JamSessionBar.vue      # Key, scale, progression, beat, BPM pickers + transport
+│   ├── ScaleSelector.vue      # Scale dropdown with preview
+│   └── OctaveControl.vue      # Octave up/down control
+├── music/
+│   ├── ChordCardBody.vue      # Three-mode chord display (pad/guitar/piano)
+│   ├── RootNotePicker.vue     # Root note selector with note names
+│   ├── ScaleLegend.vue        # Scale degree color legend
+│   └── MidiControl.vue        # MIDI device selector
+├── progressions/
+│   ├── ProgressionCard.vue    # Single progression card with actions
+│   ├── ProgressionSection.vue # Grouped section of progressions
+│   └── GenreTabs.vue          # Genre filter tabs
+└── layout/
+    └── ModeLayout.vue         # Wraps page content with consistent padding
+```
+
+All `ui/` and `music/PianoOctave`, `music/GuitarChordDiagram`, and all `learn/` files are shims.
+
+### Constants (`src/constants/`)
+
+All constants files have been deleted. Only `.test.js` files remain, with imports updated to `@tonarium/core` or `@tonarium/learn`. Do not add new constants files here — add to the appropriate package.
+
+### Utils (`src/utils/`)
+
+| File | Exports | Description |
+|------|---------|-------------|
+| `musicUtils.js` | `buildRows`, `buildGuitarNeck` | Pad grid and guitar neck layout builders |
+| `beatUtils.js` | `GROOVE_INST_MAP`, `createEmptyPattern`, `buildPatternFromBeat` | Converts `BEAT_PATTERNS[idx]` to live drum engine pattern |
+| `chordDetect.js` | `detectChord` | Detects chord name from a set of active notes |
+
+---
+
+## 4. Audio Architecture
+
+Three cooperating modules share a single `AudioContext` to prevent clock drift.
+
+```
+audioContext.js          ← Shared AudioContext singleton + compressor
+    ↑                        getCtx(), getBeatDest(), getProgDest()
+    │
+    ├── audioEngine.js   ← Note synth (bell/piano/pluck/synth styles)
+    │                       startNote, stopNote, playNote, playChord
+    │
+    ├── drumEngine.js    ← 9-instrument drum synthesis + 16-step pattern state
+    │                       play(), pause(), triggerDrumHit(), pattern, isPlaying, currentStep
+    │
+    └── transportClock.js ← Master lookahead scheduler (25ms tick, 0.1s lookahead)
+                            startTransport(), stopTransport()
+                            Drives: drum hits (via triggerDrumHit) + chord advancement
+                            Reads: sessionState (BPM, progression, beatsPerChord)
+```
+
+**Critical invariant:** Only one drum scheduler may run at a time.
+
+- `drumEngine.play()` runs its own `setTimeout` loop — used when playing beats standalone (DrumComputer, LearnBeats).
+- `transportClock.startTransport()` takes over drum scheduling via `triggerDrumHit()`. It calls `drumEngine.pause()` first to stop any standalone loop.
+- `transportClock._tick()` exits immediately if `sessionPlaying` is false — guards against timer races.
+- `LearnBeats.loadBeat()` calls `stopTransport()` before `drumEngine.play()` to ensure the transport isn't running when the learn loop starts.
+
+**MIDI:** `midiManager.js` handles device selection and sends note on/off in parallel with audio engine output.
+
+---
+
+## 5. State Management
+
+No Vuex/Pinia. Shared state is exported `ref` from plain JS modules. Components import directly.
+
+### Session State (`src/state/sessionState.js`)
+
+The primary shared state — persists key settings to `localStorage`.
+
+| Export | Type | Description |
+|--------|------|-------------|
+| `sessionKey` | `Ref<string>` | Current key (e.g. `'C'`) |
+| `sessionProgression` | `Ref<Progression\|null>` | Active chord progression |
+| `sessionBeatIdx` | `Ref<number>` | Index into `BEAT_PATTERNS` |
+| `sessionBpm` | `Ref<number>` | Beats per minute |
+| `sessionBeatsPerChord` | `Ref<number>` | How many beats each chord plays |
+| `sessionPlaying` | `Ref<boolean>` | Transport running |
+| `sessionCurrentChordIdx` | `Ref<number>` | Which chord is active in the loop |
+
+### Other State Modules
+
+| Module | Exports | Description |
+|--------|---------|-------------|
+| `displayMode.js` | `displayMode` | `'pad' \| 'guitar' \| 'piano'` |
+| `padSize.js` | `padSize` | `'4x3' \| '4x4'` |
+| `octave.js` | `octave` | Current pad octave |
+| `jamSettings.js` | `selectedRoot`, `selectedScaleId`, `pianoOctave` | Jam Mode UI selections |
+| `mixerState.js` | `jamVolume`, `beatVolume`, `progVolume` | Per-channel gain levels |
+| `colorMode.js` | `colorMode` | Light/dark mode |
+| `soundStyle.js` | `soundStyle` | Synth style selection |
+| `soundEnabled.js` | `soundEnabled` | Global audio on/off |
+
+---
+
+## 6. Import Patterns
+
+```js
+// Library packages
+import { NOTES, BEAT_PATTERNS, ALL_PROGRESSIONS } from '@tonarium/core'
+import { NoteStripPicker, Card } from '@tonarium/vue'
+import { LearnMode, INTERVALS } from '@tonarium/learn'
+
+// App-local (via @ alias → src/)
+import { buildRows } from '@/utils/musicUtils.js'
+import { buildPatternFromBeat } from '@/utils/beatUtils.js'
+import { displayMode } from '@/state/displayMode.js'
+import { sessionProgression, sessionBpm } from '@/state/sessionState.js'
+import { playNote, playChord } from '@/audio/audioEngine.js'
+import { pattern, play, pause, isPlaying } from '@/audio/drumEngine.js'
+import { startTransport, stopTransport } from '@/audio/transportClock.js'
+
+// CSS (once, in main.js)
+import '@tonarium/vue/styles'
+```
+
+**Rule:** Never import from `@/constants/` — those files are deleted. All constants come from `@tonarium/core` or `@tonarium/learn`.
+
+---
+
+## 7. CSS Architecture
+
+### Design Tokens (in `@tonarium/vue/styles`)
+
+```css
+/* Spacing: --space-1 (0.25rem) through --space-8 (2rem) */
+/* Typography: --text-2xs (0.65rem) through --text-2xl (1.1rem) */
+/* Radius: --radius-sm (4px) through --radius-full (9999px) */
+/* Font weight: --font-normal through --font-bold */
+/* Transitions: --transition-fast / --transition-base / --transition-slow */
+```
+
+### Color Palette (dark warm theme)
+
+Key variables defined in `colors.css`:
+
+```css
+--bg:         #242019   /* page background */
+--accent:     #c8a96e   /* gold — primary accent */
+--accent-mid: #a08850   /* muted accent */
+--text:       #e8dcc8   /* primary text */
+--text3:      #9a8f7f   /* secondary text */
+--raised:     #2e2820   /* raised surface */
+--input:      #1e1a14   /* input background */
+--border:     #3a3228   /* subtle border */
+--border2:    #4a4038   /* stronger border */
+```
+
+### Global Classes (available everywhere)
+
+```
+Buttons:  .btn, .btn-sm, .btn-lg, .btn-accent, .btn-block, .btn-icon
+Cards:    .card, .card-sm, .card-interactive
+Forms:    .form-select, .form-input
+Layout:   .picker-row, .picker-label, .flex, .gap-*, .w-full
+Learn:    .step-content, .step-intro, .step-bridge, .numbered-badge
+Pills:    .note-pill
+Tabs:     .tab, .tab-active
+```
+
+### Scoped CSS Convention
+
+Every SFC has its own scoped `<style>`. Component-specific classes use a `tc-component-element` prefix (e.g. `.tc-learn-roots-picker`, `.tc-jsb-bpm-row`) to avoid collisions when scoping is insufficient.
+
+---
+
+## 8. Component API Contracts
+
+### PageHeader
+
+**Source:** `packages/tonarium-vue/src/components/ui/PageHeader.vue`
 
 ```typescript
-// Props
-interface PageHeaderProps {
-  title: string       // Required. Page title text.
-  subtitle?: string   // Optional. Subtitle/description text.
-}
-
-// Slots
-// #actions - Right-aligned action buttons (e.g., close button in Settings)
-
-// Events
-// None
+Props: { title: string, subtitle?: string }
+Slots: #actions (right-aligned)
 ```
 
-**Template:**
 ```vue
-<script setup>
-defineProps({
-  title: { type: String, required: true },
-  subtitle: { type: String, default: '' },
-})
-</script>
-
-<template>
-  <div class="page-header">
-    <div class="page-header-content">
-      <h2 class="page-header-title">{{ title }}</h2>
-      <p v-if="subtitle" class="page-header-subtitle">{{ subtitle }}</p>
-    </div>
-    <div v-if="$slots.actions" class="page-header-actions">
-      <slot name="actions" />
-    </div>
-  </div>
-</template>
-```
-
-**Usage:**
-```vue
-<!-- Simple -->
-<PageHeader title="About" />
-
-<!-- With subtitle -->
-<PageHeader title="Jam Mode" :subtitle="subtitle" />
-
-<!-- With actions -->
-<PageHeader title="Settings">
-  <template #actions>
-    <button class="btn btn-icon" @click="close">✕</button>
-  </template>
+<PageHeader title="Jam Mode" subtitle="Play along" >
+  <template #actions><button class="btn btn-icon">✕</button></template>
 </PageHeader>
 ```
 
-**CSS Contract:** Uses `.page-header`, `.page-header-title`, `.page-header-subtitle`, `.page-header-actions`
-
 ---
 
-### 2.2 NoteStripPicker
+### NoteStripPicker
 
-**File:** `src/components/ui/NoteStripPicker.vue`
-
-**Purpose:** Horizontal strip of 12 chromatic notes for selection.
+**Source:** `packages/tonarium-vue/src/components/ui/NoteStripPicker.vue`
 
 ```typescript
-// Props
-interface NoteStripPickerProps {
-  modelValue: number | null        // Selected note index (0-11), or null
-  highlightSet?: Set<number>       // Additional notes to highlight (e.g., scale notes)
-  fromIndex?: number | null        // "From" note for interval display
-  toIndex?: number | null          // "To" note for interval display
-  small?: boolean                  // Compact size variant
-  disabled?: boolean               // Disable interaction
+Props: {
+  modelValue?: NoteIndex | null   // selected note (0–11)
+  highlightSet?: Set<NoteIndex>   // scale/chord highlight
+  fromIndex?: NoteIndex | null    // interval "from"
+  toIndex?: NoteIndex | null      // interval "to"
+  small?: boolean
+  disabled?: boolean
 }
-
-// Events
-// @update:modelValue - Emitted when note is selected
-// @note-down - Emitted on pointerdown (for audio playback)
+Events: 'update:modelValue', 'note-down'
 ```
 
-**Template:**
 ```vue
-<script setup>
-import { CHROMATIC, IS_SHARP } from '@/constants/musicConstants'
-
-const props = defineProps({
-  modelValue: { type: Number, default: null },
-  highlightSet: { type: Set, default: () => new Set() },
-  fromIndex: { type: Number, default: null },
-  toIndex: { type: Number, default: null },
-  small: { type: Boolean, default: false },
-  disabled: { type: Boolean, default: false },
-})
-
-const emit = defineEmits(['update:modelValue', 'note-down'])
-
-function onNoteDown(index) {
-  if (props.disabled) return
-  emit('note-down', index)
-  emit('update:modelValue', index)
-}
-</script>
-
-<template>
-  <div class="note-strip" :class="{ small, disabled }">
-    <button
-      v-for="(note, i) in CHROMATIC"
-      :key="i"
-      type="button"
-      class="note-pill"
-      :class="{
-        sharp: IS_SHARP.has(i),
-        selected: modelValue === i,
-        highlight: highlightSet.has(i),
-        from: fromIndex === i,
-        to: toIndex === i,
-      }"
-      :disabled="disabled"
-      @pointerdown.prevent="onNoteDown(i)"
-    >
-      {{ note }}
-    </button>
-  </div>
-</template>
-```
-
-**Usage:**
-```vue
-<!-- Simple selection -->
-<NoteStripPicker v-model="rootNote" @note-down="playNote" />
-
-<!-- With scale highlighting -->
-<NoteStripPicker 
-  v-model="selectedNote" 
-  :highlight-set="scaleNotes"
-  @note-down="playNote"
-/>
-
-<!-- Interval picker (from/to) -->
-<NoteStripPicker
-  :from-index="fromIdx"
-  :to-index="toIdx"
-  @note-down="pickIntervalNote"
-/>
+<NoteStripPicker v-model="root" :highlight-set="scaleNotes" @note-down="playNote" />
+<NoteStripPicker :from-index="fromIdx" :to-index="toIdx" @note-down="pickNote" />
 ```
 
 ---
 
-### 2.3 Card
+### KnobControl
 
-**File:** `src/components/ui/Card.vue`
-
-**Purpose:** Generic card container with optional header.
+**Source:** `packages/tonarium-vue/src/components/ui/KnobControl.vue`
 
 ```typescript
-// Props
-interface CardProps {
-  title?: string      // Optional card title
-  subtitle?: string   // Optional subtitle
-  small?: boolean     // Compact padding variant
+Props: {
+  modelValue: number
+  min?: number        // default 0
+  max?: number        // default 100
+  label?: string
 }
-
-// Slots
-// default - Card body content
-// #header - Custom header content (overrides title/subtitle)
-// #footer - Footer content
-```
-
-**Template:**
-```vue
-<script setup>
-defineProps({
-  title: { type: String, default: '' },
-  subtitle: { type: String, default: '' },
-  small: { type: Boolean, default: false },
-})
-</script>
-
-<template>
-  <div class="card" :class="{ 'card-sm': small }">
-    <div v-if="$slots.header || title" class="card-header">
-      <slot name="header">
-        <div>
-          <div v-if="title" class="card-title">{{ title }}</div>
-          <div v-if="subtitle" class="card-subtitle">{{ subtitle }}</div>
-        </div>
-      </slot>
-    </div>
-    <div class="card-body">
-      <slot />
-    </div>
-    <div v-if="$slots.footer" class="card-footer">
-      <slot name="footer" />
-    </div>
-  </div>
-</template>
+Events: 'update:modelValue'
 ```
 
 ---
 
-### 2.4 PickerRow
+### Card / PickerRow
 
-**File:** `src/components/ui/PickerRow.vue`
-
-**Purpose:** Label + control layout for form rows.
-
-```typescript
-// Props
-interface PickerRowProps {
-  label: string       // Row label text
-}
-
-// Slots
-// default - Control content
-```
-
-**Template:**
 ```vue
-<script setup>
-defineProps({
-  label: { type: String, required: true },
-})
-</script>
+<!-- Card: use CSS classes directly, no props needed -->
+<div class="card">...</div>
+<div class="card card-sm card-interactive">...</div>
 
-<template>
-  <div class="picker-row">
-    <span class="picker-label">{{ label }}</span>
-    <div class="picker-control">
-      <slot />
-    </div>
-  </div>
-</template>
-```
-
-**Usage:**
-```vue
-<PickerRow label="Root">
-  <NoteStripPicker v-model="root" />
-</PickerRow>
-
-<PickerRow label="Scale">
-  <select class="form-select" v-model="scale">...</select>
+<!-- PickerRow: label + slot -->
+<PickerRow label="Key">
+  <select class="form-select">...</select>
 </PickerRow>
 ```
 
 ---
 
-## Quick Reference
+### PianoOctave
 
-### CSS Class Naming
+**Source:** `packages/tonarium-vue/src/components/music/PianoOctave.vue`
 
-| Type | Pattern | Example |
-|------|---------|---------|
-| Component | `.component-name` | `.page-header` |
-| Element | `.component-element` | `.page-header-title` |
-| Modifier | `.component--modifier` | `.card--small` or `.card-sm` |
-| State | `.is-state` or `.state` | `.is-active`, `.active` |
-| Utility | `.property-value` | `.flex`, `.gap-2` |
-
-### Import Patterns (with @/ alias)
-
-```js
-// Pages
-import StartPage from '@/pages/StartPage.vue'
-
-// UI Components
-import PageHeader from '@/components/ui/PageHeader.vue'
-import NoteStripPicker from '@/components/ui/NoteStripPicker.vue'
-
-// Music Components
-import PianoOctave from '@/components/music/PianoOctave.vue'
-
-// Constants
-import { NOTES, CHROMATIC } from '@/constants/musicConstants'
-import { JAM_SCALES } from '@/constants/scales'
-
-// Utils
-import { buildRows } from '@/utils/musicUtils'
-
-// State
-import { displayMode } from '@/state/displayMode'
-
-// Audio
-import { playNote } from '@/audio/audioEngine'
-
-// Composables
-import { useNotePlayback } from '@/composables/useNotePlayback'
+```typescript
+Props: {
+  activeIndices?: Set<NoteIndex>
+  rootIndex?: NoteIndex
+  octave?: number
+  showOctaveSelector?: boolean
+  clickable?: boolean
+  dimInactive?: boolean
+}
+Events: 'notedown', 'noteup', 'update:octave'
 ```
 
-### File Naming
+---
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Page | `PascalCase.vue` | `StartPage.vue` |
-| Component | `PascalCase.vue` | `PageHeader.vue` |
-| Test | `*.test.js` colocated | `PageHeader.test.js` |
-| Constant | `camelCase.js` | `musicConstants.js` |
-| Util | `camelCase.js` | `musicUtils.js` |
-| State | `camelCase.js` | `displayMode.js` |
-| CSS | `kebab-case.css` | `page-header.css` |
+### GuitarChordDiagram
+
+**Source:** `packages/tonarium-vue/src/components/music/GuitarChordDiagram.vue`
+
+```typescript
+Props: {
+  root: NoteIndex       // root note index (A-based)
+  type: string          // 'maj' | 'min' | 'dom7' | 'maj7' | 'min7' | 'dim'
+}
+```
+
+Internally cycles through voicings. Reads `OPEN_STRINGS` from `@tonarium/core`.
+
+---
+
+### ChordCardBody
+
+**Source:** `src/components/music/ChordCardBody.vue`
+
+Shared by `ChordProgressions` and `ProgressionBuilder`. Adapts to the global `displayMode` ref.
+
+```typescript
+Props: {
+  chord: ProgressionChord   // from @tonarium/core Chord type
+  isActive?: boolean
+}
+```
+
+Renders pad highlights, guitar chord diagram, or piano keys depending on `displayMode.value`.
