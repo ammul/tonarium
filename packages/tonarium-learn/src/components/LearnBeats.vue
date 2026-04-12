@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onUnmounted } from 'vue'
 import { pattern as drumPattern, play as drumPlay, pause as drumPause, isPlaying as drumIsPlaying, currentStep as drumCurrentStep } from '@/audio/drumEngine.js'
+import { stopTransport } from '@/audio/transportClock.js'
+import { sessionPlaying } from '@/state/sessionState.js'
 import { BEAT_PATTERNS } from '@tonarium/core'
 import { BEAT_TIPS } from '../constants/beatPatterns.js'
 import { buildPatternFromBeat } from '@/utils/beatUtils.js'
@@ -11,6 +13,7 @@ const loadedPattern = ref(null)
 let _navigatingToDrums = false
 
 function loadBeat(pi) {
+  if (sessionPlaying.value) stopTransport()
   if (drumIsPlaying.value) drumPause()
   if (loadedPattern.value === pi) {
     loadedPattern.value = null

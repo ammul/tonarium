@@ -42,6 +42,7 @@ export function stopTransport() {
 }
 
 function _tick() {
+  if (!sessionPlaying.value) return
   const ctx     = getCtx()
   const stepDur = 60 / sessionBpm.value / 4
 
