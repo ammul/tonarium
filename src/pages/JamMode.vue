@@ -3,7 +3,6 @@ import { ref, computed } from 'vue'
 import { displayMode } from '@/state/displayMode.js'
 import { NOTES, CHORD_SUFFIX } from '@tonarium/core'
 import { JAM_SCALES as SCALES } from '@tonarium/core'
-import ScaleLegend from '@/components/music/ScaleLegend.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
 import ScaleSelector from '@/components/jam/ScaleSelector.vue'
@@ -98,8 +97,6 @@ const subtitle = computed(() => {
       </PickerRow>
     </div>
 
-    <ScaleLegend />
-
     <JamInstrument />
   </div>
 </template>
@@ -124,8 +121,6 @@ const subtitle = computed(() => {
   gap: 0.5rem;
   flex-wrap: wrap;
 }
-
-:deep(.legend) { margin-top: 0; }
 
 @media (max-width: 600px) {
   .tc-jam {

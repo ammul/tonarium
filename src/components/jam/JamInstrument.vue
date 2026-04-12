@@ -8,6 +8,7 @@ import { buildGuitarNeck, sliceRows } from '@/utils/musicUtils.js'
 import { activeInputNotes, midiStatus } from '@/audio/midiManager.js'
 import { useNotePlayback } from '@/composables/useNotePlayback.js'
 import PianoOctave from '@/components/music/PianoOctave.vue'
+import ScaleLegend from '@/components/music/ScaleLegend.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
 import { selectedRoot, selectedScaleId, pianoOctave, selectedChordType, selectedChordRoot } from '@/state/jamSettings.js'
 import { sessionProgression, sessionPlaying, sessionCurrentChordIdx } from '@/state/sessionState.js'
@@ -123,6 +124,8 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
 
 <template>
   <div class="tc-instrument">
+    <ScaleLegend />
+
     <div class="tc-instrument-scale-notes">
       <span class="tc-instrument-scale-label">Notes</span>
       <span
@@ -214,6 +217,19 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
 </template>
 
 <style scoped>
+:deep(.legend) { margin-top: 0; }
+
+.tc-instrument-pad-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tc-instrument-pad-row {
+  display: grid;
+  gap: 0.5rem;
+}
+
 .tc-instrument-scale-notes {
   display: flex;
   align-items: center;
