@@ -157,13 +157,12 @@ describe('SPA history (handlePopState)', () => {
     expect(wrapper.vm.activeTab).toBe('learn')
   })
 
-  it('navigates to home and opens panel from popstate event for panel id', async () => {
+  it('navigates to jam tab from popstate event', async () => {
     const wrapper = shallowMount(App)
     const event = new PopStateEvent('popstate', { state: { tab: 'jam' } })
     window.dispatchEvent(event)
     await nextTick()
-    expect(wrapper.vm.activeTab).toBe('home')
-    expect(wrapper.vm.openPanel).toBe('jam')
+    expect(wrapper.vm.activeTab).toBe('jam')
   })
 
   it('ignores popstate for unknown tab ids', async () => {

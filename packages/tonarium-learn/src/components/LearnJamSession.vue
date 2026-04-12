@@ -50,7 +50,7 @@ function launchJam() {
     drumPattern.value = buildPatternFromBeat(chosenBeat.value)
     sessionBpm.value = chosenBpm.value
   }
-  emit('navigate', 'jam')
+  emit('navigate', 'home')
 }
 </script>
 

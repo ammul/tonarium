@@ -157,7 +157,7 @@ function tapSection(ti, si) {
 
     <div class="tc-learn-song-cta">
       Ready to play? <strong>Jam Mode</strong> loops a progression with a drum beat while you improvise. Highlights follow each chord.
-      <button class="btn btn-accent btn-block" style="margin-top:0.75rem" @click="emit('navigate', 'jam')">
+      <button class="btn btn-accent btn-block" style="margin-top:0.75rem" @click="emit('navigate', 'home')">
         Try in Jam Mode &rarr;
       </button>
     </div>

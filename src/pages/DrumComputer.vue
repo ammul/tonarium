@@ -26,7 +26,7 @@ function loadGroove(pi) {
 
 function useInJam() {
   sessionBeatIdx.value = loadedGroove.value
-  emit('navigate', 'jam')
+  emit('navigate', 'home')
 }
 </script>
 

@@ -17,6 +17,8 @@ import { selectedRoot, selectedScaleId, pianoOctave } from '@/state/jamSettings.
 import { sessionKey } from '@/state/sessionState.js'
 import { jamVolume, beatVolume, progVolume } from '@/state/mixerState.js'
 
+const emit = defineEmits(['navigate'])
+
 const GENRE_BEAT_MAP = {
   pop: 0, rock: 0, blues: 3, jazz: 7, soul: 4,
   classical: 0, latin: 7, cinematic: 5, modal: 0,
@@ -188,27 +190,33 @@ const activeBeatName = computed(() =>
     <!-- Controls -->
     <div class="tc-jam-bar-controls">
       <PickerRow label="Progression">
-        <select
-          v-model="selectedProgressionId"
-          class="form-select"
-          @change="selectProgression(selectedProgressionId)"
-        >
-          <option :value="null">None</option>
-          <option v-for="p in topProgressions" :key="p.id" :value="p.id">
-            {{ p.label }} ({{ p.numeral }})
-          </option>
-        </select>
+        <div class="tc-jam-bar-picker-row">
+          <select
+            v-model="selectedProgressionId"
+            class="form-select"
+            @change="selectProgression(selectedProgressionId)"
+          >
+            <option :value="null">None</option>
+            <option v-for="p in topProgressions" :key="p.id" :value="p.id">
+              {{ p.label }} ({{ p.numeral }})
+            </option>
+          </select>
+          <button class="btn btn-sm tc-jam-bar-edit-btn" @click="emit('navigate', 'chords')">Edit</button>
+        </div>
       </PickerRow>
 
       <PickerRow label="Beat">
-        <select
-          v-model="sessionBeatIdx"
-          class="form-select"
-          @change="selectBeat(sessionBeatIdx)"
-        >
-          <option :value="null">None</option>
-          <option v-for="(bp, i) in BEAT_PATTERNS" :key="i" :value="i">{{ bp.name }}</option>
-        </select>
+        <div class="tc-jam-bar-picker-row">
+          <select
+            v-model="sessionBeatIdx"
+            class="form-select"
+            @change="selectBeat(sessionBeatIdx)"
+          >
+            <option :value="null">None</option>
+            <option v-for="(bp, i) in BEAT_PATTERNS" :key="i" :value="i">{{ bp.name }}</option>
+          </select>
+          <button class="btn btn-sm tc-jam-bar-edit-btn" @click="emit('navigate', 'drums')">Edit</button>
+        </div>
       </PickerRow>
 
       <PickerRow label="BPM">
@@ -321,6 +329,23 @@ const activeBeatName = computed(() =>
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.tc-jam-bar-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.tc-jam-bar-picker-row .form-select {
+  flex: 1;
+}
+
+.tc-jam-bar-edit-btn {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
 }
 
 

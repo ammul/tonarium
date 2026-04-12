@@ -18,10 +18,10 @@ import DrumComputer from '@/pages/DrumComputer.vue'
 import AboutPage from '@/pages/AboutPage.vue'
 
 const allTabs = [
-  { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: StartPage },
-  { id: 'jam',            label: 'Jam Mode',            shortLabel: 'Jam',          component: JamMode },
-  { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer },
-  { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions },
+  { id: 'home',           label: 'Jam',                 shortLabel: 'Jam',          component: StartPage },
+  { id: 'jam',            label: 'Jam Mode',            shortLabel: 'Jam Mode',     component: JamMode,            menuOnly: true },
+  { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer,       menuOnly: true },
+  { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions,  menuOnly: true },
   { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LearnMode,          menuOnly: true },
   { id: 'scales',         label: 'Scale Visualizer',    shortLabel: 'Scales',       component: ScaleVisualizer,    menuOnly: true },
   { id: 'chord-detector', label: 'Chord Detector',      shortLabel: 'Detector',     component: ChordDetector,      menuOnly: true },
@@ -32,14 +32,10 @@ const allTabs = [
 
 const activeTab      = ref('home')
 const previousTab    = ref('home')
-const previousPanel  = ref(null)
-const openPanel      = ref(null)
 const menuOpen       = ref(false)
 const drumEverPlayed = ref(false)
 
 const sessionEverStarted = ref(false)
-
-const PANEL_IDS = new Set(['jam', 'drums', 'chords'])
 
 watch(drumIsPlaying, (playing) => {
   if (playing) drumEverPlayed.value = true
@@ -72,21 +68,13 @@ const activeComponent = computed(() => allTabs.find(t => t.id === activeTab.valu
 function selectTab(id) {
   if (id === 'settings' && activeTab.value !== 'settings') {
     previousTab.value = activeTab.value
-    previousPanel.value = openPanel.value
   }
-  if (PANEL_IDS.has(id)) {
-    openPanel.value = openPanel.value === id ? null : id
-    activeTab.value = 'home'
-  } else {
-    if (id === 'home') openPanel.value = null
-    activeTab.value = id
-  }
+  activeTab.value = id
   menuOpen.value = false
   history.pushState({ tab: id }, '')
 }
 
 function closeSettings() {
-  openPanel.value = previousPanel.value
   activeTab.value = previousTab.value
   menuOpen.value = false
 }
@@ -94,13 +82,7 @@ function closeSettings() {
 function handlePopState(e) {
   const tab = e.state?.tab
   if (!tab || !allTabs.some(t => t.id === tab)) return
-  if (PANEL_IDS.has(tab)) {
-    openPanel.value = tab
-    activeTab.value = 'home'
-  } else {
-    activeTab.value = tab
-    if (tab === 'home') openPanel.value = null
-  }
+  activeTab.value = tab
   menuOpen.value = false
 }
 
@@ -122,7 +104,7 @@ onUnmounted(() => {
           <h1 @click="selectTab('home')" class="home-link">Tonarium</h1>
         </div>
         <div class="header-controls">
-          <div v-if="sessionEverStarted" class="drum-widget session-widget" :class="{ playing: sessionPlaying }" @click="selectTab('jam')">
+          <div v-if="sessionEverStarted" class="drum-widget session-widget" :class="{ playing: sessionPlaying }" @click="selectTab('home')">
             <span class="dw-dot"></span>
             <span v-if="sessionPlaying && currentChordName" class="dw-label">{{ currentChordName }}</span>
             <span v-else class="dw-label">Session</span>
@@ -187,7 +169,6 @@ onUnmounted(() => {
     <main>
       <component
         :is="activeComponent"
-        v-bind="activeTab === 'home' ? { openPanel } : {}"
         @navigate="selectTab"
         @close="closeSettings"
       />

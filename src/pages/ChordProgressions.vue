@@ -160,7 +160,7 @@ function jamWith(progressionId) {
   }
   sessionKey.value = selectedRoot.value
   sessionBpm.value = bpm.value
-  emit('navigate', 'jam')
+  emit('navigate', 'home')
 }
 
 watch([expandedId, selectedRoot], stopLoop)

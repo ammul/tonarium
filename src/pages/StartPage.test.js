@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 
-vi.mock('@/pages/JamMode.vue', () => ({ default: { template: '<div class="jam-mode-stub"></div>' } }))
-vi.mock('@/pages/ChordProgressions.vue', () => ({ default: { template: '<div class="chord-progressions-stub"></div>' } }))
-vi.mock('@/pages/DrumComputer.vue', () => ({ default: { template: '<div class="drum-computer-stub"></div>' } }))
+vi.mock('@/components/jam/JamSessionBar.vue', () => ({ default: { template: '<div class="jam-session-bar-stub"></div>' } }))
+vi.mock('@/components/jam/JamInstrument.vue', () => ({ default: { template: '<div class="jam-instrument-stub"></div>' } }))
+vi.mock('@/components/jam/ScaleSelector.vue', () => ({ default: { template: '<div class="scale-selector-stub"></div>', props: ['modelValue', 'scales'] } }))
 
 import StartPage from './StartPage.vue'
 
@@ -13,44 +13,28 @@ describe('StartPage', () => {
     expect(wrapper.exists()).toBe(true)
   })
 
-  it('renders 3 panels', () => {
+  it('renders key/scale row', () => {
     const wrapper = mount(StartPage)
-    expect(wrapper.findAll('.tc-start-panel')).toHaveLength(3)
+    expect(wrapper.find('.tc-home-key-row').exists()).toBe(true)
   })
 
-  it('panel labels include Jam Mode, Chord Progressions, Drum Computer', () => {
+  it('renders key selector', () => {
     const wrapper = mount(StartPage)
-    const labels = wrapper.findAll('.tc-start-panel-label').map(el => el.text())
-    expect(labels).toContain('Jam Mode')
-    expect(labels).toContain('Chord Progressions')
-    expect(labels).toContain('Drum Computer')
+    expect(wrapper.find('.tc-home-key-select').exists()).toBe(true)
   })
 
-  it('no panel is open by default', () => {
+  it('renders JamSessionBar', () => {
     const wrapper = mount(StartPage)
-    expect(wrapper.findAll('.tc-start-panel.open')).toHaveLength(0)
+    expect(wrapper.find('.jam-session-bar-stub').exists()).toBe(true)
   })
 
-  it('opens jam panel when openPanel prop is "jam"', () => {
-    const wrapper = mount(StartPage, { props: { openPanel: 'jam' } })
-    expect(wrapper.findAll('.tc-start-panel.open')).toHaveLength(1)
-    expect(wrapper.find('.tc-start-panel.open .tc-start-panel-label').text()).toBe('Jam Mode')
-  })
-
-  it('emits navigate with panel id when panel header is clicked', async () => {
+  it('renders JamInstrument', () => {
     const wrapper = mount(StartPage)
-    await wrapper.findAll('.tc-start-panel-header')[0].trigger('click')
-    expect(wrapper.emitted('navigate')).toBeTruthy()
-    expect(wrapper.emitted('navigate')[0][0]).toBe('chords')
+    expect(wrapper.find('.jam-instrument-stub').exists()).toBe(true)
   })
 
-  it('shows hero text when no panel is open', () => {
+  it('does not render panels', () => {
     const wrapper = mount(StartPage)
-    expect(wrapper.find('.tc-start-hero').exists()).toBe(true)
-  })
-
-  it('hides hero text when a panel is open', () => {
-    const wrapper = mount(StartPage, { props: { openPanel: 'jam' } })
-    expect(wrapper.find('.tc-start-hero').exists()).toBe(false)
+    expect(wrapper.find('.tc-start-panel').exists()).toBe(false)
   })
 })

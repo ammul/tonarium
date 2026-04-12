@@ -54,6 +54,6 @@ describe('LearnSongStructure', () => {
     const jamBtn = btns.find(b => b.text().includes('Jam Mode'))
     await jamBtn.trigger('click')
     expect(w.emitted('navigate')).toBeTruthy()
-    expect(w.emitted('navigate')[0]).toEqual(['jam'])
+    expect(w.emitted('navigate')[0]).toEqual(['home'])
   })
 })
