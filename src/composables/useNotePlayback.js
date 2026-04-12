@@ -1,4 +1,4 @@
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted, getCurrentInstance } from 'vue'
 import { startNote, stopNote } from '@/audio/audioEngine.js'
 
 export function useNotePlayback() {
@@ -29,7 +29,7 @@ export function useNotePlayback() {
     pressedMidi.value = new Map()
   }
 
-  onUnmounted(releaseAll)
+  if (getCurrentInstance()) onUnmounted(releaseAll)
 
   return { pressedMidi, pressDown, pressUp, pressToggle, releaseAll }
 }
