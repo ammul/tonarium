@@ -33,6 +33,9 @@ vi.mock('@/audio/audioContext.js', () => ({
   getJamDest:  () => mockGainDest,
   getBeatDest: () => mockGainDest,
   getProgDest: () => mockGainDest,
+  JAM_GAIN_BASE:  1.0,
+  BEAT_GAIN_BASE: 0.55,
+  PROG_GAIN_BASE: 0.35,
 }))
 
 vi.stubGlobal('setTimeout', vi.fn())

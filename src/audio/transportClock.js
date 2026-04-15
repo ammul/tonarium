@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { getCtx, getProgDest } from '@/audio/audioContext.js'
+import { initMixer } from '@/state/mixerState.js'
 import { sessionBpm, sessionPlaying, sessionBeatsPerChord, sessionCurrentChordIdx, sessionProgression } from '@/state/sessionState.js'
 import { pattern, currentStep, isPlaying as drumIsPlaying, INSTRUMENTS, triggerDrumHit, pause as drumPause } from '@/audio/drumEngine.js'
 import { startNote, stopNote } from '@/audio/audioEngine.js'
@@ -21,6 +22,7 @@ export function startTransport() {
   if (sessionPlaying.value) return
   drumPause()  // stop any standalone drum engine loop before taking over
   const ctx = getCtx()
+  initMixer()  // apply current slider values now that AudioContext exists
   sessionPlaying.value = true
   drumIsPlaying.value = true
   _globalStep = 0

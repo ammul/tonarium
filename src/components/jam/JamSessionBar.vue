@@ -2,7 +2,6 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
 import KnobControl from '@/components/ui/KnobControl.vue'
-import ScaleSelector from '@/components/jam/ScaleSelector.vue'
 import { NOTES, CHORD_SUFFIX } from '@tonarium/core'
 import { JAM_SCALES as SCALES } from '@tonarium/core'
 import { ALL_PROGRESSIONS } from '@tonarium/core'
@@ -35,16 +34,6 @@ const PRESETS = [
 ]
 
 const activePreset = ref(null)
-const showScaleInfo = ref(false)
-
-function onKeyChange() {
-  activePreset.value = null
-}
-
-function onScaleChange() {
-  activePreset.value = null
-  showScaleInfo.value = false
-}
 
 // Keep local ref in sync with externally-loaded progressions ("Jam with This", Learn)
 const selectedProgressionId = ref(sessionProgression.value?.id ?? null)
@@ -167,6 +156,11 @@ onMounted(() => {
     const autoScale = prog.key === 'minor' ? 'mi.p' : 'ma.p'
     if (selectedScaleId.value !== autoScale) selectedScaleId.value = autoScale
   }
+
+  // Auto-select the first preset if no session is already loaded
+  if (!sessionProgression.value && sessionBeatIdx.value === null) {
+    applyPreset(PRESETS[0])
+  }
 })
 
 // Re-enrich progression chords when root changes
@@ -199,33 +193,17 @@ const activeBeatName = computed(() =>
 
 <template>
   <div class="tc-jam-bar">
+    <span class="tc-jam-bar-title">Quick Jam</span>
+
     <!-- Preset row -->
-    <div class="tc-jam-bar-presets">
-      <div class="tc-jam-bar-presets-row">
-        <span class="tc-jam-bar-presets-label">Quick start</span>
-        <div class="tc-jam-bar-preset-btns">
-          <button
-            v-for="preset in PRESETS"
-            :key="preset.label"
-            class="tc-jam-bar-preset-btn"
-            :class="{ active: activePreset?.label === preset.label }"
-            @click="applyPreset(preset)"
-          >{{ preset.label }}</button>
-        </div>
-      </div>
-      <PickerRow label="Key">
-        <select v-model="selectedRoot" class="form-select" @change="onKeyChange">
-          <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
-        </select>
-      </PickerRow>
-      <PickerRow label="Scale">
-        <ScaleSelector
-          v-model="selectedScaleId"
-          :scales="SCALES"
-          v-model:showInfo="showScaleInfo"
-          @update:modelValue="onScaleChange"
-        />
-      </PickerRow>
+    <div class="tc-jam-bar-preset-btns">
+      <button
+        v-for="preset in PRESETS"
+        :key="preset.label"
+        class="tc-jam-bar-preset-btn"
+        :class="{ active: activePreset?.label === preset.label }"
+        @click="applyPreset(preset)"
+      >{{ preset.label }}</button>
     </div>
 
     <!-- Controls -->
@@ -318,29 +296,15 @@ const activeBeatName = computed(() =>
   overflow: hidden;
 }
 
-/* Presets */
-.tc-jam-bar-presets {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.tc-jam-bar-presets-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.tc-jam-bar-presets-label {
+.tc-jam-bar-title {
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text4);
-  flex-shrink: 0;
 }
 
+/* Presets */
 .tc-jam-bar-preset-btns {
   display: flex;
   gap: 0.35rem;

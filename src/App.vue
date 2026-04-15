@@ -3,9 +3,8 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { displayMode } from '@/state/displayMode.js'
 import { colorScheme as _colorScheme } from '@/state/colorScheme.js'
 import { isPlaying as drumIsPlaying, play as drumPlay, pause as drumPause } from '@/audio/drumEngine.js'
-import { sessionPlaying, sessionProgression, sessionCurrentChordIdx } from '@/state/sessionState.js'
+import { sessionPlaying } from '@/state/sessionState.js'
 import { startTransport, stopTransport } from '@/audio/transportClock.js'
-import { NOTES, CHORD_SUFFIX } from '@tonarium/core'
 import StartPage from '@/pages/StartPage.vue'
 import ScaleVisualizer from '@/pages/ScaleVisualizer.vue'
 import ChordProgressions from '@/pages/ChordProgressions.vue'
@@ -43,14 +42,6 @@ watch(drumIsPlaying, (playing) => {
 
 watch(sessionPlaying, (playing) => {
   if (playing) sessionEverStarted.value = true
-})
-
-const currentChordName = computed(() => {
-  const prog = sessionProgression.value
-  if (!prog) return ''
-  const chord = prog.chords[sessionCurrentChordIdx.value]
-  if (!chord) return ''
-  return NOTES[chord._rootIdx] + (CHORD_SUFFIX[chord.type] ?? '')
 })
 
 const tabs = computed(() =>
@@ -106,8 +97,7 @@ onUnmounted(() => {
         <div class="header-controls">
           <div v-if="sessionEverStarted" class="drum-widget session-widget" :class="{ playing: sessionPlaying }" @click="selectTab('home')">
             <span class="dw-dot"></span>
-            <span v-if="sessionPlaying && currentChordName" class="dw-label">{{ currentChordName }}</span>
-            <span v-else class="dw-label">Session</span>
+            <span class="dw-label">Session</span>
             <button
               class="btn btn-icon dw-btn"
               :aria-label="sessionPlaying ? 'Stop session' : 'Start session'"
