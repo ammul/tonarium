@@ -54,7 +54,7 @@ const selectedScale = computed(() => SCALES.find(s => s.id === selectedScaleId.v
 
 const topProgressions = computed(() => {
   const key = selectedScale.value?.intervals.includes(3) ? 'minor' : 'major'
-  return ALL_PROGRESSIONS.filter(p => p.key === key).slice(0, 16)
+  return ALL_PROGRESSIONS.filter(p => p.key === key)
 })
 
 function applyBeat(idx) {
@@ -157,8 +157,8 @@ onMounted(() => {
     if (selectedScaleId.value !== autoScale) selectedScaleId.value = autoScale
   }
 
-  // Auto-select the first preset if no session is already loaded
-  if (!sessionProgression.value && sessionBeatIdx.value === null) {
+  // Auto-select the first preset if no progression is loaded
+  if (!sessionProgression.value) {
     applyPreset(PRESETS[0])
   }
 })

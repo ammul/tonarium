@@ -133,36 +133,36 @@ describe('drum widget', () => {
 describe('tab switching', () => {
   it('opening settings via gear and closing returns to previous page', async () => {
     const wrapper = shallowMount(App)
-    // Navigate to learn via burger menu
+    // Navigate to Drum Computer via burger menu
     await wrapper.find('.burger-btn').trigger('click')
-    const learnBtn = wrapper.findAll('.side-menu button').find(b => b.text() === 'Learn')
-    await learnBtn.trigger('click')
+    const drumsBtn = wrapper.findAll('.side-menu button').find(b => b.text() === 'Drum Computer')
+    await drumsBtn.trigger('click')
     // Open settings via icon button
     await wrapper.find('.icon-btn').trigger('click')
     expect(wrapper.vm.activeTab).toBe('settings')
     // Close settings
     await wrapper.find('.icon-btn').trigger('click')
-    expect(wrapper.vm.activeTab).toBe('learn')
+    expect(wrapper.vm.activeTab).toBe('drums')
   })
 })
 
 // ── SPA history ──────────────────────────────────────────────────────────────
 
 describe('SPA history (handlePopState)', () => {
-  it('navigates to learn tab from popstate event', async () => {
+  it('navigates to drums tab from popstate event', async () => {
     const wrapper = shallowMount(App)
-    const event = new PopStateEvent('popstate', { state: { tab: 'learn' } })
+    const event = new PopStateEvent('popstate', { state: { tab: 'drums' } })
     window.dispatchEvent(event)
     await nextTick()
-    expect(wrapper.vm.activeTab).toBe('learn')
+    expect(wrapper.vm.activeTab).toBe('drums')
   })
 
-  it('navigates to jam tab from popstate event', async () => {
+  it('navigates to chords tab from popstate event', async () => {
     const wrapper = shallowMount(App)
-    const event = new PopStateEvent('popstate', { state: { tab: 'jam' } })
+    const event = new PopStateEvent('popstate', { state: { tab: 'chords' } })
     window.dispatchEvent(event)
     await nextTick()
-    expect(wrapper.vm.activeTab).toBe('jam')
+    expect(wrapper.vm.activeTab).toBe('chords')
   })
 
   it('ignores popstate for unknown tab ids', async () => {

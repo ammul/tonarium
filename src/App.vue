@@ -6,20 +6,16 @@ import { isPlaying as drumIsPlaying, play as drumPlay, pause as drumPause } from
 import { sessionPlaying } from '@/state/sessionState.js'
 import { startTransport, stopTransport } from '@/audio/transportClock.js'
 import LandingPage from '@/pages/LandingPage.vue'
-import StartPage from '@/pages/StartPage.vue'
 import ScaleVisualizer from '@/pages/ScaleVisualizer.vue'
 import ChordProgressions from '@/pages/ChordProgressions.vue'
 import ChordDetector from '@/pages/ChordDetector.vue'
 import ProgressionBuilder from '@/pages/ProgressionBuilder.vue'
-import LearnMode from '@/pages/LearnMode.vue'
 import SettingsPage from '@/pages/SettingsPage.vue'
 import DrumComputer from '@/pages/DrumComputer.vue'
 import AboutPage from '@/pages/AboutPage.vue'
 
 const allTabs = [
   { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: LandingPage },
-  { id: 'jam',            label: 'Quick Jam',           shortLabel: 'Jam',          component: StartPage },
-  { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LearnMode },
   { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer,       menuOnly: true },
   { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions,  menuOnly: true },
   { id: 'scales',         label: 'Scale Visualizer',    shortLabel: 'Scales',       component: ScaleVisualizer,    menuOnly: true },
