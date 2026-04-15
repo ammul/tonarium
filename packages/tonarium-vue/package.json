@@ -14,7 +14,7 @@
     "vue": "^3"
   },
   "devDependencies": {
-    "@vue/language-core": "^2.2.10",
+    "@vue/language-core": "^3.2.6",
     "typescript": "^5.8.3",
     "vue": "^3.5.31",
     "vue-tsc": "^2.2.10"
