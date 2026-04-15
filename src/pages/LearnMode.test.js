@@ -45,9 +45,11 @@ describe('step navigation', () => {
     expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('active')
   })
 
-  it('clicking a step marks it active and prior steps as done', async () => {
+  it('clicking a step marks it active; only visited steps get the done class', async () => {
     const wrapper = mount(LearnMode)
-    await wrapper.findAll('.tc-step-nav-btn')[2].trigger('click')
+    // Navigate sequentially: 0 → 1 → 2
+    await wrapper.find('.tc-step-footer-nav-btn:last-child').trigger('click')
+    await wrapper.find('.tc-step-footer-nav-btn:last-child').trigger('click')
     expect(wrapper.findAll('.tc-step-nav-btn')[2].classes()).toContain('active')
     expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('done')
     expect(wrapper.findAll('.tc-step-nav-btn')[1].classes()).toContain('done')

@@ -75,6 +75,7 @@ function onPointerUp(): void {
     </div>
     <span class="tc-knob-label">{{ label }}</span>
     <span class="tc-knob-value">{{ percent }}%</span>
+    <span class="tc-knob-hint">drag ↕</span>
   </div>
 </template>
 
@@ -124,5 +125,16 @@ function onPointerUp(): void {
 .tc-knob-value {
   font-size: 0.6rem;
   color: var(--text4);
+}
+
+.tc-knob-hint {
+  display: none;
+  font-size: 0.55rem;
+  color: var(--text4);
+  opacity: 0.7;
+}
+
+@media (pointer: coarse) {
+  .tc-knob-hint { display: block; }
 }
 </style>

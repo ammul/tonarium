@@ -22,12 +22,19 @@ describe('LearnStepNav', () => {
     expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).not.toContain('active')
   })
 
-  it('marks steps before modelValue with the done class', () => {
-    const wrapper = mount(LearnStepNav, { props: { steps: STEPS, modelValue: 3 } })
+  it('marks visited steps (excluding current) with the done class', () => {
+    const wrapper = mount(LearnStepNav, { props: { steps: STEPS, modelValue: 3, visitedSteps: [0, 1, 2, 3] } })
     expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('done')
     expect(wrapper.findAll('.tc-step-nav-btn')[1].classes()).toContain('done')
     expect(wrapper.findAll('.tc-step-nav-btn')[2].classes()).toContain('done')
-    expect(wrapper.findAll('.tc-step-nav-btn')[3].classes()).not.toContain('done')
+    expect(wrapper.findAll('.tc-step-nav-btn')[3].classes()).not.toContain('done') // active, not done
+  })
+
+  it('only marks actually visited steps as done, not skipped steps', () => {
+    const wrapper = mount(LearnStepNav, { props: { steps: STEPS, modelValue: 3, visitedSteps: [0, 3] } })
+    expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('done')
+    expect(wrapper.findAll('.tc-step-nav-btn')[1].classes()).not.toContain('done')
+    expect(wrapper.findAll('.tc-step-nav-btn')[2].classes()).not.toContain('done')
   })
 
   it('emits update:modelValue with the clicked step index', async () => {

@@ -19,7 +19,7 @@ import AboutPage from '@/pages/AboutPage.vue'
 
 const allTabs = [
   { id: 'home',           label: 'Jam',                 shortLabel: 'Jam',          component: StartPage },
-  { id: 'jam',            label: 'Jam Mode',            shortLabel: 'Jam Mode',     component: JamMode,            menuOnly: true },
+  { id: 'jam',            label: 'Jam Mode',            shortLabel: 'Jam Mode',     component: JamMode,            hidden: true },
   { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer,       menuOnly: true },
   { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions,  menuOnly: true },
   { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LearnMode,          menuOnly: true },
@@ -54,7 +54,7 @@ const currentChordName = computed(() => {
 })
 
 const tabs = computed(() =>
-  allTabs.filter(t => !t.padOnly || displayMode.value === 'pad')
+  allTabs.filter(t => !t.hidden && (!t.padOnly || displayMode.value === 'pad'))
 )
 
 watch(displayMode, (mode) => {
@@ -389,9 +389,10 @@ main {
   background: transparent;
   border: 1px solid transparent;
   border-radius: 8px;
-  color: var(--text3);
+  color: var(--text2);
   font-size: 0.95rem;
   font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
   padding: 0.65rem 0.9rem;
   letter-spacing: 0.03em;

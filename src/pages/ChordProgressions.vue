@@ -11,7 +11,8 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
 import { GENRES, ALL_PROGRESSIONS } from '@tonarium/core'
 import ProgressionSection from '@/components/progressions/ProgressionSection.vue'
-import { sessionProgression, sessionBpm, sessionKey } from '@/state/sessionState.js'
+import { sessionProgression, sessionBpm, sessionKey, sessionPlaying } from '@/state/sessionState.js'
+import { stopTransport } from '@/audio/transportClock.js'
 
 const emit = defineEmits(['navigate'])
 
@@ -103,6 +104,7 @@ function stopPreview(card) {
 }
 
 function playLoop(progressionId) {
+  if (sessionPlaying.value) stopTransport()
   if (_loopTimer) { stopLoop(); if (loopProgressionId.value === progressionId) return }
   loopProgressionId.value = progressionId
   const progression = ALL_PROGRESSIONS.find(p => p.id === progressionId) ?? selectedProgression.value

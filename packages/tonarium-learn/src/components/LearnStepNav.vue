@@ -1,7 +1,8 @@
 <script setup>
 defineProps({
-  steps:       { type: Array,  required: true },
-  modelValue:  { type: Number, required: true },
+  steps:        { type: Array,  required: true },
+  modelValue:   { type: Number, required: true },
+  visitedSteps: { type: Array,  default: () => [] },
 })
 const emit = defineEmits(['update:modelValue'])
 </script>
@@ -12,7 +13,7 @@ const emit = defineEmits(['update:modelValue'])
       v-for="(s, i) in steps"
       :key="i"
       class="tc-step-nav-btn"
-      :class="{ active: modelValue === i, done: modelValue > i }"
+      :class="{ active: modelValue === i, done: visitedSteps.includes(i) && modelValue !== i }"
       @click="emit('update:modelValue', i)"
     >
       <span class="tc-step-nav-num">{{ i + 1 }}</span>

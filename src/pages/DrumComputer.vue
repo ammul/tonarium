@@ -3,25 +3,27 @@ import { ref } from 'vue'
 import { pattern, isPlaying, currentStep, clearPattern, toggleCell, INSTRUMENTS } from '@/audio/drumEngine.js'
 import { BEAT_PATTERNS } from '@tonarium/core'
 import PageHeader from '@/components/ui/PageHeader.vue'
+import PickerRow from '@/components/ui/PickerRow.vue'
 import { sessionBeatIdx, sessionBpm } from '@/state/sessionState.js'
 import { startTransport, stopTransport } from '@/audio/transportClock.js'
 import { buildPatternFromBeat } from '@/utils/beatUtils.js'
 
 const emit = defineEmits(['navigate'])
 
-const loadedGroove = ref(null)
+const loadedGroove = ref(sessionBeatIdx.value)
 
-function loadGroove(pi) {
+function selectGroove() {
   if (isPlaying.value) stopTransport()
-  if (loadedGroove.value === pi) {
+  const pi = loadedGroove.value
+  if (pi === null || pi === undefined || pi === '') {
     loadedGroove.value = null
+    sessionBeatIdx.value = null
     clearPattern()
     return
   }
   pattern.value = buildPatternFromBeat(pi)
-  loadedGroove.value = pi
+  sessionBeatIdx.value = pi
   if (BEAT_PATTERNS[pi].bpm) sessionBpm.value = BEAT_PATTERNS[pi].bpm
-  startTransport()
 }
 
 function useInJam() {
@@ -35,19 +37,14 @@ function useInJam() {
     <PageHeader title="Drum Computer" subtitle="loop continues while switching tabs" />
 
     <div class="tc-drum-groove-picker">
-      <span class="tc-drum-groove-label">Grooves</span>
-      <div class="tc-drum-groove-btns">
-        <button
-          v-for="(gp, pi) in BEAT_PATTERNS"
-          :key="gp.name"
-          class="tc-drum-groove-btn"
-          :class="{ active: loadedGroove === pi }"
-          @click="loadGroove(pi)"
-        >
-          <span class="tc-drum-groove-name">{{ gp.name }}</span>
-          <span class="tc-drum-groove-genre">{{ gp.genre }} · {{ gp.bpm }} BPM</span>
-        </button>
-      </div>
+      <PickerRow label="Groove">
+        <select v-model="loadedGroove" class="form-select" @change="selectGroove">
+          <option :value="null">None</option>
+          <option v-for="(gp, pi) in BEAT_PATTERNS" :key="pi" :value="pi">
+            {{ gp.name }} ({{ gp.genre }}, {{ gp.bpm }} BPM)
+          </option>
+        </select>
+      </PickerRow>
     </div>
 
     <div class="tc-drum-transport">
@@ -105,59 +102,7 @@ function useInJam() {
 }
 
 .tc-drum-groove-picker {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
   margin: 1.5rem 0 0;
-}
-
-.tc-drum-groove-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-}
-
-.tc-drum-groove-btns {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
-
-.tc-drum-groove-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.1rem;
-  padding: 0.35rem 0.65rem;
-  border-radius: 6px;
-  border: 1px solid var(--border2);
-  background: var(--input);
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-  transition: border-color 0.12s, background 0.12s;
-}
-
-.tc-drum-groove-btn:hover { border-color: var(--accent); }
-
-.tc-drum-groove-btn.active {
-  border-color: var(--accent);
-  background: var(--accent-bg);
-}
-
-.tc-drum-groove-name {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text2);
-}
-
-.tc-drum-groove-btn.active .tc-drum-groove-name { color: var(--accent); }
-
-.tc-drum-groove-genre {
-  font-size: 0.65rem;
-  color: var(--text5);
 }
 
 .tc-drum-transport {

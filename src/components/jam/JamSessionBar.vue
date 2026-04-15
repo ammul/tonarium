@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
 import KnobControl from '@/components/ui/KnobControl.vue'
+import ScaleSelector from '@/components/jam/ScaleSelector.vue'
 import { NOTES, CHORD_SUFFIX } from '@tonarium/core'
 import { JAM_SCALES as SCALES } from '@tonarium/core'
 import { ALL_PROGRESSIONS } from '@tonarium/core'
@@ -34,14 +35,29 @@ const PRESETS = [
 ]
 
 const activePreset = ref(null)
+const showScaleInfo = ref(false)
 
-// Keep local ref in sync with externally-loaded progressions ("Jam with This")
+function onKeyChange() {
+  activePreset.value = null
+}
+
+function onScaleChange() {
+  activePreset.value = null
+  showScaleInfo.value = false
+}
+
+// Keep local ref in sync with externally-loaded progressions ("Jam with This", Learn)
 const selectedProgressionId = ref(sessionProgression.value?.id ?? null)
 watch(sessionProgression, prog => {
   selectedProgressionId.value = prog?.id ?? null
   // Clear active preset if progression changed externally
   if (activePreset.value && prog?.id !== activePreset.value.progressionId) {
     activePreset.value = null
+  }
+  // Sync scale to match the loaded progression so it appears in the filtered dropdown
+  if (prog?.key) {
+    const autoScale = prog.key === 'minor' ? 'mi.p' : 'ma.p'
+    if (selectedScaleId.value !== autoScale) selectedScaleId.value = autoScale
   }
 })
 
@@ -138,9 +154,19 @@ watch(sessionKey, key => {
 })
 
 // Restore drum pattern from persisted beat index (sessionBeatIdx survives reload but pattern does not)
+// Also sync selectedRoot and scale if a progression was loaded before this component mounted (e.g. from Learn)
 onMounted(() => {
   const idx = sessionBeatIdx.value
   if (idx !== null) drumPattern.value = buildPatternFromBeat(idx)
+
+  if (sessionKey.value && sessionKey.value !== selectedRoot.value) {
+    selectedRoot.value = sessionKey.value
+  }
+  const prog = sessionProgression.value
+  if (prog?.key) {
+    const autoScale = prog.key === 'minor' ? 'mi.p' : 'ma.p'
+    if (selectedScaleId.value !== autoScale) selectedScaleId.value = autoScale
+  }
 })
 
 // Re-enrich progression chords when root changes
@@ -175,16 +201,31 @@ const activeBeatName = computed(() =>
   <div class="tc-jam-bar">
     <!-- Preset row -->
     <div class="tc-jam-bar-presets">
-      <span class="tc-jam-bar-presets-label">Quick start</span>
-      <div class="tc-jam-bar-preset-btns">
-        <button
-          v-for="preset in PRESETS"
-          :key="preset.label"
-          class="tc-jam-bar-preset-btn"
-          :class="{ active: activePreset?.label === preset.label }"
-          @click="applyPreset(preset)"
-        >{{ preset.label }}</button>
+      <div class="tc-jam-bar-presets-row">
+        <span class="tc-jam-bar-presets-label">Quick start</span>
+        <div class="tc-jam-bar-preset-btns">
+          <button
+            v-for="preset in PRESETS"
+            :key="preset.label"
+            class="tc-jam-bar-preset-btn"
+            :class="{ active: activePreset?.label === preset.label }"
+            @click="applyPreset(preset)"
+          >{{ preset.label }}</button>
+        </div>
       </div>
+      <PickerRow label="Key">
+        <select v-model="selectedRoot" class="form-select" @change="onKeyChange">
+          <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
+        </select>
+      </PickerRow>
+      <PickerRow label="Scale">
+        <ScaleSelector
+          v-model="selectedScaleId"
+          :scales="SCALES"
+          v-model:showInfo="showScaleInfo"
+          @update:modelValue="onScaleChange"
+        />
+      </PickerRow>
     </div>
 
     <!-- Controls -->
@@ -201,7 +242,7 @@ const activeBeatName = computed(() =>
               {{ p.label }} ({{ p.numeral }})
             </option>
           </select>
-          <button class="btn btn-sm tc-jam-bar-edit-btn" @click="emit('navigate', 'chords')">Edit</button>
+          <button class="btn btn-sm tc-jam-bar-edit-btn" @click="emit('navigate', 'chords')">Select</button>
         </div>
       </PickerRow>
 
@@ -279,6 +320,12 @@ const activeBeatName = computed(() =>
 
 /* Presets */
 .tc-jam-bar-presets {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tc-jam-bar-presets-row {
   display: flex;
   align-items: center;
   gap: 0.75rem;

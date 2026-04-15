@@ -13,6 +13,7 @@ let _nextStepTime   = 0
 let _schedulerTimer  = null
 let _globalStep      = 0
 let _currentMidis    = []
+let _chordStopTimer  = null
 
 export const currentDrumStep = ref(0)
 
@@ -92,12 +93,18 @@ function _playCurrentChord() {
   const beatSec = Math.max(0.1, (60 / sessionBpm.value) * sessionBeatsPerChord.value - 0.05)
   const dest = getProgDest()
   _currentMidis.forEach(m => startNote(m, dest))
-  setTimeout(() => {
+  if (_chordStopTimer) clearTimeout(_chordStopTimer)
+  _chordStopTimer = setTimeout(() => {
+    _chordStopTimer = null
     _currentMidis.forEach(m => stopNote(m))
   }, Math.round(beatSec * 1000))
 }
 
 function _stopChord() {
+  if (_chordStopTimer) {
+    clearTimeout(_chordStopTimer)
+    _chordStopTimer = null
+  }
   if (_currentMidis.length) {
     chordOff(_currentMidis)
     _currentMidis.forEach(m => stopNote(m))

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { pause as drumPause, isPlaying as drumIsPlaying } from '@/audio/drumEngine.js'
 import LearnStepNav from './LearnStepNav.vue'
 import LearnRootNotes from './LearnRootNotes.vue'
@@ -16,17 +16,50 @@ import LearnStepFooter from './LearnStepFooter.vue'
 const emit = defineEmits(['navigate'])
 
 const STEPS = ['Root Notes', 'Intervals', 'Scales', 'Chords', 'Progressions', 'Improvising', 'Beats', 'Song Structure', 'Jam Session']
-const step  = ref(0)
+
+function loadVisited() {
+  try { return JSON.parse(localStorage.getItem('learnVisited') || '[]') } catch { return [] }
+}
+function saveVisited(arr) {
+  try { localStorage.setItem('learnVisited', JSON.stringify(arr)) } catch {}
+}
+
+const step = ref(0)
+const visitedSteps = ref(loadVisited())
+
+function handlePopState(e) {
+  if (typeof e.state?.learnStep === 'number') {
+    step.value = e.state.learnStep
+  }
+}
+
+onMounted(() => {
+  history.replaceState({ ...history.state, learnStep: step.value }, '')
+  window.addEventListener('popstate', handlePopState)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('popstate', handlePopState)
+})
 
 watch(step, (newStep, oldStep) => {
   if (oldStep === 6 && drumIsPlaying.value) drumPause()
-})
+  if (!visitedSteps.value.includes(newStep)) {
+    visitedSteps.value = [...visitedSteps.value, newStep]
+    saveVisited(visitedSteps.value)
+  }
+  // Push browser history for each step so back button / swipe works
+  // Skip on initial setup run (oldStep is undefined) — onMounted handles that with replaceState
+  if (oldStep !== undefined && history.state?.learnStep !== newStep) {
+    history.pushState({ ...history.state, learnStep: newStep }, '')
+  }
+}, { immediate: true })
 </script>
 
 <template>
   <div class="tc-learn">
 
-    <LearnStepNav :steps="STEPS" :model-value="step" @update:model-value="step = $event" />
+    <LearnStepNav :steps="STEPS" :model-value="step" :visited-steps="visitedSteps" @update:model-value="step = $event" />
 
     <LearnRootNotes     v-if="step === 0" />
     <LearnIntervals     v-else-if="step === 1" />
