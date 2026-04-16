@@ -12,7 +12,7 @@ import PickerRow from '@/components/ui/PickerRow.vue'
 import { GENRES, ALL_PROGRESSIONS } from '@tonarium/core'
 import ProgressionSection from '@/components/progressions/ProgressionSection.vue'
 import { sessionProgression, sessionBpm, sessionKey, sessionPlaying } from '@/state/sessionState.js'
-import { stopTransport } from '@/audio/transportClock.js'
+import { startTransport, stopTransport } from '@/audio/transportClock.js'
 
 const emit = defineEmits(['navigate'])
 
@@ -162,7 +162,12 @@ function jamWith(progressionId) {
   }
   sessionKey.value = selectedRoot.value
   sessionBpm.value = bpm.value
-  emit('navigate', 'home')
+  if (sessionPlaying.value) {
+    stopTransport()
+    setTimeout(() => startTransport(), 50)
+  } else {
+    emit('navigate', 'home')
+  }
 }
 
 watch([expandedId, selectedRoot], stopLoop)

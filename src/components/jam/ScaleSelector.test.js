@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
 import ScaleSelector from './ScaleSelector.vue'
 
 const scales = [
@@ -12,7 +11,7 @@ const scales = [
 describe('ScaleSelector', () => {
   it('renders a select with one option per scale', () => {
     const wrapper = mount(ScaleSelector, {
-      props: { modelValue: 'mi.p', scales, showInfo: false },
+      props: { modelValue: 'mi.p', scales },
     })
     const options = wrapper.findAll('option')
     expect(options).toHaveLength(scales.length)
@@ -21,7 +20,7 @@ describe('ScaleSelector', () => {
 
   it('select value reflects modelValue prop', () => {
     const wrapper = mount(ScaleSelector, {
-      props: { modelValue: 'maj', scales, showInfo: false },
+      props: { modelValue: 'maj', scales },
     })
     const select = wrapper.find('select')
     expect(select.element.value).toBe('maj')
@@ -29,7 +28,7 @@ describe('ScaleSelector', () => {
 
   it('emits update:modelValue with new scale id on change', async () => {
     const wrapper = mount(ScaleSelector, {
-      props: { modelValue: 'mi.p', scales, showInfo: false },
+      props: { modelValue: 'mi.p', scales },
     })
     const select = wrapper.find('select')
     await select.setValue('maj')
@@ -38,53 +37,10 @@ describe('ScaleSelector', () => {
     expect(emitted[0]).toEqual(['maj'])
   })
 
-  it('emits update:showInfo false when scale changes', async () => {
+  it('does not render info button', () => {
     const wrapper = mount(ScaleSelector, {
-      props: { modelValue: 'mi.p', scales, showInfo: true },
+      props: { modelValue: 'mi.p', scales },
     })
-    const select = wrapper.find('select')
-    await select.setValue('dor')
-    const emitted = wrapper.emitted('update:showInfo')
-    expect(emitted).toBeTruthy()
-    expect(emitted[0]).toEqual([false])
-  })
-
-  it('renders info button', () => {
-    const wrapper = mount(ScaleSelector, {
-      props: { modelValue: 'mi.p', scales, showInfo: false },
-    })
-    expect(wrapper.find('.tc-scale-sel-info-btn').exists()).toBe(true)
-  })
-
-  it('info button has active class when showInfo is true', () => {
-    const wrapper = mount(ScaleSelector, {
-      props: { modelValue: 'mi.p', scales, showInfo: true },
-    })
-    expect(wrapper.find('.tc-scale-sel-info-btn').classes()).toContain('active')
-  })
-
-  it('does not show description when showInfo is false', () => {
-    const wrapper = mount(ScaleSelector, {
-      props: { modelValue: 'mi.p', scales, showInfo: false },
-    })
-    expect(wrapper.find('.tc-scale-sel-info').exists()).toBe(false)
-  })
-
-  it('shows scale description when showInfo is true', () => {
-    const wrapper = mount(ScaleSelector, {
-      props: { modelValue: 'mi.p', scales, showInfo: true },
-    })
-    expect(wrapper.find('.tc-scale-sel-info').exists()).toBe(true)
-    expect(wrapper.find('.tc-scale-sel-info').text()).toBe('Great for improv.')
-  })
-
-  it('toggles showInfo on info button click', async () => {
-    const wrapper = mount(ScaleSelector, {
-      props: { modelValue: 'mi.p', scales, showInfo: false },
-    })
-    await wrapper.find('.tc-scale-sel-info-btn').trigger('click')
-    const emitted = wrapper.emitted('update:showInfo')
-    expect(emitted).toBeTruthy()
-    expect(emitted[0]).toEqual([true])
+    expect(wrapper.find('.tc-scale-sel-info-btn').exists()).toBe(false)
   })
 })

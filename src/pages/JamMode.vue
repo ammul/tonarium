@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { displayMode } from '@/state/displayMode.js'
 import { NOTES, CHORD_SUFFIX } from '@tonarium/core'
 import { JAM_SCALES as SCALES } from '@tonarium/core'
@@ -21,7 +21,6 @@ const CHORD_OPTIONS = [
   ['maj7', 'M7'],
 ]
 
-const showInfo = ref(false)
 
 const chordRoot = computed(() => selectedChordRoot.value ?? selectedRoot.value)
 
@@ -75,7 +74,6 @@ const subtitle = computed(() => {
         <ScaleSelector
           v-model="selectedScaleId"
           :scales="SCALES"
-          v-model:showInfo="showInfo"
           @update:modelValue="onScaleChange"
         />
       </PickerRow>

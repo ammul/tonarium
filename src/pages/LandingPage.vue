@@ -111,7 +111,7 @@ onUnmounted(() => {
   max-width: 560px;
   width: 100%;
   margin: 0 auto;
-  padding: 3rem 1.5rem 0;
+  padding: clamp(1.25rem, 5vh, 3rem) 1.5rem 0;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -138,7 +138,7 @@ onUnmounted(() => {
   max-width: 560px;
   width: 100%;
   margin: 0 auto;
-  padding: 2rem 1.5rem 4rem;
+  padding: clamp(1rem, 3vh, 2rem) 1.5rem clamp(2rem, 5vh, 4rem);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
@@ -158,7 +158,7 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.2rem;
-  padding: 1.5rem 1.75rem;
+  padding: 1rem 1.25rem;
   border-radius: 14px;
   border: 1.5px solid var(--border2);
   background: var(--surface);
@@ -186,7 +186,7 @@ onUnmounted(() => {
 }
 
 .tc-landing-btn-label {
-  font-size: 1.45rem;
+  font-size: clamp(1.1rem, 4vw, 1.45rem);
   font-weight: 800;
   color: var(--text);
   letter-spacing: -0.01em;
