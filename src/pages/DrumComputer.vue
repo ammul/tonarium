@@ -33,7 +33,7 @@ function useInJam() {
 </script>
 
 <template>
-  <div class="tc-drum">
+  <div class="tc-drum page-card">
     <PageHeader title="Drum Computer" subtitle="loop continues while switching tabs" />
 
     <div class="tc-drum-groove-picker">
@@ -94,13 +94,6 @@ function useInJam() {
 </template>
 
 <style scoped>
-.tc-drum {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
-}
-
 .tc-drum-groove-picker {
   margin: 1.5rem 0 0;
 }
@@ -245,7 +238,6 @@ function useInJam() {
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .tc-drum { padding: 0.75rem 1rem; }
   .tc-drum-transport { margin: 0.5rem 0; }
   .tc-drum-step-btn { height: 1.6rem; }
 }

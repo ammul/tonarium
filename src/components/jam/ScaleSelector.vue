@@ -34,7 +34,7 @@ export default { name: 'ScaleSelector' }
       </select>
       <button class="btn btn-round btn-subtle tc-scale-sel-info-btn" :class="{ active: showInfo }" @click="toggleInfo" aria-label="Scale info">i</button>
     </div>
-    <p v-if="showInfo && selectedScale" class="tc-scale-sel-info">{{ selectedScale.description }}</p>
+    <p v-if="showInfo && selectedScale" class="info-box tc-scale-sel-info">{{ selectedScale.description }}</p>
   </div>
 </template>
 
@@ -54,14 +54,6 @@ export default { name: 'ScaleSelector' }
 
 .tc-scale-sel-info {
   margin-top: 0.6rem;
-  padding: 0.65rem 0.85rem;
-  background: var(--input);
-  border: 1px solid var(--border2);
-  border-left: 3px solid var(--accent);
-  border-radius: 6px;
-  font-size: 0.82rem;
-  color: var(--text2);
-  line-height: 1.55;
   width: 100%;
 }
 

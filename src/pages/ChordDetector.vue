@@ -69,7 +69,7 @@ const subtitle = computed(() => {
 </script>
 
 <template>
-  <div class="tc-detector">
+  <div class="tc-detector page-card">
 
     <PageHeader title="Chord Detector" :subtitle="subtitle" />
 
@@ -160,10 +160,6 @@ const subtitle = computed(() => {
 
 <style scoped>
 .tc-detector {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -302,13 +298,11 @@ const subtitle = computed(() => {
 .tc-detector-chord-notes { font-size: 0.8rem; color: var(--text4); letter-spacing: 0.08em; margin-top: 0.2rem; }
 
 @media (max-width: 600px) {
-  .tc-detector { padding: 1.25rem 1rem; }
   .tc-detector-pad-note { font-size: 1.2rem; }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
   .tc-detector {
-    padding: 0.75rem 1rem;
     gap: 0.75rem;
   }
 

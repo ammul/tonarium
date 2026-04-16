@@ -7,6 +7,7 @@ import { JAM_SCALES as SCALES } from '@tonarium/core'
 import { buildGuitarNeck, sliceRows } from '@/utils/musicUtils.js'
 import { activeInputNotes, midiStatus } from '@/audio/midiManager.js'
 import { useNotePlayback } from '@/composables/useNotePlayback.js'
+import { useScaleIndices } from '@/composables/useScaleIndices.js'
 import PianoOctave from '@/components/music/PianoOctave.vue'
 import ScaleLegend from '@/components/music/ScaleLegend.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
@@ -18,13 +19,8 @@ const STRING_BASE_MIDI = [40, 45, 50, 55, 59, 64]
 
 const chordRoot = computed(() => selectedChordRoot.value ?? selectedRoot.value)
 
-const rootIndex = computed(() => NOTES.indexOf(selectedRoot.value))
 const selectedScale = computed(() => SCALES.find(s => s.id === selectedScaleId.value))
-
-const activeIndices = computed(() => {
-  const root = rootIndex.value
-  return new Set(selectedScale.value.intervals.map(i => (root + i) % 12))
-})
+const { rootIndex, activeIndices } = useScaleIndices(selectedRoot, selectedScale)
 
 const anchorIndices = computed(() => {
   if (selectedChordType.value) {

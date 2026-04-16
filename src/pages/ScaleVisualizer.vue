@@ -5,6 +5,7 @@ import { padSize } from '@/state/padSize.js'
 import { NOTES, SHARPS, FRET_COUNT, NOTE_TO_SEMI } from '@tonarium/core'
 import { buildGuitarNeck, sliceRows } from '@/utils/musicUtils.js'
 import { useNotePlayback } from '@/composables/useNotePlayback.js'
+import { useScaleIndices } from '@/composables/useScaleIndices.js'
 import PianoOctave from '@/components/music/PianoOctave.vue'
 import RootNotePicker from '@/components/music/RootNotePicker.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
@@ -18,12 +19,7 @@ const showInfo = ref(false)
 const pianoOctave = ref(4)
 
 const selectedScale = computed(() => SCALES.find(s => s.id === selectedScaleId.value))
-const rootIndex = computed(() => NOTES.indexOf(selectedRoot.value))
-
-const activeIndices = computed(() => {
-  const root = rootIndex.value
-  return new Set(selectedScale.value.intervals.map(i => (root + i) % 12))
-})
+const { rootIndex, activeIndices } = useScaleIndices(selectedRoot, selectedScale)
 
 const degreeMap = computed(() => {
   const root = rootIndex.value
@@ -84,7 +80,7 @@ const subtitle = computed(() => {
 </script>
 
 <template>
-  <div class="tc-scale-viz">
+  <div class="tc-scale-viz page-card">
     <PageHeader title="Scale Visualizer" :subtitle="subtitle" />
 
     <div class="tc-scale-viz-controls">
@@ -101,7 +97,7 @@ const subtitle = computed(() => {
           </select>
           <button class="tc-scale-viz-info-btn" :class="{ active: showInfo }" @click="showInfo = !showInfo" aria-label="Scale info">i</button>
         </div>
-        <p v-if="showInfo" class="tc-scale-viz-scale-info">{{ selectedScale.description }}</p>
+        <p v-if="showInfo" class="info-box tc-scale-viz-scale-info">{{ selectedScale.description }}</p>
       </div>
     </div>
 
@@ -183,13 +179,6 @@ const subtitle = computed(() => {
 </template>
 
 <style scoped>
-.tc-scale-viz {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
-}
-
 .tc-scale-viz-controls {
   display: flex;
   flex-direction: column;
@@ -242,14 +231,6 @@ const subtitle = computed(() => {
 
 .tc-scale-viz-scale-info {
   margin-top: 0.6rem;
-  padding: 0.65rem 0.85rem;
-  background: var(--input);
-  border: 1px solid var(--border2);
-  border-left: 3px solid var(--accent);
-  border-radius: 6px;
-  font-size: 0.82rem;
-  color: var(--text2);
-  line-height: 1.55;
   width: 100%;
 }
 
@@ -305,10 +286,6 @@ select:focus { border-color: var(--accent); }
 
 
 @media (max-width: 600px) {
-  .tc-scale-viz {
-    padding: 1.25rem 1rem;
-  }
-
   .tc-scale-viz-control-group {
     flex-direction: column;
     align-items: flex-start;
@@ -325,10 +302,6 @@ select:focus { border-color: var(--accent); }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .tc-scale-viz {
-    padding: 0.75rem 1rem;
-  }
-
   .tc-scale-viz-controls {
     margin: 0.5rem 0;
     gap: 0.5rem;

@@ -89,7 +89,7 @@ const chordCards = computed(() =>
 </script>
 
 <template>
-  <div class="tc-prog-builder">
+  <div class="tc-prog-builder page-card">
     <PageHeader title="Progression Builder" subtitle="type chords separated by spaces" />
 
     <div class="tc-prog-builder-input-row">
@@ -145,13 +145,6 @@ const chordCards = computed(() =>
 </template>
 
 <style scoped>
-.tc-prog-builder {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
-}
-
 .tc-prog-builder-input-row { margin: 1.5rem 0 0.6rem; }
 
 .tc-prog-builder-chord-input {
@@ -262,12 +255,10 @@ const chordCards = computed(() =>
 .tc-prog-builder-chord-name { font-size: 1.1rem; font-weight: 700; color: var(--rust); line-height: 1; }
 
 @media (max-width: 600px) {
-  .tc-prog-builder { padding: 1.25rem 1rem; }
   .tc-prog-builder-chord-card { flex: 1 1 calc(50% - 0.375rem); max-width: calc(50% - 0.375rem); }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .tc-prog-builder { padding: 0.75rem 1rem; }
   .tc-prog-builder-chord-row { margin-top: 0.5rem; }
 }
 </style>

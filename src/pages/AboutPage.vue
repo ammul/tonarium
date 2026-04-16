@@ -3,7 +3,7 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 </script>
 
 <template>
-  <div class="tc-about">
+  <div class="tc-about page-card">
     <PageHeader title="About" />
 
     <section class="tc-about-section">
@@ -23,10 +23,6 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 
 <style scoped>
 .tc-about {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
   max-width: 480px;
 }
 
@@ -53,15 +49,4 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 /* unique properties not covered by .btn + .btn-sm + .btn-subtle */
 .tc-about-github-btn { text-decoration: none; }
 
-@media (max-width: 600px) {
-  .tc-about {
-    padding: 1.25rem 1rem;
-  }
-}
-
-@media (orientation: landscape) and (max-height: 500px) {
-  .tc-about {
-    padding: 0.75rem 1rem;
-  }
-}
 </style>

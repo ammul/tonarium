@@ -61,7 +61,7 @@ const subtitle = computed(() => {
 </script>
 
 <template>
-  <div class="tc-jam">
+  <div class="tc-jam page-card">
     <PageHeader title="Jam Mode" :subtitle="subtitle" />
 
     <div class="tc-jam-controls">
@@ -102,13 +102,6 @@ const subtitle = computed(() => {
 </template>
 
 <style scoped>
-.tc-jam {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
-}
-
 .tc-jam-controls {
   display: flex;
   flex-direction: column;
@@ -122,17 +115,7 @@ const subtitle = computed(() => {
   flex-wrap: wrap;
 }
 
-@media (max-width: 600px) {
-  .tc-jam {
-    padding: 1.25rem 1rem;
-  }
-}
-
 @media (orientation: landscape) and (max-height: 500px) {
-  .tc-jam {
-    padding: 0.75rem 1rem;
-  }
-
   .tc-jam-controls {
     margin: 0.5rem 0;
     gap: 0.5rem;

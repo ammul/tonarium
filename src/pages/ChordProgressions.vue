@@ -169,7 +169,7 @@ watch([expandedId, selectedRoot], stopLoop)
 </script>
 
 <template>
-  <div class="tc-progressions">
+  <div class="tc-progressions page-card">
     <PageHeader title="Chord Progressions" subtitle="explore chord sequences by genre - transposed to any key" />
 
     <!-- Chord cards for selected progression -->
@@ -182,13 +182,13 @@ watch([expandedId, selectedRoot], stopLoop)
           {{ loopPlaying ? 'Stop' : 'Play' }}
         </button>
         <span class="tc-progressions-midi-divider"></span>
-        <span class="tc-progressions-midi-lbl">Oct</span>
+        <span class="label-caps">Oct</span>
         <button class="btn btn-xs btn-subtle btn-icon" @click="chordOctave = Math.max(2, chordOctave - 1)">−</button>
         <span class="tc-progressions-midi-val">{{ chordOctave }}</span>
         <button class="btn btn-xs btn-subtle btn-icon" @click="chordOctave = Math.min(6, chordOctave + 1)">+</button>
         <span class="tc-progressions-midi-divider"></span>
         <input type="number" v-model.number="bpm" min="40" max="200" class="tc-progressions-bpm-input" />
-        <span class="tc-progressions-midi-lbl">BPM</span>
+        <span class="label-caps">BPM</span>
         <span class="tc-progressions-midi-divider"></span>
         <button
           v-for="b in [1, 2, 4, 8]"
@@ -198,7 +198,7 @@ watch([expandedId, selectedRoot], stopLoop)
           @click="beatsPerChord = b"
         >{{ b }}</button>
         <span class="tc-progressions-midi-divider"></span>
-        <span class="tc-progressions-midi-lbl">Lane</span>
+        <span class="label-caps">Lane</span>
         <button
           v-for="(lane, i) in ['A','B','C','D']"
           :key="lane"
@@ -239,7 +239,7 @@ watch([expandedId, selectedRoot], stopLoop)
             @click.stop="showInfoIdx = showInfoIdx === card.idx ? null : card.idx"
             aria-label="Solo tip"
           >i</button>
-          <div v-if="showInfoIdx === card.idx" class="tc-progressions-solo-info">
+          <div v-if="showInfoIdx === card.idx" class="info-box tc-progressions-solo-info">
             <span class="tc-progressions-solo-scale">{{ SOLO_ADVICE[card.type].scale }}</span>
             - {{ SOLO_ADVICE[card.type].why }}
           </div>
@@ -287,13 +287,6 @@ watch([expandedId, selectedRoot], stopLoop)
 </template>
 
 <style scoped>
-.tc-progressions {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
-}
-
 .tc-progressions-controls {
   display: flex;
   flex-direction: column;
@@ -322,14 +315,6 @@ watch([expandedId, selectedRoot], stopLoop)
   border: 1px solid var(--border2);
   border-radius: 6px;
   font-size: 0.82rem;
-}
-
-.tc-progressions-midi-lbl {
-  font-weight: 600;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.72rem;
 }
 
 .tc-progressions-midi-val {
@@ -426,13 +411,6 @@ watch([expandedId, selectedRoot], stopLoop)
 
 .tc-progressions-solo-info {
   font-size: 0.78rem;
-  color: var(--text2);
-  line-height: 1.5;
-  padding: 0.5rem 0.65rem;
-  background: var(--input);
-  border: 1px solid var(--border2);
-  border-left: 3px solid var(--accent);
-  border-radius: 5px;
   flex-basis: 100%;
 }
 
@@ -467,8 +445,6 @@ watch([expandedId, selectedRoot], stopLoop)
 }
 
 @media (max-width: 600px) {
-  .tc-progressions { padding: 1.25rem 1rem; }
-
   .tc-progressions-chord-card {
     flex: 1 1 calc(50% - 0.375rem);
     max-width: calc(50% - 0.375rem);
@@ -476,7 +452,6 @@ watch([expandedId, selectedRoot], stopLoop)
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .tc-progressions { padding: 0.75rem 1rem; }
-  .tc-progressions-controls   { margin: 0.5rem 0; }
+  .tc-progressions-controls { margin: 0.5rem 0; }
 }
 </style>

@@ -37,7 +37,7 @@ function selectSoundStyle(style) {
 </script>
 
 <template>
-  <div class="tc-settings">
+  <div class="tc-settings page-card">
     <PageHeader title="Settings">
       <template #actions>
         <button class="btn btn-icon tc-settings-close-btn" @click="emit('close')" aria-label="Close settings">&#x2715;</button>
@@ -149,10 +149,6 @@ function selectSoundStyle(style) {
 
 <style scoped>
 .tc-settings {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 2rem;
   width: 100%;
   max-width: 680px;
   margin: 0 auto;
@@ -292,15 +288,5 @@ function selectSoundStyle(style) {
   color: var(--text);
 }
 
-@media (max-width: 600px) {
-  .tc-settings {
-    padding: 1.25rem 1rem;
-  }
-}
 
-@media (orientation: landscape) and (max-height: 500px) {
-  .tc-settings {
-    padding: 0.75rem 1rem;
-  }
-}
 </style>
