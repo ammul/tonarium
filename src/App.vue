@@ -316,12 +316,12 @@ h1 {
 .burger-btn:hover { border-color: var(--accent); }
 
 main {
-  padding-top: 4rem;
+  padding-top: 1rem;
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
   main {
-    padding-top: 2.5rem;
+    padding-top: 1rem;
   }
 }
 
