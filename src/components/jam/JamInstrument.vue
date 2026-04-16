@@ -289,7 +289,7 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
   cursor: pointer;
 }
 
-.tc-instrument-pad.inactive { background: var(--bg); opacity: 0.35; }
+.tc-instrument-pad.inactive { background: var(--bg); border-color: var(--border2); }
 .tc-instrument-pad.active   { background: var(--raised); border-color: var(--border2); }
 .tc-instrument-pad.anchor   { background: var(--accent-bg); border-color: var(--accent-mid); }
 .tc-instrument-pad.root     { background: var(--rust-bg); border-color: var(--rust); }
@@ -299,7 +299,8 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
 .tc-instrument-pad-note  { font-size: 1.5rem; font-weight: 700; line-height: 1; }
 .tc-instrument-pad-midi  { font-size: 0.6rem; color: var(--text5); letter-spacing: 0.03em; }
 
-.tc-instrument-pad.inactive .tc-instrument-pad-note { color: var(--text5); }
+.tc-instrument-pad.inactive .tc-instrument-pad-label { color: var(--text5); }
+.tc-instrument-pad.inactive .tc-instrument-pad-note  { color: var(--text5); }
 .tc-instrument-pad.active   .tc-instrument-pad-note { color: var(--text2); }
 .tc-instrument-pad.anchor   .tc-instrument-pad-note { color: var(--accent); }
 .tc-instrument-pad.root     .tc-instrument-pad-note { color: var(--rust-hi); }
