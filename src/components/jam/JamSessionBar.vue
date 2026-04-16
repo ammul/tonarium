@@ -198,81 +198,84 @@ const canPlay = computed(() => sessionProgression.value !== null || sessionBeatI
 const activeBeatName = computed(() =>
   sessionBeatIdx.value !== null ? BEAT_PATTERNS[sessionBeatIdx.value]?.name : null
 )
+
+const notesOpen  = ref(false)
+const rhythmOpen = ref(false)
 </script>
 
 <template>
   <div class="tc-jam-bar">
     <span class="tc-jam-bar-title">Quick Jam</span>
 
-    <!-- Preset row -->
-    <div class="tc-jam-bar-preset-btns">
-      <button
-        v-for="preset in PRESETS"
-        :key="preset.label"
-        class="tc-jam-bar-preset-btn"
-        :class="{ active: activePreset?.label === preset.label }"
-        @click="applyPreset(preset)"
-      >{{ preset.label }}</button>
+    <!-- Vibe (preset) row -->
+    <div class="tc-jam-bar-vibe-row">
+      <span class="picker-label">Vibe</span>
+      <div class="tc-jam-bar-preset-btns">
+        <button
+          v-for="preset in PRESETS"
+          :key="preset.label"
+          class="tc-jam-bar-preset-btn"
+          :class="{ active: activePreset?.label === preset.label }"
+          @click="applyPreset(preset)"
+        >{{ preset.label }}</button>
+      </div>
     </div>
 
-    <!-- Controls -->
-    <div class="tc-jam-bar-controls">
-      <PickerRow label="Key">
-        <select v-model="selectedRoot" class="form-select tc-jam-bar-key-select" @change="onKeyChange">
-          <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
-        </select>
-      </PickerRow>
-
-      <PickerRow label="Scale">
-        <ScaleSelector
-          v-model="selectedScaleId"
-          :scales="SCALES"
-          @update:modelValue="onScaleChange"
-        />
-      </PickerRow>
-
-      <PickerRow label="Progression">
-        <div class="tc-jam-bar-picker-row">
-          <select
-            v-model="selectedProgressionId"
-            class="form-select"
-            @change="selectProgression(selectedProgressionId)"
-          >
-            <option :value="null">None</option>
-            <option v-for="p in topProgressions" :key="p.id" :value="p.id">
-              {{ p.label }} ({{ p.numeral }})
-            </option>
+    <!-- Notes panel (Key, Scale, Progression) -->
+    <div class="tc-jam-bar-panel">
+      <button class="tc-jam-bar-panel-toggle" @click="notesOpen = !notesOpen">
+        <span class="tc-jam-bar-panel-name">Notes</span>
+        <span class="tc-jam-bar-panel-chevron" :class="{ open: notesOpen }"></span>
+      </button>
+      <div v-show="notesOpen" class="tc-jam-bar-panel-body">
+        <PickerRow label="Key">
+          <select v-model="selectedRoot" class="form-select tc-jam-bar-key-select" @change="onKeyChange">
+            <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
           </select>
-          <button class="btn btn-sm tc-jam-bar-edit-btn" @click="emit('navigate', 'chords')">Select</button>
-        </div>
-      </PickerRow>
+        </PickerRow>
+        <PickerRow label="Scale">
+          <ScaleSelector v-model="selectedScaleId" :scales="SCALES" @update:modelValue="onScaleChange" />
+        </PickerRow>
+        <PickerRow label="Progression">
+          <div class="tc-jam-bar-picker-row">
+            <select v-model="selectedProgressionId" class="form-select" @change="selectProgression(selectedProgressionId)">
+              <option :value="null">None</option>
+              <option v-for="p in topProgressions" :key="p.id" :value="p.id">{{ p.label }} ({{ p.numeral }})</option>
+            </select>
+            <button class="btn btn-sm tc-jam-bar-edit-btn" @click="emit('navigate', 'chords')">Select</button>
+          </div>
+        </PickerRow>
+      </div>
+    </div>
 
-      <PickerRow label="Beat">
-        <div class="tc-jam-bar-picker-row">
-          <select
-            v-model="sessionBeatIdx"
-            class="form-select"
-            @change="selectBeat(sessionBeatIdx)"
-          >
-            <option :value="null">None</option>
-            <option v-for="(bp, i) in BEAT_PATTERNS" :key="i" :value="i">{{ bp.name }}</option>
+    <!-- Rhythm panel (Beat, BPM, Beats/chord) -->
+    <div class="tc-jam-bar-panel">
+      <button class="tc-jam-bar-panel-toggle" @click="rhythmOpen = !rhythmOpen">
+        <span class="tc-jam-bar-panel-name">Rhythm</span>
+        <span class="tc-jam-bar-panel-chevron" :class="{ open: rhythmOpen }"></span>
+      </button>
+      <div v-show="rhythmOpen" class="tc-jam-bar-panel-body">
+        <PickerRow label="Beat">
+          <div class="tc-jam-bar-picker-row">
+            <select v-model="sessionBeatIdx" class="form-select" @change="selectBeat(sessionBeatIdx)">
+              <option :value="null">None</option>
+              <option v-for="(bp, i) in BEAT_PATTERNS" :key="i" :value="i">{{ bp.name }}</option>
+            </select>
+            <button class="btn btn-sm tc-jam-bar-edit-btn" @click="emit('navigate', 'drums')">Edit</button>
+          </div>
+        </PickerRow>
+        <PickerRow label="BPM">
+          <input type="number" v-model.number="sessionBpm" min="40" max="200" class="tc-jam-bar-bpm-input" />
+        </PickerRow>
+        <PickerRow label="Chord">
+          <select v-model.number="sessionBeatsPerChord" class="form-select">
+            <option :value="1">1 beat/chord</option>
+            <option :value="2">2 beats/chord</option>
+            <option :value="4">4 beats/chord</option>
+            <option :value="8">8 beats/chord</option>
           </select>
-          <button class="btn btn-sm tc-jam-bar-edit-btn" @click="emit('navigate', 'drums')">Edit</button>
-        </div>
-      </PickerRow>
-
-      <PickerRow label="BPM">
-        <input type="number" v-model.number="sessionBpm" min="40" max="200" class="tc-jam-bar-bpm-input" />
-      </PickerRow>
-
-      <PickerRow label="Chord">
-        <select v-model.number="sessionBeatsPerChord" class="form-select">
-          <option :value="1">1 beat/chord</option>
-          <option :value="2">2 beats/chord</option>
-          <option :value="4">4 beats/chord</option>
-          <option :value="8">8 beats/chord</option>
-        </select>
-      </PickerRow>
+        </PickerRow>
+      </div>
     </div>
 
     <!-- Mixer -->
@@ -327,11 +330,22 @@ const activeBeatName = computed(() =>
   color: var(--text4);
 }
 
-/* Presets */
+/* Vibe row */
+.tc-jam-bar-vibe-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.tc-jam-bar-vibe-row .picker-label {
+  padding-top: 0.3rem;
+}
+
 .tc-jam-bar-preset-btns {
   display: flex;
   gap: 0.35rem;
   flex-wrap: wrap;
+  flex: 1;
 }
 
 .tc-jam-bar-preset-btn {
@@ -358,11 +372,56 @@ const activeBeatName = computed(() =>
   color: var(--accent);
 }
 
-/* Controls */
-.tc-jam-bar-controls {
+/* Expansion panels */
+.tc-jam-bar-panel {
+  border-top: 1px solid var(--border);
+}
+
+.tc-jam-bar-panel-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.55rem 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.tc-jam-bar-panel-toggle:hover .tc-jam-bar-panel-name {
+  color: var(--text2);
+}
+
+.tc-jam-bar-panel-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text4);
+  transition: color 0.12s;
+}
+
+.tc-jam-bar-panel-chevron {
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid var(--text4);
+  border-bottom: 1.5px solid var(--text4);
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+.tc-jam-bar-panel-chevron.open {
+  transform: rotate(45deg);
+}
+
+.tc-jam-bar-panel-body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  padding-bottom: 0.65rem;
 }
 
 .tc-jam-bar-picker-row {
