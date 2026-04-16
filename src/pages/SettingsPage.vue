@@ -51,7 +51,7 @@ function selectSoundStyle(style) {
         <button
           v-for="opt in DISPLAY_OPTIONS"
           :key="opt.value"
-          class="tc-settings-tab-btn tc-settings-option-btn"
+          class="btn tc-settings-option-btn"
           :class="{ active: displayMode === opt.value }"
           @click="displayMode = opt.value"
         >{{ opt.label }}</button>
@@ -63,8 +63,8 @@ function selectSoundStyle(style) {
       <h3>Pad Layout</h3>
       <p class="tc-settings-section-desc">Number of columns in the pad grid.</p>
       <div class="tc-settings-option-group">
-        <button class="tc-settings-tab-btn tc-settings-option-btn" :class="{ active: padSize === '4x3' }" @click="padSize = '4x3'">4x3 (12 pads)</button>
-        <button class="tc-settings-tab-btn tc-settings-option-btn" :class="{ active: padSize === '4x4' }" @click="padSize = '4x4'">4x4 (16 pads)</button>
+        <button class="btn tc-settings-option-btn" :class="{ active: padSize === '4x3' }" @click="padSize = '4x3'">4x3 (12 pads)</button>
+        <button class="btn tc-settings-option-btn" :class="{ active: padSize === '4x4' }" @click="padSize = '4x4'">4x4 (16 pads)</button>
       </div>
     </section>
 
@@ -72,8 +72,8 @@ function selectSoundStyle(style) {
       <h3>Audio</h3>
       <p class="tc-settings-section-desc">Play sound when tapping notes, chords, and pads.</p>
       <div class="tc-settings-option-group">
-        <button class="tc-settings-tab-btn tc-settings-option-btn" :class="{ active: soundEnabled }" @click="soundEnabled = true">On</button>
-        <button class="tc-settings-tab-btn tc-settings-option-btn" :class="{ active: !soundEnabled }" @click="soundEnabled = false">Off</button>
+        <button class="btn tc-settings-option-btn" :class="{ active: soundEnabled }" @click="soundEnabled = true">On</button>
+        <button class="btn tc-settings-option-btn" :class="{ active: !soundEnabled }" @click="soundEnabled = false">Off</button>
       </div>
     </section>
 
@@ -81,28 +81,28 @@ function selectSoundStyle(style) {
       <h3>Button Sound Style</h3>
       <p class="tc-settings-section-desc">Timbre used when tapping pads, keys, and tiles.</p>
       <div class="tc-settings-option-group">
-        <button class="tc-settings-tab-btn tc-settings-option-btn" :class="{ active: soundStyle === 'synth' }" @click="selectSoundStyle('synth')">Synth</button>
-        <button class="tc-settings-tab-btn tc-settings-option-btn" :class="{ active: soundStyle === 'piano' }" @click="selectSoundStyle('piano')">Piano</button>
-        <button class="tc-settings-tab-btn tc-settings-option-btn" :class="{ active: soundStyle === 'bell' }"  @click="selectSoundStyle('bell')">Bell</button>
-        <button class="tc-settings-tab-btn tc-settings-option-btn" :class="{ active: soundStyle === 'pluck' }" @click="selectSoundStyle('pluck')">Pluck</button>
+        <button class="btn tc-settings-option-btn" :class="{ active: soundStyle === 'synth' }" @click="selectSoundStyle('synth')">Synth</button>
+        <button class="btn tc-settings-option-btn" :class="{ active: soundStyle === 'piano' }" @click="selectSoundStyle('piano')">Piano</button>
+        <button class="btn tc-settings-option-btn" :class="{ active: soundStyle === 'bell' }"  @click="selectSoundStyle('bell')">Bell</button>
+        <button class="btn tc-settings-option-btn" :class="{ active: soundStyle === 'pluck' }" @click="selectSoundStyle('pluck')">Pluck</button>
       </div>
     </section>
 
     <section class="tc-settings-section">
       <h3>Theme</h3>
       <div class="tc-settings-option-group">
-        <button class="tc-settings-tab-btn tc-settings-option-btn" :class="{ active: colorMode === 'dark' }"  @click="colorMode = 'dark'">Dark</button>
-        <button class="tc-settings-tab-btn tc-settings-option-btn" :class="{ active: colorMode === 'light' }" @click="colorMode = 'light'">Light</button>
+        <button class="btn tc-settings-option-btn" :class="{ active: colorMode === 'dark' }"  @click="colorMode = 'dark'">Dark</button>
+        <button class="btn tc-settings-option-btn" :class="{ active: colorMode === 'light' }" @click="colorMode = 'light'">Light</button>
       </div>
     </section>
 
     <section class="tc-settings-section">
       <h3>Color Scheme</h3>
       <div class="tc-settings-option-group">
-        <button class="tc-settings-tab-btn tc-settings-option-btn" :class="{ active: colorScheme === 'none' }"     @click="colorScheme = 'none'">Neutral</button>
-        <button class="tc-settings-option-btn tc-settings-scheme-btn tc-settings-scheme-medieval" :class="{ active: colorScheme === 'medieval' }" @click="colorScheme = 'medieval'">Medieval</button>
-        <button class="tc-settings-option-btn tc-settings-scheme-btn tc-settings-scheme-ko2"      :class="{ active: colorScheme === 'ko2' }"      @click="colorScheme = 'ko2'">K.O. II</button>
-        <button class="tc-settings-option-btn tc-settings-scheme-btn tc-settings-scheme-riddim"   :class="{ active: colorScheme === 'riddim' }"   @click="colorScheme = 'riddim'">Riddim</button>
+        <button class="btn tc-settings-option-btn" :class="{ active: colorScheme === 'none' }"     @click="colorScheme = 'none'">Neutral</button>
+        <button class="btn tc-settings-option-btn tc-settings-scheme-btn tc-settings-scheme-medieval" :class="{ active: colorScheme === 'medieval' }" @click="colorScheme = 'medieval'">Medieval</button>
+        <button class="btn tc-settings-option-btn tc-settings-scheme-btn tc-settings-scheme-ko2"      :class="{ active: colorScheme === 'ko2' }"      @click="colorScheme = 'ko2'">K.O. II</button>
+        <button class="btn tc-settings-option-btn tc-settings-scheme-btn tc-settings-scheme-riddim"   :class="{ active: colorScheme === 'riddim' }"   @click="colorScheme = 'riddim'">Riddim</button>
       </div>
     </section>
 
@@ -188,7 +188,6 @@ function selectSoundStyle(style) {
   flex-wrap: wrap;
 }
 
-/* unique properties not covered by .tab-btn */
 .tc-settings-option-btn { padding: 0.35rem 0.9rem; font-size: 0.85rem; }
 
 .tc-settings-scheme-btn {
