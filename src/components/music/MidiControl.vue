@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { Cable, X } from 'lucide-vue-next'
 import { midiStatus, midiOutputs, selectedOutputId, initMidi, disconnectMidi } from '@/audio/midiManager.js'
 
 function truncate(name, max = 20) {
@@ -14,7 +15,7 @@ const selectedDevice = computed({
 
 <template>
   <div v-if="midiStatus !== 'unsupported'" class="tc-midi">
-    <button v-if="midiStatus === 'idle'" class="btn btn-sm tc-midi-btn" @click="initMidi">MIDI</button>
+    <button v-if="midiStatus === 'idle'" class="btn btn-sm tc-midi-btn" @click="initMidi"><Cable :size="13" />MIDI</button>
 
     <template v-else-if="midiStatus === 'connected'">
       <span class="tc-midi-dot connected"></span>
@@ -22,13 +23,13 @@ const selectedDevice = computed({
       <select v-else-if="midiOutputs.length > 1" v-model="selectedDevice" class="form-select tc-midi-select">
         <option v-for="o in midiOutputs" :key="o.id" :value="o.id">{{ truncate(o.name) }}</option>
       </select>
-      <button class="tc-midi-disconnect" @click="disconnectMidi" aria-label="Disconnect MIDI">&#x2715;</button>
+      <button class="tc-midi-disconnect" @click="disconnectMidi" aria-label="Disconnect MIDI"><X :size="12" /></button>
     </template>
 
     <template v-else-if="midiStatus === 'error'">
       <span class="tc-midi-dot error"></span>
       <span class="tc-midi-name muted">MIDI error</span>
-      <button class="tc-midi-disconnect" @click="disconnectMidi" aria-label="Dismiss">&#x2715;</button>
+      <button class="tc-midi-disconnect" @click="disconnectMidi" aria-label="Dismiss"><X :size="12" /></button>
     </template>
   </div>
 </template>
@@ -43,6 +44,9 @@ const selectedDevice = computed({
 
 /* unique properties not covered by .btn + .btn-sm */
 .tc-midi-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -80,10 +84,11 @@ const selectedDevice = computed({
   background: transparent;
   border: none;
   color: var(--text4);
-  font-size: 0.75rem;
   cursor: pointer;
   padding: 0;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: color 0.15s;
   flex-shrink: 0;
 }

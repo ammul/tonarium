@@ -22,10 +22,6 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 </template>
 
 <style scoped>
-.tc-about {
-  max-width: 480px;
-}
-
 .tc-about-section {
   padding: 1.25rem 0;
   border-top: 1px solid var(--border);

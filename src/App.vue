@@ -14,18 +14,19 @@ import ProgressionBuilder from '@/pages/ProgressionBuilder.vue'
 import SettingsPage from '@/pages/SettingsPage.vue'
 import DrumComputer from '@/pages/DrumComputer.vue'
 import AboutPage from '@/pages/AboutPage.vue'
+import { Home, Zap, BookOpen, Disc3, Music, BarChart2, ScanSearch, Layers, Info, Settings, Menu, X, Play, Pause, Square } from 'lucide-vue-next'
 
 const allTabs = [
-  { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: LandingPage },
-  { id: 'jam',            label: 'Quick Jam',           shortLabel: 'Jam',          component: LandingPage,        menuOnly: true },
-  { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LandingPage,        menuOnly: true },
-  { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer,       menuOnly: true },
-  { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions,  menuOnly: true },
-  { id: 'scales',         label: 'Scale Visualizer',    shortLabel: 'Scales',       component: ScaleVisualizer,    menuOnly: true },
-  { id: 'chord-detector', label: 'Chord Detector',      shortLabel: 'Detector',     component: ChordDetector,      menuOnly: true },
-  { id: 'prog-builder',   label: 'Progression Builder', shortLabel: 'Builder',      component: ProgressionBuilder, menuOnly: true },
-  { id: 'about',          label: 'About',               shortLabel: 'About',        component: AboutPage,          menuOnly: true },
-  { id: 'settings',       label: 'Settings',            shortLabel: 'Settings',     component: SettingsPage },
+  { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: LandingPage,        icon: Home },
+  { id: 'jam',            label: 'Quick Jam',           shortLabel: 'Jam',          component: LandingPage,        menuOnly: true, icon: Zap },
+  { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LandingPage,        menuOnly: true, icon: BookOpen },
+  { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer,       menuOnly: true, icon: Disc3 },
+  { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions,  menuOnly: true, icon: Music },
+  { id: 'scales',         label: 'Scale Visualizer',    shortLabel: 'Scales',       component: ScaleVisualizer,    menuOnly: true, icon: BarChart2 },
+  { id: 'chord-detector', label: 'Chord Detector',      shortLabel: 'Detector',     component: ChordDetector,      menuOnly: true, icon: ScanSearch },
+  { id: 'prog-builder',   label: 'Progression Builder', shortLabel: 'Builder',      component: ProgressionBuilder, menuOnly: true, icon: Layers },
+  { id: 'about',          label: 'About',               shortLabel: 'About',        component: AboutPage,          menuOnly: true, icon: Info },
+  { id: 'settings',       label: 'Settings',            shortLabel: 'Settings',     component: SettingsPage,       icon: Settings },
 ]
 
 const activeTab      = ref('home')
@@ -125,13 +126,8 @@ onUnmounted(() => {
               :aria-label="sessionPlaying ? 'Stop session' : 'Start session'"
               @click.stop="sessionPlaying ? stopTransport() : startTransport()"
             >
-              <svg v-if="sessionPlaying" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-                <rect x="1.5" y="1" width="3" height="8" rx="1"/>
-                <rect x="5.5" y="1" width="3" height="8" rx="1"/>
-              </svg>
-              <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-                <polygon points="2,1 9,5 2,9"/>
-              </svg>
+              <Pause v-if="sessionPlaying" :size="10" />
+              <Play v-else :size="10" />
             </button>
           </div>
           <div v-else-if="drumEverPlayed" class="drum-widget" :class="{ playing: drumIsPlaying }" @click="selectTab('drums')">
@@ -142,23 +138,15 @@ onUnmounted(() => {
               :aria-label="drumIsPlaying ? 'Pause drums' : 'Play drums'"
               @click.stop="drumIsPlaying ? drumPause() : drumPlay()"
             >
-              <svg v-if="drumIsPlaying" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-                <rect x="1.5" y="1" width="3" height="8" rx="1"/>
-                <rect x="5.5" y="1" width="3" height="8" rx="1"/>
-              </svg>
-              <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-                <polygon points="2,1 9,5 2,9"/>
-              </svg>
+              <Pause v-if="drumIsPlaying" :size="10" />
+              <Play v-else :size="10" />
             </button>
           </div>
           <button class="btn btn-icon icon-btn" @click="activeTab === 'settings' ? closeSettings() : selectTab('settings')" :class="{ active: activeTab === 'settings' }" aria-label="Settings">
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
-              <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.474l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
-            </svg>
+            <Settings :size="16" />
           </button>
-          <button class="btn burger-btn" @click="menuOpen = true" aria-label="Open menu">
-            <span></span><span></span><span></span>
+          <button class="btn btn-icon icon-btn burger-btn" @click="menuOpen = true" aria-label="Open menu">
+            <Menu :size="18" />
           </button>
         </div>
       </div>
@@ -167,13 +155,18 @@ onUnmounted(() => {
     <div class="menu-overlay" :class="{ open: menuOpen }" @click="menuOpen = false"></div>
 
     <nav class="side-menu" :class="{ open: menuOpen }">
-      <button class="btn btn-ghost close-btn" @click="menuOpen = false" aria-label="Close menu">&#x2715;</button>
+      <button class="btn btn-ghost close-btn" @click="menuOpen = false" aria-label="Close menu">
+        <X :size="18" />
+      </button>
       <ul>
         <li v-for="tab in tabs" :key="tab.id">
           <button
             :class="{ active: activeTab === tab.id }"
             @click="selectTab(tab.id)"
-          >{{ tab.label }}</button>
+          >
+            <component :is="tab.icon" :size="16" class="menu-tab-icon" />
+            {{ tab.label }}
+          </button>
         </li>
       </ul>
     </nav>
@@ -344,22 +337,11 @@ h1 {
   flex-shrink: 0;
 }
 
-/* unique properties not covered by .btn */
+/* unique properties not covered by .btn + .btn-icon */
 .burger-btn {
-  flex-direction: column;
-  gap: 5px;
-  padding: 8px 7px;
   width: 36px;
   height: 36px;
   flex-shrink: 0;
-}
-
-.burger-btn span {
-  display: block;
-  width: 100%;
-  height: 2px;
-  background: var(--accent);
-  border-radius: 1px;
 }
 
 .burger-btn:hover { border-color: var(--accent); }
@@ -428,6 +410,9 @@ main {
 
 .side-menu ul li button {
   width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   text-align: left;
   background: transparent;
   border: 1px solid transparent;
@@ -440,6 +425,16 @@ main {
   padding: 0.65rem 0.9rem;
   letter-spacing: 0.03em;
   transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.menu-tab-icon {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.side-menu ul li button.active .menu-tab-icon,
+.side-menu ul li button:hover .menu-tab-icon {
+  opacity: 1;
 }
 
 .side-menu ul li button:hover {

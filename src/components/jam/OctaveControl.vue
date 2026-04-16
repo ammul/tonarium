@@ -1,4 +1,6 @@
 <script setup>
+import { ChevronDown, ChevronUp } from 'lucide-vue-next'
+
 const props = defineProps({
   modelValue: { type: Number, required: true },
   min: { type: Number, default: 1 },
@@ -22,9 +24,9 @@ export default { name: 'OctaveControl' }
 
 <template>
   <div class="tc-octave">
-    <button class="btn btn-round tc-octave-btn" :disabled="modelValue <= min" @click="decrement" aria-label="Octave down">−</button>
+    <button class="btn btn-round tc-octave-btn" :disabled="modelValue <= min" @click="decrement" aria-label="Octave down"><ChevronDown :size="14" /></button>
     <span class="tc-octave-value">{{ modelValue }}</span>
-    <button class="btn btn-round tc-octave-btn" :disabled="modelValue >= max" @click="increment" aria-label="Octave up">+</button>
+    <button class="btn btn-round tc-octave-btn" :disabled="modelValue >= max" @click="increment" aria-label="Octave up"><ChevronUp :size="14" /></button>
   </div>
 </template>
 
@@ -39,8 +41,9 @@ export default { name: 'OctaveControl' }
 .tc-octave-btn {
   background: var(--input);
   color: var(--text);
-  font-size: 1rem;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tc-octave-value {

@@ -1,4 +1,6 @@
 <script setup>
+import { Play, Square, Zap } from 'lucide-vue-next'
+
 defineProps({
   progression: {
     type: Object,
@@ -26,12 +28,12 @@ defineEmits(['toggle-expand', 'play', 'stop', 'jam'])
           :class="{ active: isPlaying }"
           :aria-label="isPlaying ? 'Stop' : 'Play'"
           @click="isPlaying ? $emit('stop') : $emit('play')"
-        >{{ isPlaying ? '■' : '▶' }}</button>
+        ><Square v-if="isPlaying" :size="11" /><Play v-else :size="11" /></button>
         <button
           class="btn btn-xs btn-subtle tc-prog-card-ctrl-btn tc-prog-card-jam-btn"
           aria-label="Jam with this"
           @click="$emit('jam')"
-        >Jam</button>
+        ><Zap :size="11" />Jam</button>
       </div>
     </div>
 
@@ -120,6 +122,9 @@ defineEmits(['toggle-expand', 'play', 'stop', 'jam'])
 }
 
 .tc-prog-card-jam-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.04em;

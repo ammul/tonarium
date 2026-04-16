@@ -3,6 +3,7 @@ import { ref, watch, onMounted, onUnmounted } from 'vue'
 import StartPage from '@/pages/StartPage.vue'
 import LearnMode from '@/pages/LearnMode.vue'
 import { requestedLandingView, activeLandingView } from '@/state/landingState.js'
+import { Zap, BookOpen, Disc3, Music, BarChart2, ScanSearch, Layers, Settings } from 'lucide-vue-next'
 
 const emit = defineEmits(['navigate'])
 
@@ -71,15 +72,24 @@ onUnmounted(() => {
       </div>
 
       <div class="tc-landing-ctas">
+        <button class="tc-landing-btn tc-landing-btn--learn" @click="goTo('learn')">
+          <BookOpen :size="28" class="tc-landing-btn-icon" />
+          <span class="tc-landing-btn-label">Learn</span>
+          <span class="tc-landing-btn-desc">Root notes to full jams</span>
+        </button>
+
         <button class="tc-landing-btn tc-landing-btn--jam" @click="goTo('jam')">
+          <Zap :size="28" class="tc-landing-btn-icon" />
           <span class="tc-landing-btn-label">Quick Jam</span>
           <span class="tc-landing-btn-desc">Pick a vibe and play</span>
         </button>
 
-        <button class="tc-landing-btn tc-landing-btn--learn" @click="goTo('learn')">
-          <span class="tc-landing-btn-label">Learn</span>
-          <span class="tc-landing-btn-desc">Root notes to full jams</span>
-        </button>
+        <button class="tc-landing-tool-btn" @click="$emit('navigate', 'drums')"><Disc3 :size="15" />Drum Computer</button>
+        <button class="tc-landing-tool-btn" @click="$emit('navigate', 'chords')"><Music :size="15" />Chord Progressions</button>
+        <button class="tc-landing-tool-btn" @click="$emit('navigate', 'scales')"><BarChart2 :size="15" />Scale Visualizer</button>
+        <button class="tc-landing-tool-btn" @click="$emit('navigate', 'chord-detector')"><ScanSearch :size="15" />Chord Detector</button>
+        <button class="tc-landing-tool-btn" @click="$emit('navigate', 'prog-builder')"><Layers :size="15" />Progression Builder</button>
+        <button class="tc-landing-tool-btn" @click="$emit('navigate', 'settings')"><Settings :size="15" />Settings</button>
       </div>
     </template>
 
@@ -123,15 +133,24 @@ onUnmounted(() => {
   letter-spacing: 0.01em;
 }
 
-/* CTAs */
+/* CTAs grid */
 .tc-landing-ctas {
   max-width: 560px;
   width: 100%;
   margin: 0 auto;
   padding: 2rem 1.5rem 4rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.tc-landing-btn-icon {
+  color: var(--text3);
+  margin-bottom: 0.35rem;
+}
+
+.tc-landing-btn--jam .tc-landing-btn-icon {
+  color: var(--accent);
 }
 
 .tc-landing-btn {
@@ -139,7 +158,6 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.2rem;
-  width: 100%;
   padding: 1.5rem 1.75rem;
   border-radius: 14px;
   border: 1.5px solid var(--border2);
@@ -185,16 +203,31 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
-@media (min-width: 480px) {
-  .tc-landing-ctas {
-    flex-direction: row;
-  }
-
-  .tc-landing-btn {
-    flex: 1;
-    min-height: 160px;
-  }
+/* Tool buttons — smaller cells in the same grid */
+.tc-landing-tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text2);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, transform 0.1s;
 }
+
+.tc-landing-tool-btn:hover {
+  border-color: var(--accent-dim);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.tc-landing-tool-btn:active { transform: translateY(0); }
+
 
 @media (orientation: landscape) and (max-height: 500px) {
   .tc-landing-hero {
@@ -202,12 +235,7 @@ onUnmounted(() => {
   }
 
   .tc-landing-ctas {
-    flex-direction: row;
     padding-bottom: 2rem;
-  }
-
-  .tc-landing-btn {
-    flex: 1;
   }
 }
 </style>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { OPEN_STRINGS } from '@tonarium/core'
 import type { NoteIndex } from '@tonarium/core'
 
@@ -130,9 +131,9 @@ const voicing = computed(() => {
     </div>
 
     <div class="tc-chord-diagram-voicing-sel" v-if="voicingCount > 1">
-      <button class="tc-chord-diagram-voicing-btn" @click="prevVoicing">‹</button>
+      <button class="tc-chord-diagram-voicing-btn" @click="prevVoicing"><ChevronLeft :size="13" /></button>
       <span class="tc-chord-diagram-voicing-label">{{ voicing.label }}</span>
-      <button class="tc-chord-diagram-voicing-btn" @click="nextVoicing">›</button>
+      <button class="tc-chord-diagram-voicing-btn" @click="nextVoicing"><ChevronRight :size="13" /></button>
     </div>
   </div>
 </template>

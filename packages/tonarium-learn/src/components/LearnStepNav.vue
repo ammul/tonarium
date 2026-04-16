@@ -1,4 +1,6 @@
 <script setup>
+import { Check } from 'lucide-vue-next'
+
 defineProps({
   steps:        { type: Array,  required: true },
   modelValue:   { type: Number, required: true },
@@ -16,7 +18,10 @@ const emit = defineEmits(['update:modelValue'])
       :class="{ active: modelValue === i, done: visitedSteps.includes(i) && modelValue !== i }"
       @click="emit('update:modelValue', i)"
     >
-      <span class="tc-step-nav-num">{{ i + 1 }}</span>
+      <span class="tc-step-nav-num">
+        <Check v-if="visitedSteps.includes(i) && modelValue !== i" :size="9" />
+        <template v-else>{{ i + 1 }}</template>
+      </span>
       <span class="tc-step-nav-label">{{ s }}</span>
     </button>
   </div>

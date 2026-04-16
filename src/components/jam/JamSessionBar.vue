@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
 import KnobControl from '@/components/ui/KnobControl.vue'
 import ScaleSelector from '@/components/jam/ScaleSelector.vue'
+import { Music2, Drum, Play, Square, Pencil, ExternalLink } from 'lucide-vue-next'
 import { NOTES, CHORD_SUFFIX } from '@tonarium/core'
 import { JAM_SCALES as SCALES } from '@tonarium/core'
 import { ALL_PROGRESSIONS } from '@tonarium/core'
@@ -224,6 +225,7 @@ const rhythmOpen = ref(false)
     <!-- Notes panel (Key, Scale, Progression) -->
     <div class="tc-jam-bar-panel">
       <button class="tc-jam-bar-panel-toggle" @click="notesOpen = !notesOpen">
+        <Music2 :size="13" class="tc-jam-bar-panel-icon" />
         <span class="tc-jam-bar-panel-name">Notes</span>
         <span class="tc-jam-bar-panel-chevron" :class="{ open: notesOpen }"></span>
       </button>
@@ -242,7 +244,7 @@ const rhythmOpen = ref(false)
               <option :value="null">None</option>
               <option v-for="p in topProgressions" :key="p.id" :value="p.id">{{ p.label }} ({{ p.numeral }})</option>
             </select>
-            <button class="btn btn-sm tc-jam-bar-edit-btn" @click="emit('navigate', 'chords')">Select</button>
+            <button class="btn btn-sm btn-icon tc-jam-bar-edit-btn" @click="emit('navigate', 'chords')" aria-label="Browse progressions"><ExternalLink :size="13" /></button>
           </div>
         </PickerRow>
       </div>
@@ -251,6 +253,7 @@ const rhythmOpen = ref(false)
     <!-- Rhythm panel (Beat, BPM, Beats/chord) -->
     <div class="tc-jam-bar-panel">
       <button class="tc-jam-bar-panel-toggle" @click="rhythmOpen = !rhythmOpen">
+        <Drum :size="13" class="tc-jam-bar-panel-icon" />
         <span class="tc-jam-bar-panel-name">Rhythm</span>
         <span class="tc-jam-bar-panel-chevron" :class="{ open: rhythmOpen }"></span>
       </button>
@@ -261,7 +264,7 @@ const rhythmOpen = ref(false)
               <option :value="null">None</option>
               <option v-for="(bp, i) in BEAT_PATTERNS" :key="i" :value="i">{{ bp.name }}</option>
             </select>
-            <button class="btn btn-sm tc-jam-bar-edit-btn" @click="emit('navigate', 'drums')">Edit</button>
+            <button class="btn btn-sm btn-icon tc-jam-bar-edit-btn" @click="emit('navigate', 'drums')" aria-label="Edit beat"><Pencil :size="13" /></button>
           </div>
         </PickerRow>
         <PickerRow label="BPM">
@@ -293,6 +296,8 @@ const rhythmOpen = ref(false)
         :disabled="!canPlay"
         @click="toggleTransport"
       >
+        <Square v-if="sessionPlaying" :size="13" />
+        <Play v-else :size="13" />
         {{ sessionPlaying ? 'Stop' : 'Play' }}
       </button>
 
@@ -380,6 +385,7 @@ const rhythmOpen = ref(false)
 .tc-jam-bar-panel-toggle {
   display: flex;
   align-items: center;
+  gap: 0.4rem;
   justify-content: space-between;
   width: 100%;
   padding: 0.55rem 0;
@@ -387,6 +393,16 @@ const rhythmOpen = ref(false)
   border: none;
   cursor: pointer;
   font-family: inherit;
+}
+
+.tc-jam-bar-panel-icon {
+  color: var(--text4);
+  flex-shrink: 0;
+  transition: color 0.12s;
+}
+
+.tc-jam-bar-panel-toggle:hover .tc-jam-bar-panel-icon {
+  color: var(--text2);
 }
 
 .tc-jam-bar-panel-toggle:hover .tc-jam-bar-panel-name {
@@ -476,6 +492,9 @@ const rhythmOpen = ref(false)
 }
 
 .tc-jam-bar-play-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   padding: 0.45rem 1.4rem;
   border-radius: 8px;
   border: 1px solid var(--border2);

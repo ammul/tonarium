@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { Info } from 'lucide-vue-next'
 
 const props = defineProps({
   modelValue: { type: String, required: true },
@@ -32,7 +33,7 @@ export default { name: 'ScaleSelector' }
       <select :value="modelValue" @change="onSelectChange" class="form-select">
         <option v-for="s in scales" :key="s.id" :value="s.id">{{ s.label }}</option>
       </select>
-      <button class="btn btn-round btn-subtle tc-scale-sel-info-btn" :class="{ active: showInfo }" @click="toggleInfo" aria-label="Scale info">i</button>
+      <button class="btn btn-round btn-subtle tc-scale-sel-info-btn" :class="{ active: showInfo }" @click="toggleInfo" aria-label="Scale info"><Info :size="13" /></button>
     </div>
     <p v-if="showInfo && selectedScale" class="info-box tc-scale-sel-info">{{ selectedScale.description }}</p>
   </div>
@@ -47,9 +48,10 @@ export default { name: 'ScaleSelector' }
 
 /* unique properties not covered by .btn + .btn-round + .btn-subtle */
 .tc-scale-sel-info-btn {
-  font-style: italic;
-  font-weight: 700;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tc-scale-sel-info {
