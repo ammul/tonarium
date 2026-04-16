@@ -60,6 +60,8 @@ function selectTab(id) {
   if (id === 'jam' || id === 'learn') {
     requestedLandingView.value = id
     id = 'home'
+  } else if (id === 'home') {
+    requestedLandingView.value = 'hero'
   }
   if (id === 'settings' && activeTab.value !== 'settings') {
     previousTab.value = activeTab.value

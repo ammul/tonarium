@@ -23,9 +23,12 @@ function goHome() {
   window.scrollTo(0, 0)
 }
 
-// React to menu navigation from App.vue (e.g. clicking 'Quick Jam' or 'Learn' in side menu)
+// React to navigation requests from App.vue
 watch(requestedLandingView, view => {
-  if (view) {
+  if (view === 'hero') {
+    goHome()
+    requestedLandingView.value = null
+  } else if (view) {
     goTo(view)
     requestedLandingView.value = null
   }
