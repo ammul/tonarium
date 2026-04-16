@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import StartPage from '@/pages/StartPage.vue'
 import LearnMode from '@/pages/LearnMode.vue'
-import { requestedLandingView } from '@/state/landingState.js'
+import { requestedLandingView, activeLandingView } from '@/state/landingState.js'
 
 const emit = defineEmits(['navigate'])
 
@@ -12,12 +12,14 @@ const subView = ref(null)
 function goTo(view) {
   history.pushState({ landingView: view }, '')
   subView.value = view
+  activeLandingView.value = view
   window.scrollTo(0, 0)
 }
 
 function goHome() {
   history.pushState({ landingView: null }, '')
   subView.value = null
+  activeLandingView.value = null
   window.scrollTo(0, 0)
 }
 
@@ -42,6 +44,7 @@ function handleChildNavigate(dest) {
 function handlePopState(e) {
   const v = e.state?.landingView ?? null
   subView.value = v
+  activeLandingView.value = v
 }
 
 onMounted(() => {
@@ -56,27 +59,6 @@ onUnmounted(() => {
 
 <template>
   <div class="tc-landing">
-
-    <!-- Sub-nav: shown when inside a child view -->
-    <div v-if="subView" class="tc-landing-subnav">
-      <button class="tc-landing-back" @click="goHome" aria-label="Back to home">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 2 4 7 9 12"/>
-        </svg>
-      </button>
-      <div class="tc-landing-tabs">
-        <button
-          class="tc-landing-tab"
-          :class="{ active: subView === 'jam' }"
-          @click="goTo('jam')"
-        >Quick Jam</button>
-        <button
-          class="tc-landing-tab"
-          :class="{ active: subView === 'learn' }"
-          @click="goTo('learn')"
-        >Learn</button>
-      </div>
-    </div>
 
     <!-- Hero screen -->
     <template v-if="!subView">
@@ -109,69 +91,6 @@ onUnmounted(() => {
 .tc-landing {
   display: flex;
   flex-direction: column;
-}
-
-/* Sub-nav */
-.tc-landing-subnav {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.75rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.tc-landing-back {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text3);
-  cursor: pointer;
-  font-family: inherit;
-  flex-shrink: 0;
-  transition: border-color 0.12s, color 0.12s;
-}
-
-.tc-landing-back:hover {
-  border-color: var(--border2);
-  color: var(--text);
-}
-
-.tc-landing-tabs {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.tc-landing-tab {
-  padding: 0.3rem 0.9rem;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text3);
-  font-size: 0.85rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.12s, color 0.12s, border-color 0.12s;
-}
-
-.tc-landing-tab:hover {
-  color: var(--text);
-  background: var(--hover);
-}
-
-.tc-landing-tab.active {
-  background: var(--raised);
-  border-color: var(--border2);
-  color: var(--accent);
 }
 
 /* Hero */
