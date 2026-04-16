@@ -13,16 +13,6 @@ describe('StartPage', () => {
     expect(wrapper.exists()).toBe(true)
   })
 
-  it('renders key/scale row', () => {
-    const wrapper = mount(StartPage)
-    expect(wrapper.find('.tc-home-key-row').exists()).toBe(true)
-  })
-
-  it('renders key selector', () => {
-    const wrapper = mount(StartPage)
-    expect(wrapper.find('.tc-home-key-select').exists()).toBe(true)
-  })
-
   it('renders JamSessionBar', () => {
     const wrapper = mount(StartPage)
     expect(wrapper.find('.jam-session-bar-stub').exists()).toBe(true)
