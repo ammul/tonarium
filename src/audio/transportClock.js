@@ -10,30 +10,74 @@ import { chordOn, chordOff } from '@/audio/midiManager.js'
 const LOOKAHEAD = 0.1
 const TICK_MS   = 25
 
-let _nextStepTime   = 0
+let _nextStepTime    = 0
 let _schedulerTimer  = null
+let _countInTimer    = null
 let _globalStep      = 0
 let _currentMidis    = []
 let _chordStopTimer  = null
 
 export const currentDrumStep = ref(0)
 
+function _playClick(time, isDownbeat) {
+  const ctx = getCtx()
+  const sr = ctx.sampleRate
+  const len = Math.floor(sr * 0.025)
+  const buf = ctx.createBuffer(1, len, sr)
+  const data = buf.getChannelData(0)
+  for (let i = 0; i < len; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (len * 0.15))
+  }
+  const src = ctx.createBufferSource()
+  src.buffer = buf
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'bandpass'
+  filter.frequency.value = isDownbeat ? 2800 : 1800
+  filter.Q.value = 0.7
+  const gain = ctx.createGain()
+  gain.gain.setValueAtTime(isDownbeat ? 0.75 : 0.48, time)
+  src.connect(filter)
+  filter.connect(gain)
+  gain.connect(ctx.destination)
+  src.start(time)
+  src.stop(time + 0.05)
+}
+
 export function startTransport() {
   if (sessionPlaying.value) return
   drumPause()  // stop any standalone drum engine loop before taking over
   const ctx = getCtx()
   initMixer()  // apply current slider values now that AudioContext exists
+
+  const beatSec = 60 / sessionBpm.value
+  const startTime = ctx.currentTime + 0.1
+
+  // 4-beat count-in: first click is louder (downbeat)
+  for (let i = 0; i < 4; i++) {
+    _playClick(startTime + i * beatSec, i === 0)
+  }
+
   sessionPlaying.value = true
   drumIsPlaying.value = true
   _globalStep = 0
   currentDrumStep.value = 0
   sessionCurrentChordIdx.value = 0
-  _nextStepTime = ctx.currentTime + 0.05
-  _playCurrentChord()
-  _tick()
+
+  // Start main loop after count-in completes
+  _countInTimer = setTimeout(() => {
+    _countInTimer = null
+    if (!sessionPlaying.value) return
+    _nextStepTime = getCtx().currentTime + 0.05
+    _playCurrentChord()
+    _tick()
+  }, Math.round((4 * beatSec + 0.12) * 1000))
 }
 
 export function stopTransport() {
+  if (_countInTimer) {
+    clearTimeout(_countInTimer)
+    _countInTimer = null
+  }
   sessionPlaying.value = false
   drumIsPlaying.value = false
   clearTimeout(_schedulerTimer)

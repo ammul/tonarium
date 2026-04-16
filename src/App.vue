@@ -6,6 +6,7 @@ import { isPlaying as drumIsPlaying, play as drumPlay, pause as drumPause } from
 import { sessionPlaying } from '@/state/sessionState.js'
 import { startTransport, stopTransport } from '@/audio/transportClock.js'
 import LandingPage from '@/pages/LandingPage.vue'
+import { requestedLandingView } from '@/state/landingState.js'
 import ScaleVisualizer from '@/pages/ScaleVisualizer.vue'
 import ChordProgressions from '@/pages/ChordProgressions.vue'
 import ChordDetector from '@/pages/ChordDetector.vue'
@@ -16,6 +17,8 @@ import AboutPage from '@/pages/AboutPage.vue'
 
 const allTabs = [
   { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: LandingPage },
+  { id: 'jam',            label: 'Quick Jam',           shortLabel: 'Jam',          component: LandingPage,        menuOnly: true },
+  { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LandingPage,        menuOnly: true },
   { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer,       menuOnly: true },
   { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions,  menuOnly: true },
   { id: 'scales',         label: 'Scale Visualizer',    shortLabel: 'Scales',       component: ScaleVisualizer,    menuOnly: true },
@@ -53,6 +56,11 @@ watch(displayMode, (mode) => {
 const activeComponent = computed(() => allTabs.find(t => t.id === activeTab.value)?.component)
 
 function selectTab(id) {
+  // 'jam' and 'learn' are sub-views of LandingPage, not top-level tabs
+  if (id === 'jam' || id === 'learn') {
+    requestedLandingView.value = id
+    id = 'home'
+  }
   if (id === 'settings' && activeTab.value !== 'settings') {
     previousTab.value = activeTab.value
   }

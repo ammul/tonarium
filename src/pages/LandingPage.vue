@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import StartPage from '@/pages/StartPage.vue'
 import LearnMode from '@/pages/LearnMode.vue'
+import { requestedLandingView } from '@/state/landingState.js'
 
 const emit = defineEmits(['navigate'])
 
@@ -9,16 +10,22 @@ const emit = defineEmits(['navigate'])
 const subView = ref(null)
 
 function goTo(view) {
-  if (subView.value !== view) {
-    history.pushState({ landingView: view }, '')
-    subView.value = view
-  }
+  history.pushState({ landingView: view }, '')
+  subView.value = view
 }
 
 function goHome() {
   history.pushState({ landingView: null }, '')
   subView.value = null
 }
+
+// React to menu navigation from App.vue (e.g. clicking 'Quick Jam' or 'Learn' in side menu)
+watch(requestedLandingView, view => {
+  if (view) {
+    goTo(view)
+    requestedLandingView.value = null
+  }
+}, { immediate: true })
 
 function handleChildNavigate(dest) {
   if (dest === 'home' || dest === 'jam') {
@@ -78,13 +85,11 @@ onUnmounted(() => {
 
       <div class="tc-landing-ctas">
         <button class="tc-landing-btn tc-landing-btn--jam" @click="goTo('jam')">
-          <span class="tc-landing-btn-icon">&#9654;</span>
           <span class="tc-landing-btn-label">Quick Jam</span>
           <span class="tc-landing-btn-desc">Pick a vibe and play</span>
         </button>
 
         <button class="tc-landing-btn tc-landing-btn--learn" @click="goTo('learn')">
-          <span class="tc-landing-btn-icon">&#9670;</span>
           <span class="tc-landing-btn-label">Learn</span>
           <span class="tc-landing-btn-desc">Root notes to full jams</span>
         </button>
@@ -109,7 +114,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1rem;
+  padding: 0.25rem 0.75rem;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
   position: sticky;
@@ -236,18 +241,6 @@ onUnmounted(() => {
 
 .tc-landing-btn--learn:hover {
   border-color: var(--accent-dim);
-}
-
-.tc-landing-btn-icon {
-  font-size: 1rem;
-  color: var(--accent);
-  margin-bottom: 0.3rem;
-  line-height: 1;
-}
-
-.tc-landing-btn--learn .tc-landing-btn-icon {
-  color: var(--text3);
-  font-size: 0.85rem;
 }
 
 .tc-landing-btn-label {
