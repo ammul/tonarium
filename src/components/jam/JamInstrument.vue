@@ -217,6 +217,12 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
 </template>
 
 <style scoped>
+.tc-instrument {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 :deep(.legend) { margin-top: 0; }
 
 .tc-instrument-pad-grid {
@@ -234,7 +240,6 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
   flex-wrap: wrap;
 }
 

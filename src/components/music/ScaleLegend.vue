@@ -22,7 +22,6 @@ const props = defineProps({
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 1.25rem;
   flex-wrap: wrap;
 }
 
@@ -52,9 +51,4 @@ const props = defineProps({
 .tc-scale-legend-item.anchor::before { background: var(--accent-mid); }
 .tc-scale-legend-item.safe::before   { background: var(--border2); }
 
-@media (orientation: landscape) and (max-height: 500px) {
-  .tc-scale-legend {
-    margin-top: 0.5rem;
-  }
-}
 </style>
