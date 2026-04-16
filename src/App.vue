@@ -67,11 +67,13 @@ function selectTab(id) {
   activeTab.value = id
   menuOpen.value = false
   history.pushState({ tab: id }, '')
+  window.scrollTo(0, 0)
 }
 
 function closeSettings() {
   activeTab.value = previousTab.value
   menuOpen.value = false
+  window.scrollTo(0, 0)
 }
 
 function handlePopState(e) {
@@ -79,6 +81,7 @@ function handlePopState(e) {
   if (!tab || !allTabs.some(t => t.id === tab)) return
   activeTab.value = tab
   menuOpen.value = false
+  window.scrollTo(0, 0)
 }
 
 onMounted(() => {

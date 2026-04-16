@@ -12,11 +12,13 @@ const subView = ref(null)
 function goTo(view) {
   history.pushState({ landingView: view }, '')
   subView.value = view
+  window.scrollTo(0, 0)
 }
 
 function goHome() {
   history.pushState({ landingView: null }, '')
   subView.value = null
+  window.scrollTo(0, 0)
 }
 
 // React to menu navigation from App.vue (e.g. clicking 'Quick Jam' or 'Learn' in side menu)
