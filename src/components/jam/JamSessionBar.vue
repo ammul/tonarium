@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
 import KnobControl from '@/components/ui/KnobControl.vue'
+import ScaleSelector from '@/components/jam/ScaleSelector.vue'
 import { NOTES, CHORD_SUFFIX } from '@tonarium/core'
 import { JAM_SCALES as SCALES } from '@tonarium/core'
 import { ALL_PROGRESSIONS } from '@tonarium/core'
@@ -117,6 +118,14 @@ function selectProgression(id) {
   if (selectedScaleId.value !== autoScale) selectedScaleId.value = autoScale
 }
 
+function onKeyChange() {
+  if (sessionPlaying.value) stopTransport()
+}
+
+function onScaleChange() {
+  if (sessionPlaying.value) stopTransport()
+}
+
 function selectBeat(idx) {
   activePreset.value = null
   if (idx === null) {
@@ -208,6 +217,20 @@ const activeBeatName = computed(() =>
 
     <!-- Controls -->
     <div class="tc-jam-bar-controls">
+      <PickerRow label="Key">
+        <select v-model="selectedRoot" class="form-select tc-jam-bar-key-select" @change="onKeyChange">
+          <option v-for="note in NOTES" :key="note" :value="note">{{ note }}</option>
+        </select>
+      </PickerRow>
+
+      <PickerRow label="Scale">
+        <ScaleSelector
+          v-model="selectedScaleId"
+          :scales="SCALES"
+          @update:modelValue="onScaleChange"
+        />
+      </PickerRow>
+
       <PickerRow label="Progression">
         <div class="tc-jam-bar-picker-row">
           <select
@@ -359,6 +382,11 @@ const activeBeatName = computed(() =>
   padding: 0.25rem 0.6rem;
 }
 
+
+.tc-jam-bar-key-select {
+  width: auto;
+  min-width: 5rem;
+}
 
 .tc-jam-bar-bpm-input {
   width: 5rem;
