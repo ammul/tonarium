@@ -174,12 +174,32 @@ All 9 learn step components, navigation, and learn-specific data constants. Uses
 
 Only app-specific code lives here. Everything extracted to a package becomes a 3-line shim.
 
+### Navigation model
+
+No Vue Router. `App.vue` maintains an `activeTab` ref and renders the matching component via `<component :is="...">`. All navigation goes through `selectTab(id)`.
+
+**LandingPage pattern.** The `'home'` tab always renders `LandingPage`. The ids `'jam'` and `'learn'` are not real tabs — they are sub-views of `LandingPage`, reached by setting `requestedLandingView` before switching to `'home'`:
+
+```js
+// In App.vue selectTab():
+if (id === 'jam' || id === 'learn') {
+  requestedLandingView.value = id   // tells LandingPage which sub-view to open
+  id = 'home'
+} else if (id === 'home') {
+  requestedLandingView.value = 'hero'  // navigate back to the hero screen
+}
+```
+
+`LandingPage` watches `requestedLandingView` and calls `goTo(view)` or `goHome()` accordingly. `activeLandingView` reflects the currently rendered sub-view so `App.vue`'s header buttons can show the correct active state.
+
+**History.** Both `App.vue` and `LandingPage` use `history.pushState` / `popstate` for browser back-button support. They coordinate independently: App stores `{ tab }`, LandingPage stores `{ landingView }`.
+
 ### Pages (real implementations)
 
 | Page | Description |
 |------|-------------|
-| `StartPage.vue` | Landing / dashboard |
-| `JamMode.vue` | Performance surface with pad/guitar/piano + transport |
+| `LandingPage.vue` | Hero screen; parent container for Quick Jam and Learn sub-views. Manages `subView` ref (`null` = hero, `'jam'`, `'learn'`). Reads `requestedLandingView` from `landingState.js` to respond to external navigation requests. |
+| `StartPage.vue` | Quick Jam performance surface (`JamSessionBar` + `JamInstrument`). Rendered as a sub-view inside `LandingPage` when `subView === 'jam'`. |
 | `ChordProgressions.vue` | Browse and load progressions |
 | `ProgressionBuilder.vue` | Custom progression builder |
 | `ChordDetector.vue` | Detect chords from played notes |
@@ -282,7 +302,8 @@ The primary shared state — persists key settings to `localStorage`.
 | `displayMode.js` | `displayMode` | `'pad' \| 'guitar' \| 'piano'` |
 | `padSize.js` | `padSize` | `'4x3' \| '4x4'` |
 | `octave.js` | `octave` | Current pad octave |
-| `jamSettings.js` | `selectedRoot`, `selectedScaleId`, `pianoOctave` | Jam Mode UI selections |
+| `jamSettings.js` | `selectedRoot`, `selectedScaleId`, `pianoOctave` | Quick Jam UI selections |
+| `landingState.js` | `requestedLandingView`, `activeLandingView` | Sub-view coordination between `App.vue` and `LandingPage`. Set `requestedLandingView` to `'jam'`, `'learn'`, or `'hero'` to trigger navigation; read `activeLandingView` to know which sub-view is active. |
 | `mixerState.js` | `jamVolume`, `beatVolume`, `progVolume` | Per-channel gain levels |
 | `colorMode.js` | `colorMode` | Light/dark mode |
 | `soundStyle.js` | `soundStyle` | Synth style selection |

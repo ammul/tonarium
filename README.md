@@ -10,7 +10,7 @@ A free web app for people who love music but never learned to read it. Pick a ch
 
 ## The Jam Experience
 
-This is the core of Tonarium. In Jam Mode:
+This is the core of Tonarium. Open **Quick Jam** from the home screen:
 
 1. **Pick a chord progression** - browse 69 presets across 10 genres, or type your own
 2. **Add a drum beat** - choose from 10 grooves (rock, hip-hop, bossa nova, trap...)
@@ -25,7 +25,7 @@ Everything stays in sync. The drums and chords share one clock so nothing drifts
 A 16-step drum sequencer with 9 synthesised instruments. Pick a groove preset or build your own pattern from scratch. The beat keeps playing when you switch tabs.
 
 ### Chord Progressions
-69 classic progressions from pop to jazz to cinematic, transposed to any key. Hear how I-V-vi-IV sounds, then tap "Jam" to play over it with a beat running.
+69 classic progressions from pop to jazz to cinematic, transposed to any key. Hear how I-V-vi-IV sounds, then tap "Jam with This" to load it into Quick Jam with a beat running.
 
 ### Improvising
 Pick a key, pick a scale, and see which notes are safe. Anchor notes (root, 3rd, 5th) glow brighter. Turn on chord mode and the highlights shift to match each chord as it plays.
@@ -34,8 +34,8 @@ Pick a key, pick a scale, and see which notes are safe. Anchor notes (root, 3rd,
 
 | Tool | What it does |
 |------|-------------|
-| **Learn** | 9-step interactive course: root notes through jam sessions |
-| **Jam Mode** | The unified performance surface - progression + beat + improv |
+| **Quick Jam** | Unified performance surface: key, scale, progression, beat, BPM and improv in one place |
+| **Learn** | 9-step interactive course: root notes through full jam sessions |
 | **Drum Computer** | 16-step sequencer, 9 instruments, 10 groove presets |
 | **Chord Progressions** | 69 presets across 10 genres with playback |
 | **Scale Visualizer** | See any scale across all 12 notes |
