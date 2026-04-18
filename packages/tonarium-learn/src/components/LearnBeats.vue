@@ -4,7 +4,6 @@ import { pattern as drumPattern, play as drumPlay, pause as drumPause, isPlaying
 import { stopTransport } from '@/audio/transportClock.js'
 import { sessionPlaying, sessionBpm, sessionBeatIdx } from '@/state/sessionState.js'
 import { BEAT_PATTERNS } from '@tonarium/core'
-import { BEAT_TIPS } from '../constants/beatPatterns.js'
 import { buildPatternFromBeat } from '@/utils/beatUtils.js'
 
 const emit = defineEmits(['navigate'])
@@ -45,7 +44,7 @@ onUnmounted(() => {
 
 <template>
   <div class="step-content">
-    <p class="step-intro">A good beat is built from three layers: <strong>kick</strong>, <strong>snare</strong>, and <strong>hi-hat</strong>. Each has a job. Together they create rhythm that makes people move.</p>
+    <p class="step-intro">Every beat starts with three layers: <strong>kick</strong>, <strong>snare</strong>, and <strong>hi-hat</strong>. Get those right and everything else is detail.</p>
 
     <div class="tc-learn-beats-recipe">
       <div class="tc-learn-beats-recipe-title">The simplest beat that works</div>
@@ -103,11 +102,8 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div class="tc-learn-beats-tips">
-      <div v-for="tip in BEAT_TIPS" :key="tip.num" class="tc-learn-beats-tip">
-        <span class="numbered-badge tc-learn-beats-tip-num">{{ tip.num }}</span>
-        <span v-html="tip.text"></span>
-      </div>
+    <div class="step-bridge">
+      Load a beat and hit <strong>Edit</strong> to open it in the Drum Computer. Try removing the hi-hat — notice how sparse and open it feels.
     </div>
 
     <button class="btn btn-accent btn-block btn-lg" @click="goToDrumComputer">
@@ -267,20 +263,4 @@ onUnmounted(() => {
   border-color: var(--accent);
 }
 
-.tc-learn-beats-tips {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.tc-learn-beats-tip {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  font-size: 0.85rem;
-  color: var(--text2);
-  line-height: 1.5;
-}
-
-.tc-learn-beats-tip strong { color: var(--accent); font-weight: 600; }
 </style>

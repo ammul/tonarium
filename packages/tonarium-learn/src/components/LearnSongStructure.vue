@@ -92,20 +92,20 @@ function tapSection(ti, si) {
 
 <template>
   <div class="step-content">
-    <p class="step-intro">Songs are built from repeating sections. Each section has a job: verse tells the story, chorus makes the hook, bridge adds contrast. Learning the pattern makes any song easier to figure out and write.</p>
+    <p class="step-intro">Songs are sections with jobs — tap any section to hear its chords.</p>
 
     <div class="tc-learn-song-concepts">
       <div class="tc-learn-song-concept-card">
         <span class="tc-learn-song-concept-label">Verse</span>
-        <span class="tc-learn-song-concept-desc">Quieter, more words, tells the story. Uses a progression that feels unresolved, pulling toward the chorus.</span>
+        <span class="tc-learn-song-concept-desc">Quieter, more words — builds anticipation toward the chorus.</span>
       </div>
       <div class="tc-learn-song-concept-card">
         <span class="tc-learn-song-concept-label chorus">Chorus</span>
-        <span class="tc-learn-song-concept-desc">Loudest, most repeated, most memorable. The hook lands here: strong resolution, clear chords.</span>
+        <span class="tc-learn-song-concept-desc">The hook — loudest, most repeated, most resolved.</span>
       </div>
       <div class="tc-learn-song-concept-card">
         <span class="tc-learn-song-concept-label bridge">Bridge</span>
-        <span class="tc-learn-song-concept-desc">Appears once, adds contrast. Often goes to an unexpected chord to reset energy before the final chorus.</span>
+        <span class="tc-learn-song-concept-desc">One-time contrast section to reset energy before the final chorus.</span>
       </div>
     </div>
 
@@ -148,18 +148,16 @@ function tapSection(ti, si) {
       </div>
     </div>
 
-    <div class="tc-learn-song-cta">
-      Build your own song structure in <strong>Progression Builder</strong>. Enter chords as symbols like <code>C F G Am</code>.
-      <button class="btn btn-accent btn-block" style="margin-top:0.75rem" @click="emit('navigate', 'builder')">
-        Open Progression Builder &rarr;
-      </button>
+    <div class="step-bridge">
+      Listen to the Verse and Chorus of the pop template back to back. The Chorus feels more conclusive — that's the I chord landing at the end.
     </div>
 
-    <div class="tc-learn-song-cta">
-      Ready to play? <strong>Jam Mode</strong> loops a progression with a drum beat while you improvise. Highlights follow each chord.
-      <button class="btn btn-accent btn-block" style="margin-top:0.75rem" @click="emit('navigate', 'home')">
-        Try in Jam Mode &rarr;
-      </button>
+    <div class="tc-learn-song-cta-row">
+      <span class="tc-learn-song-cta-label">Take it further</span>
+      <div class="tc-learn-song-cta-btns">
+        <button class="btn btn-accent" @click="emit('navigate', 'builder')">Progression Builder &rarr;</button>
+        <button class="btn btn-accent" @click="emit('navigate', 'home')">Jam Mode &rarr;</button>
+      </div>
     </div>
   </div>
 </template>
@@ -338,25 +336,28 @@ function tapSection(ti, si) {
 
 .tc-learn-song-sec-chord-pill.playing .tc-learn-song-scp-name { color: var(--accent-hi); }
 
-.tc-learn-song-cta {
-  padding: 0.85rem 1rem;
-  border-radius: 8px;
-  border: 1px dashed var(--border2);
-  font-size: 0.83rem;
-  color: var(--text3);
+.tc-learn-song-cta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.tc-learn-song-cta strong { color: var(--accent); }
-.tc-learn-song-cta code {
-  background: var(--raised);
-  border: 1px solid var(--border2);
-  border-radius: 3px;
-  padding: 0.05em 0.35em;
-  font-size: 0.82em;
-  color: var(--text2);
+.tc-learn-song-cta-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text4);
+}
+
+.tc-learn-song-cta-btns {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 @media (max-width: 500px) {
   .tc-learn-song-concepts { grid-template-columns: 1fr; }
+  .tc-learn-song-cta-btns .btn { flex: 1; }
 }
 </style>

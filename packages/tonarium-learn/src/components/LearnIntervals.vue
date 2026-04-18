@@ -52,7 +52,7 @@ const intervalInfo = computed(() => {
 
 <template>
   <div class="step-content">
-    <p class="step-intro">Tap any two notes - hear the sound and see the <strong>interval</strong> between them.</p>
+    <p class="step-intro">Pick any two notes to hear the interval between them.</p>
 
     <NoteStripPicker
       :from-index="fromIdx"
@@ -82,16 +82,17 @@ const intervalInfo = computed(() => {
       <div class="tc-learn-intervals-ref-label">All intervals from root (tap to hear)</div>
       <div class="tc-learn-intervals-ref-grid">
         <div v-for="iv in INTERVALS" :key="iv.semi" class="tc-learn-intervals-ref-item"
-          :class="{ highlight: intervalInfo && intervalInfo.semi === iv.semi }"
+          :class="[iv.category, { highlight: intervalInfo && intervalInfo.semi === iv.semi }]"
           @click="pickRefInterval(iv.semi)">
           <span class="tc-learn-intervals-ref-semi">{{ iv.semi }}</span>
           <span class="tc-learn-intervals-ref-name">{{ iv.name }}</span>
+          <span class="tc-learn-intervals-ref-feel">{{ iv.feel.split(',')[0] }}</span>
         </div>
       </div>
     </div>
 
     <div class="step-bridge">
-      Three intervals matter most: <strong>Minor 3rd</strong> (3 semitones), <strong>Major 3rd</strong> (4), and <strong>Perfect 5th</strong> (7). Stack a 3rd and a 5th above any root and you have a <strong>chord</strong>. Stack several chords in a row and you have a <strong>progression</strong>.
+      Find the most tense interval (tritone, 6 semitones) and the most resolved one (perfect 5th, 7 semitones) — those are your two poles. Stack a 3rd and a 5th above any root and you have a <strong>chord</strong>.
     </div>
   </div>
 </template>
@@ -202,8 +203,21 @@ const intervalInfo = computed(() => {
 
 .tc-learn-intervals-ref-name { color: var(--text3); }
 
+.tc-learn-intervals-ref-feel {
+  font-size: 0.65rem;
+  color: var(--text5);
+  font-style: italic;
+}
+
+/* Category border-left accent colors */
+.tc-learn-intervals-ref-item.consonant { border-left: 2px solid color-mix(in srgb, var(--good) 50%, transparent); }
+.tc-learn-intervals-ref-item.bright    { border-left: 2px solid color-mix(in srgb, var(--accent-hi) 50%, transparent); }
+.tc-learn-intervals-ref-item.dark      { border-left: 2px solid color-mix(in srgb, var(--accent-lo) 60%, transparent); }
+.tc-learn-intervals-ref-item.tense     { border-left: 2px solid color-mix(in srgb, var(--bad) 50%, transparent); }
+
 .tc-learn-intervals-ref-item.highlight .tc-learn-intervals-ref-semi { color: var(--accent); }
 .tc-learn-intervals-ref-item.highlight .tc-learn-intervals-ref-name { color: var(--text2); }
+.tc-learn-intervals-ref-item.highlight .tc-learn-intervals-ref-feel { color: var(--accent-mid); }
 
 /* step-bridge — from learn.css */
 </style>

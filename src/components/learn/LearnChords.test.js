@@ -8,7 +8,7 @@ vi.mock('@/audio/audioEngine.js', () => ({
 }))
 
 import LearnChords from './LearnChords.vue'
-import { playChord } from '@/audio/audioEngine.js'
+import { playChord, playNote } from '@/audio/audioEngine.js'
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -20,16 +20,13 @@ describe('LearnChords', () => {
     expect(wrapper.findAll('.tc-learn-chords-card')).toHaveLength(3)
   })
 
-  it('each card has a Hear it button', () => {
+  it('no chord is active by default', () => {
     const wrapper = mount(LearnChords)
-    const btns = wrapper.findAll('.tc-learn-chords-play')
-    expect(btns).toHaveLength(3)
-    for (const btn of btns) {
-      expect(btn.text()).toBe('Hear it')
-    }
+    expect(wrapper.find('.tc-learn-chords-card.active').exists()).toBe(false)
+    expect(wrapper.find('.tc-learn-chords-display').exists()).toBe(false)
   })
 
-  it('displays interval pills for each chord', () => {
+  it('displays note-name interval pills for each chord', () => {
     const wrapper = mount(LearnChords)
     const pills = wrapper.findAll('.tc-learn-chords-interval-pill')
     // major (3) + minor (3) + dom7 (4) = 10 pills
@@ -39,5 +36,31 @@ describe('LearnChords', () => {
   it('renders root note picker', () => {
     const wrapper = mount(LearnChords)
     expect(wrapper.find('.picker-row').exists()).toBe(true)
+  })
+
+  it('clicking a chord card sets it active and plays the chord', async () => {
+    const wrapper = mount(LearnChords)
+    await wrapper.findAll('.tc-learn-chords-card')[0].trigger('pointerdown')
+    expect(wrapper.findAll('.tc-learn-chords-card')[0].classes()).toContain('active')
+    expect(playChord).toHaveBeenCalled()
+  })
+
+  it('clicking an active card deactivates it', async () => {
+    const wrapper = mount(LearnChords)
+    await wrapper.findAll('.tc-learn-chords-card')[0].trigger('pointerdown')
+    await wrapper.findAll('.tc-learn-chords-card')[0].trigger('pointerdown')
+    expect(wrapper.find('.tc-learn-chords-card.active').exists()).toBe(false)
+  })
+
+  it('shows chord display area when a card is active', async () => {
+    const wrapper = mount(LearnChords)
+    await wrapper.findAll('.tc-learn-chords-card')[0].trigger('pointerdown')
+    expect(wrapper.find('.tc-learn-chords-display').exists()).toBe(true)
+  })
+
+  it('clicking an interval pill plays a single note', async () => {
+    const wrapper = mount(LearnChords)
+    await wrapper.findAll('.tc-learn-chords-interval-pill')[0].trigger('pointerdown')
+    expect(playNote).toHaveBeenCalled()
   })
 })

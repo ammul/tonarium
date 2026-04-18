@@ -3,7 +3,13 @@ import { ref } from 'vue'
 import { playNote, playChord } from '@/audio/audioEngine.js'
 import { IMPROV_CHORD_TYPES as CHORD_TYPES, IMPROV_EXAMPLES } from '../constants/chordTypes.js'
 
-const improvChordIdx = ref(0)
+const emit = defineEmits(['navigate'])
+
+const openChordIdx = ref(null)
+
+function toggleChord(i) {
+  openChordIdx.value = openChordIdx.value === i ? null : i
+}
 
 function playImprovExample(chordSemis, noteSemi) {
   const root = 60
@@ -14,90 +20,74 @@ function playImprovExample(chordSemis, noteSemi) {
 
 <template>
   <div class="step-content">
-    <p class="step-intro">Improvising is about choosing notes that sound <strong>intentional</strong>. The key: match your scale to the chord type you're playing over.</p>
+    <p class="step-intro">Improvising is about choosing notes that sound <strong>intentional</strong> — match your scale to the chord underneath you.</p>
 
     <div class="tc-learn-improv-cheat-box">
       <span class="tc-learn-improv-cheat-label">Cheat code</span>
-      <p class="tc-learn-improv-cheat-text"><strong>Minor pentatonic works over almost everything.</strong> It's only 5 notes and none of them clash. Pick your key's minor pentatonic and you can solo over nearly any chord in that key without thinking about it. Start here, always.</p>
+      <p class="tc-learn-improv-cheat-text"><strong>Minor pentatonic works over almost everything.</strong> It's only 5 notes and none of them clash. Start here, always.</p>
     </div>
 
     <div class="tc-learn-improv-list">
-      <div v-for="ct in CHORD_TYPES" :key="ct.chord" class="card tc-learn-improv-item">
-        <span class="tc-learn-improv-chord-name">{{ ct.chord }}</span>
-        <div class="tc-learn-improv-scales">
-          <span v-for="sc in ct.scales" :key="sc.name" class="tc-learn-improv-scale-pill">
-            <span class="tc-learn-improv-isp-name">{{ sc.name }}</span>
-            <span class="tc-learn-improv-isp-desc">{{ sc.desc }}</span>
-          </span>
+      <div
+        v-for="(ct, i) in CHORD_TYPES"
+        :key="ct.chord"
+        class="card tc-learn-improv-item"
+        :class="{ open: openChordIdx === i }"
+        @click="toggleChord(i)"
+      >
+        <div class="tc-learn-improv-item-header">
+          <span class="tc-learn-improv-chord-name">{{ ct.chord }}</span>
+          <div class="tc-learn-improv-scales">
+            <span v-for="sc in ct.scales" :key="sc.name" class="tc-learn-improv-scale-pill">
+              <span class="tc-learn-improv-isp-name">{{ sc.name }}</span>
+              <span class="tc-learn-improv-isp-desc">{{ sc.desc }}</span>
+            </span>
+          </div>
+          <span class="tc-learn-improv-toggle">{{ openChordIdx === i ? '▲' : '▼' }}</span>
+        </div>
+
+        <div v-if="openChordIdx === i" class="tc-learn-improv-demo" @click.stop>
+          <div class="tc-learn-improv-demo-hint">Chord plays first, then the note (all in C)</div>
+          <div class="tc-learn-improv-ie-columns">
+            <div class="tc-learn-improv-ie-col">
+              <div class="tc-learn-improv-ie-col-label good">Works well</div>
+              <button
+                v-for="n in IMPROV_EXAMPLES[i].goodNotes"
+                :key="n.semi"
+                class="tc-learn-improv-ie-note-btn good"
+                @pointerdown.prevent="playImprovExample(IMPROV_EXAMPLES[i].chordSemi, n.semi)"
+              >
+                <span class="tc-learn-improv-ie-note-name">{{ n.name }}</span>
+                <span class="tc-learn-improv-ie-note-why">{{ n.why }}</span>
+              </button>
+            </div>
+            <div class="tc-learn-improv-ie-col">
+              <div class="tc-learn-improv-ie-col-label bad">Clashes</div>
+              <button
+                v-for="n in IMPROV_EXAMPLES[i].badNotes"
+                :key="n.semi"
+                class="tc-learn-improv-ie-note-btn bad"
+                @pointerdown.prevent="playImprovExample(IMPROV_EXAMPLES[i].chordSemi, n.semi)"
+              >
+                <span class="tc-learn-improv-ie-note-name">{{ n.name }}</span>
+                <span class="tc-learn-improv-ie-note-why">{{ n.why }}</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="tc-learn-improv-tips">
-      <div class="tc-learn-improv-tip">
-        <span class="numbered-badge tc-learn-improv-tip-num">1</span>
-        <span>Start with <strong>minor pentatonic</strong>: 5 notes, no clashes, works over almost anything minor.</span>
-      </div>
-      <div class="tc-learn-improv-tip">
-        <span class="numbered-badge tc-learn-improv-tip-num">2</span>
-        <span>Land on <strong>chord tones</strong> (root, 3rd, 5th). They resolve. Other notes work best as passing notes.</span>
-      </div>
-      <div class="tc-learn-improv-tip">
-        <span class="numbered-badge tc-learn-improv-tip-num">3</span>
-        <span><strong>Rhythm beats note choice.</strong> One confident two-note groove sounds better than a hundred random pitches.</span>
-      </div>
+    <div class="step-bridge">
+      Try it live: Jam Mode highlights safe notes on the pads as each chord plays.
     </div>
 
-    <div class="tc-learn-improv-examples">
-      <div class="tc-learn-improv-ie-header">
-        <span class="tc-learn-improv-ie-title">Hear the difference</span>
-        <span class="tc-learn-improv-ie-subtitle">Chord plays first, then the note (all in C)</span>
-      </div>
-      <div class="tc-learn-improv-ie-chord-picker">
-        <button
-          v-for="(ct, i) in CHORD_TYPES"
-          :key="ct.chord"
-          class="btn btn-sm tc-learn-improv-ie-chord-btn"
-          :class="{ active: improvChordIdx === i }"
-          @click="improvChordIdx = i"
-        >{{ ct.chord }}</button>
-      </div>
-      <div class="tc-learn-improv-ie-columns">
-        <div class="tc-learn-improv-ie-col">
-          <div class="tc-learn-improv-ie-col-label good">Works well</div>
-          <button
-            v-for="n in IMPROV_EXAMPLES[improvChordIdx].goodNotes"
-            :key="n.semi"
-            class="tc-learn-improv-ie-note-btn good"
-            @pointerdown.prevent="playImprovExample(IMPROV_EXAMPLES[improvChordIdx].chordSemi, n.semi)"
-          >
-            <span class="tc-learn-improv-ie-note-name">{{ n.name }}</span>
-            <span class="tc-learn-improv-ie-note-why">{{ n.why }}</span>
-          </button>
-        </div>
-        <div class="tc-learn-improv-ie-col">
-          <div class="tc-learn-improv-ie-col-label bad">Clashes</div>
-          <button
-            v-for="n in IMPROV_EXAMPLES[improvChordIdx].badNotes"
-            :key="n.semi"
-            class="tc-learn-improv-ie-note-btn bad"
-            @pointerdown.prevent="playImprovExample(IMPROV_EXAMPLES[improvChordIdx].chordSemi, n.semi)"
-          >
-            <span class="tc-learn-improv-ie-note-name">{{ n.name }}</span>
-            <span class="tc-learn-improv-ie-note-why">{{ n.why }}</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="tc-learn-improv-cta">
-      Try it in <strong>Jam Mode</strong>. Pick a key and scale to see safe pads highlighted.
-    </div>
+    <button class="btn btn-accent btn-block" @click="emit('navigate', 'home')">Open Jam Mode &rarr;</button>
   </div>
 </template>
 
 <style scoped>
-/* step-content, step-intro — from learn.css */
+/* step-content, step-intro, step-bridge — from learn.css */
 
 .tc-learn-improv-cheat-box {
   display: flex;
@@ -129,14 +119,26 @@ function playImprovExample(chordSemis, noteSemi) {
 .tc-learn-improv-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
-/* unique properties not covered by .card */
 .tc-learn-improv-item {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.tc-learn-improv-item.open {
+  border-color: var(--accent-mid);
+}
+
+.tc-learn-improv-item-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .tc-learn-improv-chord-name {
@@ -144,12 +146,14 @@ function playImprovExample(chordSemis, noteSemi) {
   font-weight: 700;
   color: var(--accent);
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .tc-learn-improv-scales {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.35rem;
+  flex: 1;
 }
 
 .tc-learn-improv-scale-pill {
@@ -173,57 +177,24 @@ function playImprovExample(chordSemis, noteSemi) {
   color: var(--text4);
 }
 
-.tc-learn-improv-tips {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.tc-learn-improv-tip {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  font-size: 0.85rem;
-  color: var(--text2);
-  line-height: 1.5;
-}
-
-.tc-learn-improv-tip strong { color: var(--accent); font-weight: 600; }
-
-.tc-learn-improv-examples {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  padding: 1rem;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--surface2);
-}
-
-.tc-learn-improv-ie-header {
-  display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-}
-
-.tc-learn-improv-ie-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text2);
-}
-
-.tc-learn-improv-ie-subtitle {
-  font-size: 0.78rem;
+.tc-learn-improv-toggle {
+  font-size: 0.65rem;
   color: var(--text4);
+  flex-shrink: 0;
+  padding-top: 0.15rem;
 }
 
-.tc-learn-improv-ie-chord-picker {
+.tc-learn-improv-demo {
   display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--border);
+}
+
+.tc-learn-improv-demo-hint {
+  font-size: 0.75rem;
+  color: var(--text4);
 }
 
 .tc-learn-improv-ie-columns {
@@ -283,15 +254,4 @@ function playImprovExample(chordSemis, noteSemi) {
   color: var(--text4);
   line-height: 1.3;
 }
-
-.tc-learn-improv-cta {
-  padding: 0.7rem 1rem;
-  border-radius: 8px;
-  border: 1px dashed var(--border2);
-  font-size: 0.83rem;
-  color: var(--text3);
-  text-align: center;
-}
-
-.tc-learn-improv-cta strong { color: var(--accent); }
 </style>

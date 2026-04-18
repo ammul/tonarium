@@ -19,32 +19,35 @@ describe('LearnImprovising', () => {
     expect(wrapper.findAll('.tc-learn-improv-item')).toHaveLength(3)
   })
 
-  it('renders chord picker buttons', () => {
+  it('no chord demo is open by default', () => {
     const wrapper = mount(LearnImprovising)
-    const btns = wrapper.findAll('.tc-learn-improv-ie-chord-btn')
-    expect(btns).toHaveLength(3)
+    expect(wrapper.find('.tc-learn-improv-demo').exists()).toBe(false)
   })
 
-  it('first chord is selected by default', () => {
+  it('clicking a chord item opens its demo panel', async () => {
     const wrapper = mount(LearnImprovising)
-    expect(wrapper.findAll('.tc-learn-improv-ie-chord-btn')[0].classes()).toContain('active')
+    await wrapper.findAll('.tc-learn-improv-item')[0].trigger('click')
+    expect(wrapper.find('.tc-learn-improv-demo').exists()).toBe(true)
   })
 
-  it('clicking a chord btn changes active selection', async () => {
+  it('clicking the same chord item again closes the demo panel', async () => {
     const wrapper = mount(LearnImprovising)
-    await wrapper.findAll('.tc-learn-improv-ie-chord-btn')[1].trigger('click')
-    expect(wrapper.findAll('.tc-learn-improv-ie-chord-btn')[1].classes()).toContain('active')
-    expect(wrapper.findAll('.tc-learn-improv-ie-chord-btn')[0].classes()).not.toContain('active')
+    await wrapper.findAll('.tc-learn-improv-item')[0].trigger('click')
+    await wrapper.findAll('.tc-learn-improv-item')[0].trigger('click')
+    expect(wrapper.find('.tc-learn-improv-demo').exists()).toBe(false)
   })
 
-  it('renders good and bad note buttons', () => {
+  it('renders good and bad note buttons when a card is open', async () => {
     const wrapper = mount(LearnImprovising)
+    await wrapper.findAll('.tc-learn-improv-item')[0].trigger('click')
     expect(wrapper.findAll('.tc-learn-improv-ie-note-btn.good').length).toBeGreaterThan(0)
     expect(wrapper.findAll('.tc-learn-improv-ie-note-btn.bad').length).toBeGreaterThan(0)
   })
 
-  it('renders 3 tips', () => {
+  it('opening a different card closes the previous one', async () => {
     const wrapper = mount(LearnImprovising)
-    expect(wrapper.findAll('.tc-learn-improv-tip')).toHaveLength(3)
+    await wrapper.findAll('.tc-learn-improv-item')[0].trigger('click')
+    await wrapper.findAll('.tc-learn-improv-item')[1].trigger('click')
+    expect(wrapper.findAll('.tc-learn-improv-demo')).toHaveLength(1)
   })
 })

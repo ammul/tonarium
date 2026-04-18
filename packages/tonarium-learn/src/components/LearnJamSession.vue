@@ -56,7 +56,7 @@ function launchJam() {
 
 <template>
   <div class="step-content">
-    <p class="step-intro">Time to put it all together. Pick a progression, add a beat, and start jamming. The highlights on the pads will follow the chords as they cycle.</p>
+    <p class="step-intro">Pick a progression and a beat. The pad highlights will follow the chords as they loop.</p>
 
     <div class="tc-learn-jam-setup-step">
       <span class="tc-learn-jam-setup-num">1</span>
@@ -99,6 +99,15 @@ function launchJam() {
     <div class="tc-learn-jam-bpm-row">
       <input type="range" v-model.number="chosenBpm" min="60" max="180" class="tc-learn-jam-bpm-slider" />
       <span class="tc-learn-jam-bpm-val">{{ chosenBpm }} BPM</span>
+    </div>
+
+    <div class="tc-learn-jam-tips">
+      <div class="tc-learn-jam-tips-label">Before you start</div>
+      <ul class="tc-learn-jam-tips-list">
+        <li>Listen to the chord cycle a few times before playing anything.</li>
+        <li>Stick to the minor pentatonic scale — it works over almost everything.</li>
+        <li>Play slow. One note per chord change is more than enough to start.</li>
+      </ul>
     </div>
 
     <button
@@ -195,8 +204,36 @@ function launchJam() {
   text-align: right;
 }
 
+.tc-learn-jam-tips {
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--raised);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tc-learn-jam-tips-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.tc-learn-jam-tips-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.83rem;
+  color: var(--text3);
+  line-height: 1.5;
+}
+
 .tc-learn-jam-launch {
-  margin-top: 1.5rem;
   font-size: 1rem;
   padding: 0.75rem;
 }

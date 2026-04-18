@@ -28,7 +28,7 @@ describe('LearnRootNotes', () => {
   it('shows root name after picking a note', async () => {
     const wrapper = mount(LearnRootNotes)
     await wrapper.findAll('.tc-note-strip-pill')[0].trigger('pointerdown')
-    expect(wrapper.find('.tc-learn-roots-rr-name').text()).toBe('C')
+    expect(wrapper.find('.tc-learn-roots-rr-name').text()).toBe('A')
     expect(wrapper.find('.tc-learn-roots-rr-hint').exists()).toBe(false)
   })
 

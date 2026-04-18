@@ -2,7 +2,11 @@
 import { ref, computed } from 'vue'
 import { playChord, stopAllNotes } from '@/audio/audioEngine.js'
 import { NoteStripPicker } from '@tonarium/vue'
+import { NOTES, ALL_PROGRESSIONS } from '@tonarium/core'
+import { sessionProgression, sessionKey } from '@/state/sessionState.js'
 import { LEARN_PROGS as PROGS } from '../constants/progressions.js'
+
+const emit = defineEmits(['navigate'])
 
 const CHROMATIC  = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 const MAJOR_SCALE = [0,2,4,5,7,9,11]
@@ -67,11 +71,27 @@ const progActiveDeg = computed(() =>
     ? PROGS[activeProg.value].degIdx[progActiveChordIdx.value]
     : null
 )
+
+function jamWithProg(pi) {
+  const fullProg = ALL_PROGRESSIONS.find(p => p.id === PROGS[pi].progId)
+  if (!fullProg) return
+  const ri = NOTES.indexOf('C')
+  sessionProgression.value = {
+    ...fullProg,
+    chords: fullProg.chords.map(c => ({
+      ...c,
+      _rootIdx: (ri + c.degree) % 12,
+      _octave: 4,
+    })),
+  }
+  sessionKey.value = 'C'
+  emit('navigate', 'home')
+}
 </script>
 
 <template>
   <div class="step-content">
-    <p class="step-intro">Chords are labelled with <strong>Roman numerals</strong> based on the scale they come from. Every chord in a key uses only notes from that key's scale. That's why they all sound good together. Tap any chord to hear it, or tap a progression to play it.</p>
+    <p class="step-intro">Tap any chord to hear it. Tap a progression to play the loop.</p>
 
     <div class="picker-row">
       <span class="picker-label">Key</span>
@@ -127,8 +147,13 @@ const progActiveDeg = computed(() =>
             >{{ chordLabel(progRoot, deg) }}</span>
           </div>
           <div class="tc-learn-progs-songs">{{ prog.songs }}</div>
+          <button class="btn btn-sm btn-accent tc-learn-progs-jam-btn" @click.stop="jamWithProg(pi)">Jam with this &rarr;</button>
         </div>
       </button>
+    </div>
+
+    <div class="step-bridge">
+      Switch the key to any minor root and notice how the Roman numerals shift mood — the same I–V–vi–IV pattern sounds darker. These relationships work in every key, forever.
     </div>
   </div>
 </template>
@@ -275,6 +300,11 @@ const progActiveDeg = computed(() =>
   font-size: 0.76rem;
   color: var(--text4);
   letter-spacing: 0.02em;
+}
+
+.tc-learn-progs-jam-btn {
+  align-self: flex-start;
+  margin-top: 0.25rem;
 }
 
 @media (max-width: 600px) {

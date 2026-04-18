@@ -15,6 +15,14 @@ const scaleNotes = computed(() =>
   SCALES[scaleIdx.value].steps.map(s => (scaleRoot.value + s) % 12)
 )
 
+const stepPattern = computed(() => {
+  const steps = SCALES[scaleIdx.value].steps
+  return steps.map((s, i) => {
+    const gap = (i < steps.length - 1 ? steps[i + 1] : 12) - s
+    return gap === 1 ? 'H' : gap === 2 ? 'W' : 'W+H'
+  })
+})
+
 const scaleFullName = computed(() =>
   `${CHROMATIC[scaleRoot.value]} ${SCALES[scaleIdx.value].name}`
 )
@@ -53,7 +61,7 @@ function playScale() {
 
 <template>
   <div class="step-content">
-    <p class="step-intro">A <strong>scale</strong> is a fixed pattern of intervals repeating from a root. The Major scale uses the same intervals every time, so it always sounds the same no matter which root you pick. Pick a root, choose a scale, hear which notes light up.</p>
+    <p class="step-intro">A <strong>scale</strong> is a fixed interval pattern repeating from a root — same pattern, same mood, any key.</p>
 
     <div class="picker-row">
       <span class="picker-label">Root</span>
@@ -64,7 +72,7 @@ function playScale() {
       />
     </div>
 
-    <div class="picker-row">
+    <div class="picker-row tc-learn-scales-scale-row">
       <span class="picker-label">Scale</span>
       <div class="tc-learn-scales-tabs">
         <button
@@ -75,6 +83,15 @@ function playScale() {
           @click="scaleIdx = si"
         >{{ sc.name }}</button>
       </div>
+    </div>
+
+    <div class="tc-learn-scales-steps">
+      <span
+        v-for="(step, i) in stepPattern"
+        :key="i"
+        class="tc-learn-scales-step-chip"
+        :class="step === 'H' ? 'half' : step === 'W' ? 'whole' : 'wh'"
+      >{{ step }}</span>
     </div>
 
     <div class="tc-learn-scales-display-legend">
@@ -101,6 +118,10 @@ function playScale() {
       <span class="tc-learn-scales-name">{{ scaleFullName }}</span>
       <span class="tc-learn-scales-feel">{{ SCALES[scaleIdx].feel }}</span>
       <button class="btn btn-accent flex-shrink-0" @click="playScale">Play scale</button>
+    </div>
+
+    <div class="step-bridge">
+      Compare Major and Minor — notice the Minor scale has two half-steps (H) bunched closer together. That squeeze is what gives it its darker sound. These 7 notes become the 7 chords you'll use in the next lesson.
     </div>
   </div>
 </template>
@@ -235,4 +256,28 @@ function playScale() {
   color: var(--text3);
   flex: 1;
 }
+
+.tc-learn-scales-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.tc-learn-scales-step-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+
+.tc-learn-scales-step-chip.half  { background: color-mix(in srgb, var(--rust) 15%, var(--input)); border-color: color-mix(in srgb, var(--rust) 40%, transparent); color: var(--rust); }
+.tc-learn-scales-step-chip.whole { background: color-mix(in srgb, var(--accent-lo) 15%, var(--input)); border-color: color-mix(in srgb, var(--accent-lo) 40%, transparent); color: var(--accent-lo); }
+.tc-learn-scales-step-chip.wh    { background: color-mix(in srgb, var(--accent-mid) 15%, var(--input)); border-color: color-mix(in srgb, var(--accent-mid) 40%, transparent); color: var(--accent-mid); }
 </style>
