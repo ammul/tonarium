@@ -15,13 +15,15 @@ import SettingsPage from '@/pages/SettingsPage.vue'
 import DrumComputer from '@/pages/DrumComputer.vue'
 import AboutPage from '@/pages/AboutPage.vue'
 import QuickJam2 from '@/pages/QuickJam2.vue'
-import { Home, Zap, BookOpen, Disc3, Music, BarChart2, ScanSearch, Layers, Info, Settings, Menu, X, Play, Pause, Square, RefreshCw } from 'lucide-vue-next'
+import KnowledgeBase from '@/pages/KnowledgeBase.vue'
+import { Home, Zap, BookOpen, Disc3, Music, BarChart2, ScanSearch, Layers, Info, Settings, Menu, X, Play, Pause, Square, RefreshCw, BookMarked } from 'lucide-vue-next'
 
 const allTabs = [
   { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: LandingPage,        icon: Home },
   { id: 'jam',            label: 'Quick Jam',           shortLabel: 'Jam',          component: LandingPage,        menuOnly: true, icon: Zap },
   { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LandingPage,        menuOnly: true, icon: BookOpen },
   { id: 'quickjam2',      label: 'Carousel Jam',        shortLabel: 'Carousel',     component: QuickJam2,          menuOnly: true, icon: RefreshCw },
+  { id: 'kb',             label: 'Knowledge Base',      shortLabel: 'Knowledge',    component: KnowledgeBase,      menuOnly: true, icon: BookMarked },
   { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer,       menuOnly: true, icon: Disc3 },
   { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions,  menuOnly: true, icon: Music },
   { id: 'scales',         label: 'Scale Visualizer',    shortLabel: 'Scales',       component: ScaleVisualizer,    menuOnly: true, icon: BarChart2 },
