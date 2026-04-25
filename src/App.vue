@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { getCtx } from '@/audio/audioContext.js'
 import { displayMode } from '@/state/displayMode.js'
 import { colorScheme as _colorScheme } from '@/state/colorScheme.js'
 import { isPlaying as drumIsPlaying, play as drumPlay, pause as drumPause } from '@/audio/drumEngine.js'
@@ -96,6 +97,13 @@ function handlePopState(e) {
 onMounted(() => {
   history.replaceState({ tab: activeTab.value }, '')
   window.addEventListener('popstate', handlePopState)
+  // iOS Safari: AudioContext starts suspended; create it on first touch so
+  // resume() is already in-flight before the user taps a pad.
+  function unlockAudio() {
+    const ctx = getCtx()
+    if (ctx.state === 'suspended') ctx.resume()
+  }
+  document.addEventListener('touchstart', unlockAudio, { once: true, passive: true })
 })
 
 onUnmounted(() => {

@@ -10,18 +10,11 @@ function midiToFreq(note) {
   return 440 * Math.pow(2, (note - 69) / 12)
 }
 
-export function startNote(midiNote, dest = null, styleOverride = null) {
-  if (!soundEnabled.value || midiStatus.value === 'connected') return 0
-  stopNote(midiNote)
-
-  const ctx = getCtx()
+function _synthesise(ctx, midiNote, dest, styleOverride, gen) {
   const freq = midiToFreq(midiNote)
   const now = ctx.currentTime
-  const gen = ++_gen
-
   const gainNode = ctx.createGain()
   gainNode.connect(dest ?? getJamDest())
-
   const style = styleOverride ?? soundStyle.value
   let oscs
 
@@ -266,6 +259,18 @@ export function startNote(midiNote, dest = null, styleOverride = null) {
   }
 
   _active.set(midiNote, { gainNode, oscs, gen })
+}
+
+export function startNote(midiNote, dest = null, styleOverride = null) {
+  if (!soundEnabled.value || midiStatus.value === 'connected') return 0
+  stopNote(midiNote)
+  const ctx = getCtx()
+  const gen = ++_gen
+  if (ctx.state === 'running') {
+    _synthesise(ctx, midiNote, dest, styleOverride, gen)
+  } else {
+    ctx.resume().then(() => _synthesise(ctx, midiNote, dest, styleOverride, gen))
+  }
   return gen
 }
 
