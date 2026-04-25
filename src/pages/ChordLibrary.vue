@@ -5,6 +5,8 @@ import { displayMode } from '@/state/displayMode.js'
 import { padSize } from '@/state/padSize.js'
 import { buildRows } from '@/utils/musicUtils.js'
 import ChordCardBody from '@/components/music/ChordCardBody.vue'
+import { startNote, stopNote } from '@/audio/audioEngine.js'
+import { chordOn, chordOff } from '@/audio/midiManager.js'
 
 const GUITAR_TYPE_MAP = {
   'Major': 'maj', 'Minor': 'min', 'Diminished': 'dim',
@@ -31,6 +33,7 @@ CHORD_DETECT_TYPES.forEach(({ intervals, suffix, name: typeName }) => {
       typeName,
       suffix,
       chordType,
+      intervals,
       name: NOTES[root] + suffix,
       fullName: NOTES[root] + ' ' + typeName,
       noteSet,
@@ -39,6 +42,28 @@ CHORD_DETECT_TYPES.forEach(({ intervals, suffix, name: typeName }) => {
     })
   }
 })
+
+const OCTAVE = 4
+let _currentMidis = []
+
+function chordMidis(chord) {
+  const aMidi = 12 * (OCTAVE + 1) + 9
+  const root = aMidi + chord.root
+  return chord.intervals.map(i => root + i)
+}
+
+function previewChord(chord) {
+  chordOff(_currentMidis)
+  _currentMidis.forEach(m => stopNote(m))
+  _currentMidis = chordMidis(chord)
+  chordOn(_currentMidis)
+  _currentMidis.forEach(m => startNote(m))
+}
+
+function stopPreview(chord) {
+  chordOff(chordMidis(chord))
+  chordMidis(chord).forEach(m => stopNote(m))
+}
 
 const query = ref('')
 
@@ -95,7 +120,15 @@ const filteredChords = computed(() => {
     </div>
 
     <div v-else class="cl-grid">
-      <div v-for="chord in filteredChords" :key="chord.id" class="cl-card">
+      <div
+        v-for="chord in filteredChords"
+        :key="chord.id"
+        class="cl-card"
+        @pointerdown.prevent="previewChord(chord)"
+        @pointerup="stopPreview(chord)"
+        @pointerleave="stopPreview(chord)"
+        @pointercancel="stopPreview(chord)"
+      >
         <div class="cl-card-header">
           <span class="cl-chord-name">{{ chord.name }}</span>
           <span class="cl-chord-type">{{ chord.typeName }}</span>
