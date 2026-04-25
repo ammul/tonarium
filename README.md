@@ -40,6 +40,7 @@ Pick a key, pick a scale, and see which notes are safe. Anchor notes (root, 3rd,
 | **Chord Progressions** | 69 presets across 10 genres with playback |
 | **Scale Visualizer** | See any scale across all 12 notes |
 | **Chord Detector** | Select notes, identify the chord |
+| **Chord Library** | 204 chords across 17 types, searchable by name or flat notation (Bb, Db...) |
 | **Progression Builder** | Type chord symbols, see them mapped to your instrument |
 
 ## Learn Mode
@@ -73,7 +74,7 @@ npm install && npm run dev
 ```
 
 ```bash
-npm test          # 417 unit + component tests (Vitest)
+npm test          # 467 unit + component tests (Vitest)
 npm run test:e2e  # end-to-end tests (Playwright)
 npm run build     # production build
 ```

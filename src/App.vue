@@ -16,7 +16,8 @@ import DrumComputer from '@/pages/DrumComputer.vue'
 import AboutPage from '@/pages/AboutPage.vue'
 import QuickJam2 from '@/pages/QuickJam2.vue'
 import KnowledgeBase from '@/pages/KnowledgeBase.vue'
-import { Home, Zap, BookOpen, Disc3, Music, BarChart2, ScanSearch, Layers, Info, Settings, Menu, X, Play, Pause, Square, RefreshCw, BookMarked } from 'lucide-vue-next'
+import ChordLibrary from '@/pages/ChordLibrary.vue'
+import { Home, Zap, BookOpen, Disc3, Music, BarChart2, ScanSearch, Layers, Info, Settings, Menu, X, Play, Pause, Square, RefreshCw, BookMarked, Library } from 'lucide-vue-next'
 
 const allTabs = [
   { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: LandingPage,        icon: Home },
@@ -28,6 +29,7 @@ const allTabs = [
   { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions,  menuOnly: true, icon: Music },
   { id: 'scales',         label: 'Scale Visualizer',    shortLabel: 'Scales',       component: ScaleVisualizer,    menuOnly: true, icon: BarChart2 },
   { id: 'chord-detector', label: 'Chord Detector',      shortLabel: 'Detector',     component: ChordDetector,      menuOnly: true, icon: ScanSearch },
+  { id: 'chord-library',  label: 'Chord Library',       shortLabel: 'Library',      component: ChordLibrary,       menuOnly: true, icon: Library },
   { id: 'prog-builder',   label: 'Progression Builder', shortLabel: 'Builder',      component: ProgressionBuilder, menuOnly: true, icon: Layers },
   { id: 'about',          label: 'About',               shortLabel: 'About',        component: AboutPage,          menuOnly: true, icon: Info },
   { id: 'settings',       label: 'Settings',            shortLabel: 'Settings',     component: SettingsPage,       icon: Settings },

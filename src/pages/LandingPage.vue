@@ -3,7 +3,7 @@ import { ref, watch, onMounted, onUnmounted } from 'vue'
 import StartPage from '@/pages/StartPage.vue'
 import LearnMode from '@/pages/LearnMode.vue'
 import { requestedLandingView, activeLandingView } from '@/state/landingState.js'
-import { Zap, BookOpen, Disc3, Music, BarChart2, ScanSearch, Layers, Settings } from 'lucide-vue-next'
+import { Zap, BookOpen, Disc3, Music, BarChart2, ScanSearch, Layers, Settings, Library } from 'lucide-vue-next'
 
 const emit = defineEmits(['navigate'])
 
@@ -88,6 +88,7 @@ onUnmounted(() => {
         <button class="tc-landing-tool-btn" @click="$emit('navigate', 'chords')"><Music :size="15" />Chord Progressions</button>
         <button class="tc-landing-tool-btn" @click="$emit('navigate', 'scales')"><BarChart2 :size="15" />Scale Visualizer</button>
         <button class="tc-landing-tool-btn" @click="$emit('navigate', 'chord-detector')"><ScanSearch :size="15" />Chord Detector</button>
+        <button class="tc-landing-tool-btn" @click="$emit('navigate', 'chord-library')"><Library :size="15" />Chord Library</button>
         <button class="tc-landing-tool-btn" @click="$emit('navigate', 'prog-builder')"><Layers :size="15" />Progression Builder</button>
         <button class="tc-landing-tool-btn" @click="$emit('navigate', 'settings')"><Settings :size="15" />Settings</button>
       </div>
