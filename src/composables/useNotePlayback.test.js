@@ -24,7 +24,7 @@ beforeEach(() => {
 describe('useNotePlayback', () => {
   it('pressDown calls startNote and adds to pressedMidi', () => {
     playback.pressDown(60)
-    expect(startNote).toHaveBeenCalledWith(60)
+    expect(startNote).toHaveBeenCalledWith(60, null, null)
     expect(playback.pressedMidi.value.has(60)).toBe(true)
   })
 
@@ -37,7 +37,7 @@ describe('useNotePlayback', () => {
 
   it('pressToggle toggles on then off', () => {
     playback.pressToggle(72)
-    expect(startNote).toHaveBeenCalledWith(72)
+    expect(startNote).toHaveBeenCalledWith(72, null, null)
     expect(playback.pressedMidi.value.has(72)).toBe(true)
 
     playback.pressToggle(72)

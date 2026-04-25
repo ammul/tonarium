@@ -1,12 +1,12 @@
 import { ref, onUnmounted, getCurrentInstance } from 'vue'
 import { startNote, stopNote } from '@/audio/audioEngine.js'
 
-export function useNotePlayback() {
+export function useNotePlayback({ styleRef = null } = {}) {
   const pressedMidi = ref(new Map())
 
   function pressDown(midi) {
     pressedMidi.value = new Map([...pressedMidi.value, [midi, true]])
-    startNote(midi)
+    startNote(midi, null, styleRef?.value ?? null)
   }
 
   function pressUp(midi) {

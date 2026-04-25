@@ -10,7 +10,7 @@ function midiToFreq(note) {
   return 440 * Math.pow(2, (note - 69) / 12)
 }
 
-export function startNote(midiNote, dest = null) {
+export function startNote(midiNote, dest = null, styleOverride = null) {
   if (!soundEnabled.value || midiStatus.value === 'connected') return 0
   stopNote(midiNote)
 
@@ -22,7 +22,7 @@ export function startNote(midiNote, dest = null) {
   const gainNode = ctx.createGain()
   gainNode.connect(dest ?? getJamDest())
 
-  const style = soundStyle.value
+  const style = styleOverride ?? soundStyle.value
   let oscs
 
   if (style === 'bell') {
@@ -101,6 +101,140 @@ export function startNote(midiNote, dest = null) {
     osc.start(now)
     osc.stop(now + 2.3)
     oscs = [osc]
+
+  } else if (style === 'marimba') {
+    // Triangle fundamental + fast-decaying inharmonic partial for woody mallet character
+    const osc = ctx.createOscillator()
+    osc.type = 'triangle'
+    osc.frequency.value = freq
+    osc.connect(gainNode)
+
+    const h = ctx.createOscillator()
+    h.type = 'sine'
+    h.frequency.value = freq * 4.07
+    const hg = ctx.createGain()
+    hg.gain.setValueAtTime(0.35, now)
+    hg.gain.exponentialRampToValueAtTime(0.001, now + 0.1)
+    h.connect(hg)
+    hg.connect(gainNode)
+
+    gainNode.gain.setValueAtTime(0, now)
+    gainNode.gain.linearRampToValueAtTime(0.38, now + 0.004)
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.75)
+
+    osc.start(now); h.start(now)
+    osc.stop(now + 0.8); h.stop(now + 0.8)
+    oscs = [osc, h]
+
+  } else if (style === 'glass') {
+    // Stacked sine harmonics with slow attack and long shimmer
+    gainNode.gain.setValueAtTime(0.22, now)
+    const partials = [
+      { ratio: 1.0, level: 0.5,  decay: 4.0 },
+      { ratio: 2.0, level: 0.25, decay: 2.5 },
+      { ratio: 3.0, level: 0.12, decay: 1.5 },
+      { ratio: 4.0, level: 0.05, decay: 0.8 },
+    ]
+    oscs = partials.map(p => {
+      const o = ctx.createOscillator()
+      o.type = 'sine'
+      o.frequency.value = freq * p.ratio
+      const g = ctx.createGain()
+      g.gain.setValueAtTime(0, now)
+      g.gain.linearRampToValueAtTime(p.level, now + 0.08)
+      g.gain.exponentialRampToValueAtTime(0.001, now + p.decay)
+      o.connect(g)
+      g.connect(gainNode)
+      o.start(now)
+      return o
+    })
+
+  } else if (style === 'pulse') {
+    // Square wave through a resonant bandpass sweep — retro synth lead
+    const filter = ctx.createBiquadFilter()
+    filter.type = 'bandpass'
+    filter.frequency.setValueAtTime(freq * 4, now)
+    filter.frequency.exponentialRampToValueAtTime(freq * 1.8, now + 0.18)
+    filter.Q.value = 5
+    filter.connect(gainNode)
+
+    const osc = ctx.createOscillator()
+    osc.type = 'square'
+    osc.frequency.value = freq
+    osc.connect(filter)
+
+    gainNode.gain.setValueAtTime(0, now)
+    gainNode.gain.linearRampToValueAtTime(0.22, now + 0.008)
+    gainNode.gain.setValueAtTime(0.22, now + 0.1)
+
+    osc.start(now)
+    oscs = [osc]
+
+  } else if (style === 'organ') {
+    // Hammond-style sustained tone — sine fundamental plus drawbar harmonics
+    gainNode.gain.setValueAtTime(0, now)
+    gainNode.gain.linearRampToValueAtTime(0.26, now + 0.012)
+    const drawbars = [
+      { ratio: 1.0, level: 0.5 },
+      { ratio: 2.0, level: 0.32 },
+      { ratio: 3.0, level: 0.18 },
+      { ratio: 4.0, level: 0.1 },
+      { ratio: 6.0, level: 0.05 },
+    ]
+    oscs = drawbars.map(d => {
+      const o = ctx.createOscillator()
+      o.type = 'sine'
+      o.frequency.value = freq * d.ratio
+      const g = ctx.createGain()
+      g.gain.value = d.level
+      o.connect(g)
+      g.connect(gainNode)
+      o.start(now)
+      return o
+    })
+
+  } else if (style === 'brass') {
+    // Sawtooth with filter swell — closed to open, medium decay
+    const filter = ctx.createBiquadFilter()
+    filter.type = 'lowpass'
+    filter.frequency.setValueAtTime(freq * 1.2, now)
+    filter.frequency.exponentialRampToValueAtTime(freq * 7, now + 0.1)
+    filter.frequency.exponentialRampToValueAtTime(freq * 3.5, now + 0.45)
+    filter.Q.value = 3.5
+    filter.connect(gainNode)
+
+    const osc = ctx.createOscillator()
+    osc.type = 'sawtooth'
+    osc.frequency.value = freq
+    osc.connect(filter)
+
+    gainNode.gain.setValueAtTime(0, now)
+    gainNode.gain.linearRampToValueAtTime(0.3, now + 0.04)
+    gainNode.gain.setValueAtTime(0.3, now + 0.25)
+
+    osc.start(now)
+    oscs = [osc]
+
+  } else if (style === 'kalimba') {
+    // Thumb piano — inharmonic tine ratios with fast fundamental decay
+    gainNode.gain.setValueAtTime(0.3, now)
+    const tines = [
+      { ratio: 1.0,  level: 0.55, decay: 2.2 },
+      { ratio: 5.83, level: 0.22, decay: 0.9 },
+      { ratio: 9.75, level: 0.08, decay: 0.4 },
+    ]
+    oscs = tines.map(t => {
+      const o = ctx.createOscillator()
+      o.type = 'sine'
+      o.frequency.value = freq * t.ratio
+      const g = ctx.createGain()
+      g.gain.setValueAtTime(t.level, now + 0.001)
+      g.gain.exponentialRampToValueAtTime(0.001, now + t.decay)
+      o.connect(g)
+      g.connect(gainNode)
+      o.start(now)
+      return o
+    })
 
   } else {
     // 'synth' — detuned sawtooth pad through a lowpass filter

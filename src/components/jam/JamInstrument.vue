@@ -13,6 +13,7 @@ import ScaleLegend from '@/components/music/ScaleLegend.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
 import { selectedRoot, selectedScaleId, pianoOctave, selectedChordType, selectedChordRoot } from '@/state/jamSettings.js'
 import { sessionProgression, sessionPlaying, sessionCurrentChordIdx } from '@/state/sessionState.js'
+import { jamSoundStyle } from '@/state/jamSoundStyle.js'
 
 const ANCHOR_OFFSETS = new Set([0, 3, 4, 7])
 const STRING_BASE_MIDI = [40, 45, 50, 55, 59, 64]
@@ -106,7 +107,7 @@ function padMidi(noteIndex, oct) {
   return 12 * (oct + 1) + NOTE_TO_SEMI[noteIndex]
 }
 
-const { pressDown, pressUp } = useNotePlayback()
+const { pressDown, pressUp } = useNotePlayback({ styleRef: jamSoundStyle })
 
 function onPadDown(noteIndex, octaveOffset = 0) { pressDown(12 * (pianoOctave.value + 1 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
 function onPadUp(noteIndex, octaveOffset = 0)   { pressUp(12 * (pianoOctave.value + 1 + octaveOffset) + NOTE_TO_SEMI[noteIndex]) }
@@ -130,6 +131,19 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
         class="tc-instrument-scale-note"
         :class="{ root: n.isRoot, anchor: n.isAnchor && !n.isRoot }"
       >{{ n.note }}</span>
+    </div>
+
+    <div class="tc-instrument-sound-row">
+      <span class="tc-instrument-sound-label">Sound</span>
+      <div class="tc-instrument-sound-btns">
+        <button
+          v-for="s in ['synth','pluck','marimba','glass','pulse','organ','brass','kalimba']"
+          :key="s"
+          class="tc-instrument-sound-btn"
+          :class="{ active: jamSoundStyle === s }"
+          @click="jamSoundStyle = s"
+        >{{ s }}</button>
+      </div>
     </div>
 
     <ModeLayout>
@@ -305,6 +319,53 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
 .tc-instrument-neck-dot { background: var(--text3); }
 .tc-instrument-neck-dot.anchor { background: var(--accent-lo); }
 .tc-instrument-neck-dot.root { background: var(--dot-root); box-shadow: 0 0 4px var(--rust-glow); }
+
+.tc-instrument-sound-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tc-instrument-sound-label {
+  font-size: 0.75rem;
+  color: var(--text4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 0.25rem;
+  flex-shrink: 0;
+}
+
+.tc-instrument-sound-btns {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.tc-instrument-sound-btn {
+  padding: 0.22rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--border2);
+  background: var(--raised);
+  color: var(--text3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-transform: capitalize;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+
+.tc-instrument-sound-btn:hover {
+  border-color: var(--accent-dim);
+  color: var(--text);
+}
+
+.tc-instrument-sound-btn.active {
+  background: var(--accent-bg);
+  border-color: var(--accent-mid);
+  color: var(--accent);
+}
 
 @media (max-width: 600px) {
   .tc-instrument-pad-note {
