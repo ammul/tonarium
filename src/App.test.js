@@ -26,6 +26,7 @@ vi.mock('@/audio/audioContext.js', () => ({
   getJamDest:  vi.fn(() => ({ gain: { value: 1 }, connect: vi.fn() })),
   getBeatDest: vi.fn(() => ({ gain: { value: 1 }, connect: vi.fn() })),
   getProgDest: vi.fn(() => ({ gain: { value: 1 }, connect: vi.fn() })),
+  unlockCtx: vi.fn(),
 }))
 
 vi.mock('@/audio/midiManager.js', async () => {
