@@ -12,7 +12,7 @@ import { pattern as drumPattern } from '@/audio/drumEngine.js'
 import { buildPatternFromBeat, createEmptyPattern } from '@/utils/beatUtils.js'
 import {
   sessionProgression, sessionBeatIdx, sessionBpm,
-  sessionPlaying, sessionCurrentChordIdx, sessionBeatsPerChord,
+  sessionPlaying, sessionCurrentChordIdx, sessionBeatsPerChord, sessionCompPattern,
 } from '@/state/sessionState.js'
 import { startTransport, stopTransport } from '@/audio/transportClock.js'
 import { selectedRoot, selectedScaleId, pianoOctave } from '@/state/jamSettings.js'
@@ -276,6 +276,14 @@ const rhythmOpen = ref(false)
             <option :value="2">2 beats/chord</option>
             <option :value="4">4 beats/chord</option>
             <option :value="8">8 beats/chord</option>
+          </select>
+        </PickerRow>
+        <PickerRow label="Comp">
+          <select v-model="sessionCompPattern" class="form-select">
+            <option value="block">Block</option>
+            <option value="offbeat">Off-beat</option>
+            <option value="arp">Arp</option>
+            <option value="waltz">Waltz</option>
           </select>
         </PickerRow>
       </div>

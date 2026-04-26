@@ -7,7 +7,7 @@ import { isPlaying as drumIsPlaying, play as drumPlay, pause as drumPause } from
 import { sessionPlaying } from '@/state/sessionState.js'
 import { startTransport, stopTransport } from '@/audio/transportClock.js'
 import LandingPage from '@/pages/LandingPage.vue'
-import { requestedLandingView, activeLandingView } from '@/state/landingState.js'
+import { requestedLandingView } from '@/state/landingState.js'
 import ScaleVisualizer from '@/pages/ScaleVisualizer.vue'
 import ChordProgressions from '@/pages/ChordProgressions.vue'
 import ChordDetector from '@/pages/ChordDetector.vue'
@@ -24,7 +24,7 @@ const allTabs = [
   { id: 'home',           label: 'Home',                shortLabel: 'Home',         component: LandingPage,        icon: Home },
   { id: 'jam',            label: 'Quick Jam',           shortLabel: 'Jam',          component: LandingPage,        menuOnly: true, icon: Zap },
   { id: 'learn',          label: 'Learn',               shortLabel: 'Learn',        component: LandingPage,        menuOnly: true, icon: BookOpen },
-  { id: 'quickjam2',      label: 'Carousel Jam',        shortLabel: 'Carousel',     component: QuickJam2,          menuOnly: true, icon: RefreshCw },
+  { id: 'quickjam2',      label: 'Carousel Jam',        shortLabel: 'Carousel',     component: QuickJam2,          menuOnly: true, hidden: true, icon: RefreshCw },
   { id: 'kb',             label: 'Knowledge Base',      shortLabel: 'Knowledge',    component: KnowledgeBase,      menuOnly: true, icon: BookMarked },
   { id: 'drums',          label: 'Drum Computer',       shortLabel: 'Drums',        component: DrumComputer,       menuOnly: true, icon: Disc3 },
   { id: 'chords',         label: 'Chord Progressions',  shortLabel: 'Progressions', component: ChordProgressions,  menuOnly: true, icon: Music },
@@ -112,19 +112,6 @@ onUnmounted(() => {
         <div class="title-block">
           <h1 @click="selectTab('home')" class="home-link">Tonarium</h1>
         </div>
-        <div v-if="activeTab === 'home'" class="header-nav">
-          <button
-            class="header-nav-btn"
-            :class="{ active: activeLandingView === 'jam' }"
-            @click="selectTab('jam')"
-          >Quick Jam</button>
-          <button
-            class="header-nav-btn"
-            :class="{ active: activeLandingView === 'learn' }"
-            @click="selectTab('learn')"
-          >Learn</button>
-        </div>
-
         <div class="header-controls">
           <div v-if="sessionEverStarted" class="drum-widget session-widget" :class="{ playing: sessionPlaying }" @click="selectTab('home')">
             <span class="dw-dot"></span>
@@ -235,36 +222,6 @@ h1 {
   cursor: pointer;
 }
 
-.header-nav {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.header-nav-btn {
-  padding: 0.3rem 0.8rem;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text3);
-  font-size: 0.85rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 0.12s, background 0.12s, border-color 0.12s;
-  white-space: nowrap;
-}
-
-.header-nav-btn:hover {
-  color: var(--text);
-  background: var(--hover);
-}
-
-.header-nav-btn.active {
-  background: var(--raised);
-  border-color: var(--border2);
-  color: var(--accent);
-}
 
 .header-controls {
   display: flex;
@@ -355,12 +312,12 @@ h1 {
 .burger-btn:hover { border-color: var(--accent); }
 
 main {
-  padding-top: 1rem;
+  padding-top: 4.5rem;
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
   main {
-    padding-top: 1rem;
+    padding-top: 3.5rem;
   }
 }
 

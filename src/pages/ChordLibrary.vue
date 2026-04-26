@@ -21,6 +21,17 @@ function flatName(name) {
   return name
 }
 
+// C-based display order mapped to A-based NOTES indices
+const ROOT_ORDER = [3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2]
+
+const CATEGORY_TYPES = {
+  triads:    ['Major', 'Minor', 'Diminished', 'Augmented', 'Power chord'],
+  sixths:    ['Major 6th', 'Minor 6th'],
+  sevenths:  ['Dominant 7th', 'Major 7th', 'Minor 7th', 'Half-diminished 7th', 'Diminished 7th'],
+  ninths:    ['Dominant 9th', 'Major 9th', 'Minor 9th'],
+  suspended: ['Sus2', 'Sus4'],
+}
+
 const allChords = []
 CHORD_DETECT_TYPES.forEach(({ intervals, suffix, name: typeName }) => {
   const chordType = GUITAR_TYPE_MAP[typeName] ?? null
@@ -65,29 +76,62 @@ function stopPreview(chord) {
   chordMidis(chord).forEach(m => stopNote(m))
 }
 
-const query = ref('')
+const query          = ref('')
+const rootFilter     = ref(null)   // null | 0–11 (A-based root index)
+const categoryFilter = ref('all')  // 'all' | 'triads' | 'sixths' | 'sevenths' | 'ninths' | 'suspended'
+
+const hasFilter = computed(() =>
+  !!query.value.trim() || rootFilter.value !== null || categoryFilter.value !== 'all'
+)
 
 const filteredChords = computed(() => {
+  if (!hasFilter.value) return []
   const q = query.value.trim().toLowerCase()
-  if (!q) return []
   const cols = padSize.value === '4x4' ? 4 : 3
   return allChords
     .filter(c => {
-      const nameLower = c.name.toLowerCase()
-      const flatLower = flatName(c.name).toLowerCase()
-      const typeSearch = c.typeName.replace(/\s*chord$/i, '').toLowerCase()
-      return (
-        nameLower.startsWith(q) ||
-        flatLower.startsWith(q) ||
-        typeSearch.includes(q)
-      )
+      if (rootFilter.value !== null && c.root !== rootFilter.value) return false
+      if (categoryFilter.value !== 'all' && !CATEGORY_TYPES[categoryFilter.value].includes(c.typeName)) return false
+      if (q) {
+        const nameLower = c.name.toLowerCase()
+        const flatLower = flatName(c.name).toLowerCase()
+        const typeSearch = c.typeName.replace(/\s*chord$/i, '').toLowerCase()
+        return nameLower.startsWith(q) || flatLower.startsWith(q) || typeSearch.includes(q)
+      }
+      return true
     })
     .map(c => ({ ...c, rows: buildRows(c.noteSet, c.root, cols) }))
 })
+
+function clearFilters() {
+  query.value = ''
+  rootFilter.value = null
+  categoryFilter.value = 'all'
+}
 </script>
 
 <template>
   <div class="chord-library">
+    <div class="cl-root-row">
+      <button
+        v-for="r in ROOT_ORDER"
+        :key="r"
+        class="cl-root-btn"
+        :class="{ active: rootFilter === r }"
+        @click="rootFilter = rootFilter === r ? null : r"
+      >{{ NOTES[r] }}</button>
+    </div>
+
+    <div class="cl-cat-row">
+      <button
+        v-for="cat in ['all','triads','sixths','sevenths','ninths','suspended']"
+        :key="cat"
+        class="cl-cat-btn"
+        :class="{ active: categoryFilter === cat }"
+        @click="categoryFilter = cat"
+      >{{ cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1) }}</button>
+    </div>
+
     <div class="cl-search-bar">
       <input
         v-model="query"
@@ -96,13 +140,14 @@ const filteredChords = computed(() => {
         autocomplete="off"
         spellcheck="false"
       />
-      <span v-if="query && filteredChords.length" class="cl-result-count">
+      <span v-if="hasFilter && filteredChords.length" class="cl-result-count">
         {{ filteredChords.length }} chord{{ filteredChords.length === 1 ? '' : 's' }}
       </span>
+      <button v-if="hasFilter" class="cl-clear-btn" @click="clearFilters">Clear</button>
     </div>
 
-    <div v-if="!query" class="cl-empty-state">
-      <p class="cl-hint">Type a chord name to browse the library.</p>
+    <div v-if="!hasFilter" class="cl-empty-state">
+      <p class="cl-hint">Select a root note, a category, or search to browse.</p>
       <div class="cl-examples">
         <span class="cl-example-chip" @click="query = 'C'">C</span>
         <span class="cl-example-chip" @click="query = 'Dm'">Dm</span>
@@ -116,7 +161,7 @@ const filteredChords = computed(() => {
     </div>
 
     <div v-else-if="filteredChords.length === 0" class="cl-no-results">
-      No chords found for &ldquo;{{ query }}&rdquo;
+      No chords found.
     </div>
 
     <div v-else class="cl-grid">
@@ -165,6 +210,70 @@ const filteredChords = computed(() => {
   margin: 0 auto;
 }
 
+.cl-root-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.6rem;
+}
+
+.cl-root-btn {
+  padding: 0.22rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid var(--border2);
+  background: var(--raised);
+  color: var(--text2);
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+  min-width: 2rem;
+  text-align: center;
+}
+
+.cl-root-btn:hover {
+  border-color: var(--accent-mid);
+  color: var(--text);
+}
+
+.cl-root-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.cl-cat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.cl-cat-btn {
+  padding: 0.22rem 0.65rem;
+  border-radius: 4px;
+  border: 1px solid var(--border2);
+  background: var(--raised);
+  color: var(--text3);
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+
+.cl-cat-btn:hover {
+  border-color: var(--accent-mid);
+  color: var(--text);
+}
+
+.cl-cat-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
 .cl-search-bar {
   display: flex;
   align-items: center;
@@ -191,6 +300,24 @@ const filteredChords = computed(() => {
   font-size: 0.8rem;
   color: var(--text4);
   white-space: nowrap;
+}
+
+.cl-clear-btn {
+  padding: 0.22rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text4);
+  font-size: 0.78rem;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.12s, border-color 0.12s;
+}
+
+.cl-clear-btn:hover {
+  color: var(--text);
+  border-color: var(--accent-mid);
 }
 
 .cl-empty-state {

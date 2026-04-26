@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { getCtx, getProgDest } from '@/audio/audioContext.js'
 import { initMixer } from '@/state/mixerState.js'
-import { sessionBpm, sessionPlaying, sessionBeatsPerChord, sessionCurrentChordIdx, sessionProgression } from '@/state/sessionState.js'
+import { sessionBpm, sessionPlaying, sessionBeatsPerChord, sessionCurrentChordIdx, sessionProgression, sessionCompPattern } from '@/state/sessionState.js'
 import { pattern, currentStep, isPlaying as drumIsPlaying, INSTRUMENTS, triggerDrumHit, pause as drumPause } from '@/audio/drumEngine.js'
 import { startNote, stopNote } from '@/audio/audioEngine.js'
 import { CHORD_TYPES } from '@tonarium/core'
@@ -10,12 +10,11 @@ import { chordOn, chordOff } from '@/audio/midiManager.js'
 const LOOKAHEAD = 0.1
 const TICK_MS   = 25
 
-let _nextStepTime    = 0
-let _schedulerTimer  = null
-let _countInTimer    = null
-let _globalStep      = 0
-let _currentMidis    = []
-let _chordStopTimer  = null
+let _nextStepTime   = 0
+let _schedulerTimer = null
+let _countInTimer   = null
+let _globalStep     = 0
+let _chordMidis     = []
 
 export const currentDrumStep = ref(0)
 
@@ -43,16 +42,57 @@ function _playClick(time, isDownbeat) {
   src.stop(time + 0.05)
 }
 
+function _updateChordMidis() {
+  const prog = sessionProgression.value
+  if (!prog) { _chordMidis = []; return }
+  const chord = prog.chords[sessionCurrentChordIdx.value]
+  if (!chord) { _chordMidis = []; return }
+  const aMidi = 12 * (chord._octave + 1) + 9
+  _chordMidis = CHORD_TYPES[chord.type].map(i => aMidi + chord._rootIdx + i)
+}
+
+// Returns the subset of _chordMidis to play at this 16th-note step within the chord.
+function _getCompHit(stepInChord, beatsPerChord) {
+  if (!_chordMidis.length) return []
+  const pat = sessionCompPattern.value
+
+  if (pat === 'offbeat') {
+    if (beatsPerChord === 1) return stepInChord === 0 ? _chordMidis : []
+    const beat = Math.floor(stepInChord / 4)
+    return stepInChord % 4 === 0 && beat % 2 === 1 ? _chordMidis : []
+  }
+  if (pat === 'arp') {
+    if (stepInChord % 4 !== 0) return []
+    const beat = Math.floor(stepInChord / 4)
+    return [_chordMidis[beat % _chordMidis.length]]
+  }
+  if (pat === 'waltz') {
+    if (beatsPerChord < 2) return stepInChord === 0 ? _chordMidis : []
+    if (stepInChord === 0) return [_chordMidis[0]]
+    const upper = _chordMidis.slice(1)
+    return stepInChord % 4 === 0 ? (upper.length ? upper : _chordMidis) : []
+  }
+  // block: hit on step 0 only
+  return stepInChord === 0 ? _chordMidis : []
+}
+
+function _hitDuration(beatsPerChord) {
+  const beatSec = 60 / sessionBpm.value
+  const pat = sessionCompPattern.value
+  if (pat === 'block') return beatSec * beatsPerChord - 0.05
+  if (pat === 'arp')   return beatSec * 0.85
+  return beatSec * 0.65
+}
+
 export function startTransport() {
   if (sessionPlaying.value) return
-  drumPause()  // stop any standalone drum engine loop before taking over
+  drumPause()
   const ctx = getCtx()
-  initMixer()  // apply current slider values now that AudioContext exists
+  initMixer()
 
   const beatSec = 60 / sessionBpm.value
   const startTime = ctx.currentTime + 0.1
 
-  // 4-beat count-in: first click is louder (downbeat)
   for (let i = 0; i < 4; i++) {
     _playClick(startTime + i * beatSec, i === 0)
   }
@@ -63,12 +103,12 @@ export function startTransport() {
   currentDrumStep.value = 0
   sessionCurrentChordIdx.value = 0
 
-  // Start main loop after count-in completes
   _countInTimer = setTimeout(() => {
     _countInTimer = null
     if (!sessionPlaying.value) return
     _nextStepTime = getCtx().currentTime + 0.05
-    _playCurrentChord()
+    _updateChordMidis()
+    chordOn(_chordMidis)
     _tick()
   }, Math.round((4 * beatSec + 0.12) * 1000))
 }
@@ -85,13 +125,18 @@ export function stopTransport() {
   _globalStep = 0
   currentDrumStep.value = 0
   currentStep.value = 0
-  _stopChord()
+  chordOff(_chordMidis)
+  _chordMidis.forEach(m => stopNote(m))
+  _chordMidis = []
 }
 
 function _tick() {
   if (!sessionPlaying.value) return
-  const ctx     = getCtx()
-  const stepDur = 60 / sessionBpm.value / 4
+  const ctx          = getCtx()
+  const stepDur      = 60 / sessionBpm.value / 4
+  const beatsPerChord = sessionBeatsPerChord.value
+  const chordSteps   = beatsPerChord * 4
+  const dest         = getProgDest()
 
   while (_nextStepTime < ctx.currentTime + LOOKAHEAD) {
     const drumStep = _globalStep % 16
@@ -103,9 +148,28 @@ function _tick() {
     currentDrumStep.value = drumStep
     currentStep.value = drumStep
 
-    const chordSteps = sessionBeatsPerChord.value * 4
-    if (_globalStep > 0 && _globalStep % chordSteps === 0) {
-      _advanceChord()
+    const stepInChord = _globalStep % chordSteps
+
+    // Chord boundary: advance to next chord (skip at step 0, chord already set)
+    if (_globalStep > 0 && stepInChord === 0) {
+      const prog = sessionProgression.value
+      if (prog) {
+        chordOff(_chordMidis)
+        sessionCurrentChordIdx.value = (sessionCurrentChordIdx.value + 1) % prog.chords.length
+        _updateChordMidis()
+        chordOn(_chordMidis)
+      }
+    }
+
+    // Comp pattern hit
+    const notes = _getCompHit(stepInChord, beatsPerChord)
+    if (notes.length) {
+      const dur  = _hitDuration(beatsPerChord)
+      const gens = notes.map(m => startNote(m, dest))
+      setTimeout(
+        () => notes.forEach((m, i) => stopNote(m, gens[i])),
+        Math.round(dur * 1000),
+      )
     }
 
     _globalStep++
@@ -113,47 +177,4 @@ function _tick() {
   }
 
   _schedulerTimer = setTimeout(_tick, TICK_MS)
-}
-
-function _advanceChord() {
-  const prog = sessionProgression.value
-  if (!prog) return
-  const len = prog.chords.length
-  const nextIdx = (sessionCurrentChordIdx.value + 1) % len
-  sessionCurrentChordIdx.value = nextIdx
-  _stopChord()
-  _playCurrentChord()
-}
-
-function _playCurrentChord() {
-  const prog = sessionProgression.value
-  if (!prog) return
-  const chord = prog.chords[sessionCurrentChordIdx.value]
-  if (!chord) return
-
-  const rootIdx = chord._rootIdx
-  const aMidi = 12 * (chord._octave + 1) + 9
-  _currentMidis = CHORD_TYPES[chord.type].map(i => aMidi + rootIdx + i)
-
-  chordOn(_currentMidis)
-  const beatSec = Math.max(0.1, (60 / sessionBpm.value) * sessionBeatsPerChord.value - 0.05)
-  const dest = getProgDest()
-  _currentMidis.forEach(m => startNote(m, dest))
-  if (_chordStopTimer) clearTimeout(_chordStopTimer)
-  _chordStopTimer = setTimeout(() => {
-    _chordStopTimer = null
-    _currentMidis.forEach(m => stopNote(m))
-  }, Math.round(beatSec * 1000))
-}
-
-function _stopChord() {
-  if (_chordStopTimer) {
-    clearTimeout(_chordStopTimer)
-    _chordStopTimer = null
-  }
-  if (_currentMidis.length) {
-    chordOff(_currentMidis)
-    _currentMidis.forEach(m => stopNote(m))
-    _currentMidis = []
-  }
 }
