@@ -8,6 +8,9 @@
 - `npm run test:coverage` - coverage report
 - `npm run test:e2e` - Playwright e2e tests
 
+## Slash commands
+- `copuco` - commit the current changes, push to origin, then /compact
+
 ## Architecture
 
 Vue 3 Composition API (`<script setup>`). No Vuex/Pinia - shared state via exported `ref` in plain JS modules.

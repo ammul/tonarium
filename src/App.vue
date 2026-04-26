@@ -97,7 +97,9 @@ function handlePopState(e) {
 onMounted(() => {
   history.replaceState({ tab: activeTab.value }, '')
   window.addEventListener('popstate', handlePopState)
-  document.addEventListener('touchstart', unlockCtx, { once: true, passive: true })
+  const unlock = () => unlockCtx()
+  document.addEventListener('touchstart', unlock, { once: true, passive: true })
+  document.addEventListener('click',      unlock, { once: true, passive: true })
 })
 
 onUnmounted(() => {

@@ -40,18 +40,20 @@ export function getCtx() {
 }
 
 // Call from the first user gesture to reliably unlock iOS audio.
-// Playing a silent buffer forces the audio pipeline active; resume() alone
-// is not always sufficient on iOS Safari.
-export function unlockCtx() {
+// Must await resume() before scheduling the silent buffer — iOS silently
+// drops sources started on a suspended context.
+export async function unlockCtx() {
   const ctx = getCtx()
+  if (ctx.state !== 'running') {
+    try { await ctx.resume() } catch (_) {}
+  }
   try {
     const buf = ctx.createBuffer(1, 1, ctx.sampleRate)
     const src = ctx.createBufferSource()
     src.buffer = buf
     src.connect(ctx.destination)
-    src.start(0)
+    src.start(ctx.currentTime)
   } catch (_) {}
-  if (ctx.state === 'suspended') ctx.resume()
 }
 
 export function getCompressor() {
