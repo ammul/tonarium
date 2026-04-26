@@ -779,5 +779,45 @@
         ]
       }
     ]
+  },
+  {
+    "name": "Deep house",
+    "genre": "Deep House",
+    "bpm": 122,
+    "desc": "Four-on-the-floor kick, snare on 2 and 4, hi-hats on the offbeat 8th. The hi-hat push between beats is what separates deep house from ordinary four-on-the-floor.",
+    "rows": [
+      {
+        "name": "Kick",
+        "steps": [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0]
+      },
+      {
+        "name": "Snare",
+        "steps": [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0]
+      },
+      {
+        "name": "Hi-Hat",
+        "steps": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0]
+      }
+    ]
+  },
+  {
+    "name": "Trip hop",
+    "genre": "Trip Hop",
+    "bpm": 82,
+    "desc": "Displaced kick, snare on 2 and 4, sparse hi-hats with gaps. The breathing space between hi-hats gives trip hop its dark, cinematic weight.",
+    "rows": [
+      {
+        "name": "Kick",
+        "steps": [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0]
+      },
+      {
+        "name": "Snare",
+        "steps": [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0]
+      },
+      {
+        "name": "Hi-Hat",
+        "steps": [0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1]
+      }
+    ]
   }
 ]

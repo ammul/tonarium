@@ -18,21 +18,25 @@ import { startTransport, stopTransport } from '@/audio/transportClock.js'
 import { selectedRoot, selectedScaleId, pianoOctave } from '@/state/jamSettings.js'
 import { sessionKey } from '@/state/sessionState.js'
 import { jamVolume, beatVolume, progVolume } from '@/state/mixerState.js'
+import { soundStyle } from '@/state/soundStyle.js'
 
 const emit = defineEmits(['navigate'])
 
 const GENRE_BEAT_MAP = {
   pop: 0, rock: 0, blues: 3, jazz: 7, soul: 4,
   classical: 0, latin: 7, cinematic: 5, modal: 0,
+  house: 11,
 }
 
-// Beat indices: 0=rock, 3=boom-bap, 4=funk, 5=half-time, 7=bossa
 const PRESETS = [
-  { label: 'Pop',     key: 'C', scaleId: 'ma.p', progressionId: 'pop-1',   beatIdx: 0 },
-  { label: 'Blues',   key: 'A', scaleId: 'mi.p', progressionId: 'blues-4', beatIdx: 3 },
-  { label: 'Funk',    key: 'A', scaleId: 'dor',  progressionId: 'soul-5',  beatIdx: 4 },
-  { label: 'Hip-hop', key: 'A', scaleId: 'mi.p', progressionId: 'pop-6',   beatIdx: 5 },
-  { label: 'Bossa',   key: 'C', scaleId: 'ma.p', progressionId: 'latin-1', beatIdx: 7 },
+  { label: 'Pop',        key: 'C', scaleId: 'ma.p', progressionId: 'pop-1',   beatIdx: 0,  comp: 'block',   beatsPerChord: 4 },
+  { label: 'Blues',      key: 'A', scaleId: 'mi.p', progressionId: 'blues-4', beatIdx: 3,  comp: 'block',   beatsPerChord: 4 },
+  { label: 'Funk',       key: 'A', scaleId: 'dor',  progressionId: 'soul-5',  beatIdx: 4,  comp: 'arp',     beatsPerChord: 4 },
+  { label: 'Hip-hop',    key: 'A', scaleId: 'mi.p', progressionId: 'pop-6',   beatIdx: 5,  comp: 'block',   beatsPerChord: 4 },
+  { label: 'Bossa',      key: 'C', scaleId: 'ma.p', progressionId: 'latin-1', beatIdx: 7,  comp: 'waltz',   beatsPerChord: 4 },
+  { label: 'DnB',        key: 'A', scaleId: 'mi.p', progressionId: 'jazz-6',  beatIdx: 10, comp: 'offbeat', beatsPerChord: 2 },
+  { label: 'Deep House', key: 'C', scaleId: 'ma.p', progressionId: 'jazz-4',  beatIdx: 11, comp: 'offbeat', beatsPerChord: 4 },
+  { label: 'Trip Hop',   key: 'D', scaleId: 'mi.p', progressionId: 'pop-7',   beatIdx: 12, comp: 'block',   beatsPerChord: 4 },
 ]
 
 const activePreset = ref(null)
@@ -91,6 +95,8 @@ function applyPreset(preset) {
   }
 
   selectedScaleId.value = preset.scaleId
+  if (preset.comp != null) sessionCompPattern.value = preset.comp
+  if (preset.beatsPerChord != null) sessionBeatsPerChord.value = preset.beatsPerChord
 }
 
 function selectProgression(id) {
@@ -246,6 +252,20 @@ const rhythmOpen = ref(false)
             </select>
             <button class="btn btn-sm btn-icon tc-jam-bar-edit-btn" @click="emit('navigate', 'chords')" aria-label="Browse progressions"><ExternalLink :size="13" /></button>
           </div>
+        </PickerRow>
+        <PickerRow label="Tone">
+          <select v-model="soundStyle" class="form-select">
+            <option value="synth">Synth</option>
+            <option value="piano">Piano</option>
+            <option value="bell">Bell</option>
+            <option value="pluck">Pluck</option>
+            <option value="marimba">Marimba</option>
+            <option value="glass">Glass</option>
+            <option value="pulse">Pulse</option>
+            <option value="organ">Organ</option>
+            <option value="brass">Brass</option>
+            <option value="kalimba">Kalimba</option>
+          </select>
         </PickerRow>
       </div>
     </div>

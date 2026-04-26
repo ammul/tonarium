@@ -1,7 +1,7 @@
 import { ref, watchEffect } from 'vue'
 
 const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('soundStyle') : null
-const VALID = ['synth', 'piano', 'bell', 'pluck']
+const VALID = ['synth', 'piano', 'bell', 'pluck', 'marimba', 'glass', 'pulse', 'organ', 'brass', 'kalimba']
 export const soundStyle = ref(VALID.includes(stored) ? stored : 'synth')
 
 watchEffect(() => {
