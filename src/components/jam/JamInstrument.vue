@@ -13,7 +13,7 @@ import ScaleLegend from '@/components/music/ScaleLegend.vue'
 import ModeLayout from '@/components/layout/ModeLayout.vue'
 import { selectedRoot, selectedScaleId, pianoOctave, selectedChordType, selectedChordRoot } from '@/state/jamSettings.js'
 import { sessionProgression, sessionPlaying, sessionCurrentChordIdx } from '@/state/sessionState.js'
-import { jamSoundStyle } from '@/state/jamSoundStyle.js'
+import { jamSoundStyle, JAM_SOUND_STYLES } from '@/state/jamSoundStyle.js'
 
 const ANCHOR_OFFSETS = new Set([0, 3, 4, 7])
 const STRING_BASE_MIDI = [40, 45, 50, 55, 59, 64]
@@ -137,7 +137,7 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
       <span class="tc-instrument-sound-label">Sound</span>
       <div class="tc-instrument-sound-btns">
         <button
-          v-for="s in ['synth','pluck','marimba','glass','pulse','organ','brass','kalimba','rhodes','strings']"
+          v-for="s in JAM_SOUND_STYLES"
           :key="s"
           class="tc-instrument-sound-btn"
           :class="{ active: jamSoundStyle === s }"

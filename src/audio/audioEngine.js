@@ -17,6 +17,7 @@ function _synthesise(ctx, midiNote, dest, styleOverride, gen) {
   gainNode.connect(dest ?? getJamDest())
   const style = styleOverride ?? soundStyle.value
   let oscs
+  let disconnects = []
 
   if (style === 'bell') {
     // Inharmonic metallic partials — characteristic of real bells
@@ -259,6 +260,7 @@ function _synthesise(ctx, midiNote, dest, styleOverride, gen) {
     harmOsc.start(now); harmOsc.stop(now + 0.1)
     tineOsc.start(now); lfoOsc.start(now)
     oscs = [tineOsc, lfoOsc, harmOsc]
+    disconnects = [lfoDepth]
 
   } else if (style === 'strings') {
     const filter = ctx.createBiquadFilter()
@@ -331,7 +333,7 @@ function _synthesise(ctx, midiNote, dest, styleOverride, gen) {
     oscs = [osc1, osc2]
   }
 
-  _active.set(midiNote, { gainNode, oscs, gen })
+  _active.set(midiNote, { gainNode, oscs, gen, disconnects })
 }
 
 export function startNote(midiNote, dest = null, styleOverride = null) {
@@ -355,8 +357,9 @@ export function stopNote(midiNote, gen = null) {
 
   const ctx = getCtx()
   const now = ctx.currentTime
-  const { gainNode, oscs } = entry
+  const { gainNode, oscs, disconnects } = entry
 
+  disconnects.forEach(n => n.disconnect())
   gainNode.gain.cancelScheduledValues(now)
   gainNode.gain.setValueAtTime(gainNode.gain.value, now)
   gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.25)

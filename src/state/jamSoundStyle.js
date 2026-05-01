@@ -1,8 +1,8 @@
 import { ref, watchEffect } from 'vue'
 
+export const JAM_SOUND_STYLES = ['synth', 'pluck', 'marimba', 'glass', 'pulse', 'organ', 'brass', 'kalimba', 'rhodes', 'strings']
 const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('jamSoundStyle') : null
-const VALID = ['synth', 'pluck', 'marimba', 'glass', 'pulse', 'organ', 'brass', 'kalimba', 'rhodes', 'strings']
-export const jamSoundStyle = ref(VALID.includes(stored) ? stored : 'synth')
+export const jamSoundStyle = ref(JAM_SOUND_STYLES.includes(stored) ? stored : 'synth')
 
 watchEffect(() => {
   if (typeof localStorage !== 'undefined') {
