@@ -137,7 +137,7 @@ function onPianoUp(noteIdx)   { pressUp(padMidi(noteIdx, pianoOctave.value)) }
       <span class="tc-instrument-sound-label">Sound</span>
       <div class="tc-instrument-sound-btns">
         <button
-          v-for="s in ['synth','pluck','marimba','glass','pulse','organ','brass','kalimba']"
+          v-for="s in ['synth','pluck','marimba','glass','pulse','organ','brass','kalimba','rhodes','strings']"
           :key="s"
           class="tc-instrument-sound-btn"
           :class="{ active: jamSoundStyle === s }"

@@ -23,9 +23,9 @@ import { soundStyle } from '@/state/soundStyle.js'
 const emit = defineEmits(['navigate'])
 
 const GENRE_BEAT_MAP = {
-  pop: 0, rock: 0, blues: 3, jazz: 7, soul: 4,
-  classical: 0, latin: 7, cinematic: 5, modal: 0,
-  house: 11,
+  pop: 0, rock: 0, blues: 3, jazz: 14, soul: 4,
+  classical: 0, latin: 13, cinematic: 5, modal: 0,
+  house: 11, reggae: 6, afrobeat: 8,
 }
 
 const PRESETS = [
@@ -36,7 +36,13 @@ const PRESETS = [
   { label: 'Bossa',      key: 'C', scaleId: 'ma.p', progressionId: 'latin-1', beatIdx: 7,  comp: 'waltz',   beatsPerChord: 4 },
   { label: 'DnB',        key: 'A', scaleId: 'mi.p', progressionId: 'jazz-6',  beatIdx: 10, comp: 'offbeat', beatsPerChord: 2 },
   { label: 'Deep House', key: 'C', scaleId: 'ma.p', progressionId: 'jazz-4',  beatIdx: 11, comp: 'offbeat', beatsPerChord: 4 },
-  { label: 'Trip Hop',   key: 'D', scaleId: 'mi.p', progressionId: 'pop-7',   beatIdx: 12, comp: 'block',   beatsPerChord: 4 },
+  { label: 'Trip Hop',   key: 'D', scaleId: 'mi.p', progressionId: 'pop-7',      beatIdx: 12, comp: 'block',   beatsPerChord: 4 },
+  { label: 'Reggae',    key: 'G', scaleId: 'ma.p', progressionId: 'reggae-1',   beatIdx: 6,  comp: 'offbeat', beatsPerChord: 4 },
+  { label: 'Jazz',      key: 'F', scaleId: 'mix',  progressionId: 'jazz-2',     beatIdx: 14, comp: 'block',   beatsPerChord: 2 },
+  { label: 'Afrobeat',  key: 'D', scaleId: 'dor',  progressionId: 'afrobeat-1', beatIdx: 8,  comp: 'arp',     beatsPerChord: 4 },
+  { label: 'Trap',      key: 'A', scaleId: 'mi.p', progressionId: 'pop-8',      beatIdx: 9,  comp: 'block',   beatsPerChord: 4 },
+  { label: 'Rock',      key: 'E', scaleId: 'mix',  progressionId: 'rock-4',     beatIdx: 0,  comp: 'block',   beatsPerChord: 4 },
+  { label: 'Soul',      key: 'Bb',scaleId: 'ma.p', progressionId: 'soul-2',     beatIdx: 4,  comp: 'block',   beatsPerChord: 4 },
 ]
 
 const activePreset = ref(null)

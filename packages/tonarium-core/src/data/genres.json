@@ -38,5 +38,13 @@
   {
     "id": "modal",
     "label": "Modal"
+  },
+  {
+    "id": "reggae",
+    "label": "Reggae"
+  },
+  {
+    "id": "afrobeat",
+    "label": "Afrobeat"
   }
 ]

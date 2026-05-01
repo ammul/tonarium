@@ -15,11 +15,14 @@ import { Play, Square } from 'lucide-vue-next'
 // ── Presets (mirrors JamSessionBar) ──────────────────────────────────────────
 
 const PRESETS = [
-  { label: 'Pop',     key: 'C', scaleId: 'ma.p', progressionId: 'pop-1',   beatIdx: 0 },
-  { label: 'Blues',   key: 'A', scaleId: 'mi.p', progressionId: 'blues-4', beatIdx: 3 },
-  { label: 'Funk',    key: 'A', scaleId: 'dor',  progressionId: 'soul-5',  beatIdx: 4 },
-  { label: 'Hip-hop', key: 'A', scaleId: 'mi.p', progressionId: 'pop-6',   beatIdx: 5 },
-  { label: 'Bossa',   key: 'C', scaleId: 'ma.p', progressionId: 'latin-1', beatIdx: 7 },
+  { label: 'Pop',     key: 'C', scaleId: 'ma.p', progressionId: 'pop-1',    beatIdx: 0  },
+  { label: 'Blues',   key: 'A', scaleId: 'mi.p', progressionId: 'blues-4',  beatIdx: 3  },
+  { label: 'Funk',    key: 'A', scaleId: 'dor',  progressionId: 'soul-5',   beatIdx: 4  },
+  { label: 'Hip-hop', key: 'A', scaleId: 'mi.p', progressionId: 'pop-6',    beatIdx: 5  },
+  { label: 'Bossa',   key: 'C', scaleId: 'ma.p', progressionId: 'latin-1',  beatIdx: 7  },
+  { label: 'Reggae',  key: 'G', scaleId: 'ma.p', progressionId: 'reggae-1', beatIdx: 6  },
+  { label: 'Jazz',    key: 'F', scaleId: 'mix',  progressionId: 'jazz-2',   beatIdx: 14 },
+  { label: 'Rock',    key: 'E', scaleId: 'mix',  progressionId: 'rock-4',   beatIdx: 0  },
 ]
 
 const activePreset = ref(null)

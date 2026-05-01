@@ -229,6 +229,79 @@ function _synthesise(ctx, midiNote, dest, styleOverride, gen) {
       return o
     })
 
+  } else if (style === 'rhodes') {
+    const harmOsc = ctx.createOscillator()
+    harmOsc.type = 'sine'
+    harmOsc.frequency.value = freq * 7
+    const harmGain = ctx.createGain()
+    harmGain.gain.setValueAtTime(0.18, now)
+    harmGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05)
+    harmOsc.connect(harmGain)
+    harmGain.connect(gainNode)
+
+    const tineOsc = ctx.createOscillator()
+    tineOsc.type = 'sine'
+    tineOsc.frequency.value = freq
+    tineOsc.connect(gainNode)
+
+    gainNode.gain.setValueAtTime(0, now)
+    gainNode.gain.linearRampToValueAtTime(0.35, now + 0.008)
+    gainNode.gain.exponentialRampToValueAtTime(0.12, now + 0.9)
+
+    const lfoOsc = ctx.createOscillator()
+    lfoOsc.type = 'sine'
+    lfoOsc.frequency.value = 5
+    const lfoDepth = ctx.createGain()
+    lfoDepth.gain.value = 0.07
+    lfoOsc.connect(lfoDepth)
+    lfoDepth.connect(gainNode.gain)
+
+    harmOsc.start(now); harmOsc.stop(now + 0.1)
+    tineOsc.start(now); lfoOsc.start(now)
+    oscs = [tineOsc, lfoOsc, harmOsc]
+
+  } else if (style === 'strings') {
+    const filter = ctx.createBiquadFilter()
+    filter.type = 'lowpass'
+    filter.frequency.value = freq * 6
+    filter.Q.value = 1.5
+    filter.connect(gainNode)
+
+    const osc1 = ctx.createOscillator()
+    osc1.type = 'sawtooth'
+    osc1.frequency.value = freq
+    osc1.connect(filter)
+
+    const osc2 = ctx.createOscillator()
+    osc2.type = 'sawtooth'
+    osc2.frequency.value = freq * 1.006
+    const g2 = ctx.createGain()
+    g2.gain.value = 0.8
+    osc2.connect(g2); g2.connect(filter)
+
+    const osc3 = ctx.createOscillator()
+    osc3.type = 'sawtooth'
+    osc3.frequency.value = freq * 0.994
+    const g3 = ctx.createGain()
+    g3.gain.value = 0.8
+    osc3.connect(g3); g3.connect(filter)
+
+    gainNode.gain.setValueAtTime(0, now)
+    gainNode.gain.linearRampToValueAtTime(0.28, now + 0.3)
+
+    const vibOsc = ctx.createOscillator()
+    vibOsc.type = 'sine'
+    vibOsc.frequency.value = 5.5
+    const vibDepth = ctx.createGain()
+    vibDepth.gain.value = freq * 0.002
+    vibOsc.connect(vibDepth)
+    vibDepth.connect(osc1.frequency)
+    vibDepth.connect(osc2.frequency)
+    vibDepth.connect(osc3.frequency)
+
+    osc1.start(now); osc2.start(now); osc3.start(now); vibOsc.start(now)
+    oscs = [osc1, osc2, osc3, vibOsc]
+
   } else {
     // 'synth' — detuned sawtooth pad through a lowpass filter
     const filter = ctx.createBiquadFilter()

@@ -1743,5 +1743,225 @@
         "numeral": "VII"
       }
     ]
+  },
+  {
+    "id": "rock-9",
+    "genre": "rock",
+    "key": "minor",
+    "label": "Prog rock modal",
+    "numeral": "i – IV – ♭VII – III",
+    "examples": "Stairway to Heaven · Kashmir · Yes · Genesis",
+    "chords": [
+      { "degree": 0,  "type": "min", "numeral": "i" },
+      { "degree": 5,  "type": "maj", "numeral": "IV" },
+      { "degree": 10, "type": "maj", "numeral": "♭VII" },
+      { "degree": 3,  "type": "maj", "numeral": "III" }
+    ]
+  },
+  {
+    "id": "rock-10",
+    "genre": "rock",
+    "key": "minor",
+    "label": "Heavy metal cadence",
+    "numeral": "i – ♭VI – ♭VII – i",
+    "examples": "Iron Maiden · Dio · classic heavy metal riff outro",
+    "chords": [
+      { "degree": 0,  "type": "min", "numeral": "i" },
+      { "degree": 8,  "type": "maj", "numeral": "♭VI" },
+      { "degree": 10, "type": "maj", "numeral": "♭VII" },
+      { "degree": 0,  "type": "min", "numeral": "i" }
+    ]
+  },
+  {
+    "id": "rock-11",
+    "genre": "rock",
+    "key": "major",
+    "label": "Classic descending",
+    "numeral": "I – V – vi – IV",
+    "examples": "Summer of '69 · Don't Stop Believin' · Sweet Child O' Mine chorus",
+    "chords": [
+      { "degree": 0, "type": "maj", "numeral": "I" },
+      { "degree": 7, "type": "maj", "numeral": "V" },
+      { "degree": 9, "type": "min", "numeral": "vi" },
+      { "degree": 5, "type": "maj", "numeral": "IV" }
+    ]
+  },
+  {
+    "id": "pop-9",
+    "genre": "pop",
+    "key": "major",
+    "label": "Indie pop",
+    "numeral": "I – iii – IV – iv",
+    "examples": "Frank Ocean · Bon Iver · emotional indie folk",
+    "chords": [
+      { "degree": 0, "type": "maj", "numeral": "I" },
+      { "degree": 4, "type": "min", "numeral": "iii" },
+      { "degree": 5, "type": "maj", "numeral": "IV" },
+      { "degree": 5, "type": "min", "numeral": "iv" }
+    ]
+  },
+  {
+    "id": "pop-10",
+    "genre": "pop",
+    "key": "minor",
+    "label": "Synthwave",
+    "numeral": "i – VI – III – ♭VII",
+    "examples": "The Midnight · FM-84 · 80s retro synth feel",
+    "chords": [
+      { "degree": 0,  "type": "min", "numeral": "i" },
+      { "degree": 8,  "type": "maj", "numeral": "VI" },
+      { "degree": 3,  "type": "maj", "numeral": "III" },
+      { "degree": 10, "type": "maj", "numeral": "♭VII" }
+    ]
+  },
+  {
+    "id": "pop-11",
+    "genre": "pop",
+    "key": "major",
+    "label": "Dream pop",
+    "numeral": "I – IVmaj7 – vi – iii",
+    "examples": "Beach House · CHVRCHES · hazy dream-pop atmosphere",
+    "chords": [
+      { "degree": 0, "type": "maj",  "numeral": "I" },
+      { "degree": 5, "type": "maj7", "numeral": "IVmaj7" },
+      { "degree": 9, "type": "min",  "numeral": "vi" },
+      { "degree": 4, "type": "min",  "numeral": "iii" }
+    ]
+  },
+  {
+    "id": "reggae-1",
+    "genre": "reggae",
+    "key": "major",
+    "label": "Classic skank",
+    "numeral": "I – IV",
+    "examples": "One Love · Three Little Birds · most classic roots reggae",
+    "chords": [
+      { "degree": 0, "type": "maj", "numeral": "I" },
+      { "degree": 5, "type": "maj", "numeral": "IV" }
+    ]
+  },
+  {
+    "id": "reggae-2",
+    "genre": "reggae",
+    "key": "major",
+    "label": "Roots rock",
+    "numeral": "I – IV – V – IV",
+    "examples": "Red Red Wine · UB40 · reggae-rock crossover",
+    "chords": [
+      { "degree": 0, "type": "maj", "numeral": "I" },
+      { "degree": 5, "type": "maj", "numeral": "IV" },
+      { "degree": 7, "type": "maj", "numeral": "V" },
+      { "degree": 5, "type": "maj", "numeral": "IV" }
+    ]
+  },
+  {
+    "id": "reggae-3",
+    "genre": "reggae",
+    "key": "minor",
+    "label": "Rockers minor",
+    "numeral": "i – iv – VII – III",
+    "examples": "The Harder They Come · Burning Spear · minor-key roots",
+    "chords": [
+      { "degree": 0,  "type": "min", "numeral": "i" },
+      { "degree": 5,  "type": "min", "numeral": "iv" },
+      { "degree": 10, "type": "maj", "numeral": "VII" },
+      { "degree": 3,  "type": "maj", "numeral": "III" }
+    ]
+  },
+  {
+    "id": "reggae-4",
+    "genre": "reggae",
+    "key": "major",
+    "label": "Nyahbinghi feel",
+    "numeral": "I – ♭VII – IV – I",
+    "examples": "Groundation · ceremonial roots reggae",
+    "chords": [
+      { "degree": 0,  "type": "maj", "numeral": "I" },
+      { "degree": 10, "type": "maj", "numeral": "♭VII" },
+      { "degree": 5,  "type": "maj", "numeral": "IV" },
+      { "degree": 0,  "type": "maj", "numeral": "I" }
+    ]
+  },
+  {
+    "id": "reggae-5",
+    "genre": "reggae",
+    "key": "minor",
+    "label": "Dancehall drop",
+    "numeral": "i – VI – III – VII",
+    "examples": "Modern dancehall · Sean Paul influence · riddim feel",
+    "chords": [
+      { "degree": 0,  "type": "min", "numeral": "i" },
+      { "degree": 8,  "type": "maj", "numeral": "VI" },
+      { "degree": 3,  "type": "maj", "numeral": "III" },
+      { "degree": 10, "type": "maj", "numeral": "VII" }
+    ]
+  },
+  {
+    "id": "afrobeat-1",
+    "genre": "afrobeat",
+    "key": "minor",
+    "label": "Fela groove",
+    "numeral": "i – IV",
+    "examples": "Fela Kuti · two-chord Afrobeat vamp",
+    "chords": [
+      { "degree": 0, "type": "min", "numeral": "i" },
+      { "degree": 5, "type": "maj", "numeral": "IV" }
+    ]
+  },
+  {
+    "id": "afrobeat-2",
+    "genre": "afrobeat",
+    "key": "minor",
+    "label": "Lagos funk",
+    "numeral": "i – iv – VII – IV",
+    "examples": "Tony Allen · Afrobeat funk crossover",
+    "chords": [
+      { "degree": 0,  "type": "min", "numeral": "i" },
+      { "degree": 5,  "type": "min", "numeral": "iv" },
+      { "degree": 10, "type": "maj", "numeral": "VII" },
+      { "degree": 5,  "type": "maj", "numeral": "IV" }
+    ]
+  },
+  {
+    "id": "afrobeat-3",
+    "genre": "afrobeat",
+    "key": "major",
+    "label": "Highlife loop",
+    "numeral": "I – IV – V – IV",
+    "examples": "Ghanaian highlife · E.T. Mensah · joyful cyclic feel",
+    "chords": [
+      { "degree": 0, "type": "maj", "numeral": "I" },
+      { "degree": 5, "type": "maj", "numeral": "IV" },
+      { "degree": 7, "type": "maj", "numeral": "V" },
+      { "degree": 5, "type": "maj", "numeral": "IV" }
+    ]
+  },
+  {
+    "id": "afrobeat-4",
+    "genre": "afrobeat",
+    "key": "minor",
+    "label": "Afropop minor",
+    "numeral": "i – VI – III – VII",
+    "examples": "Burna Boy · Wizkid · contemporary Afropop minor",
+    "chords": [
+      { "degree": 0,  "type": "min", "numeral": "i" },
+      { "degree": 8,  "type": "maj", "numeral": "VI" },
+      { "degree": 3,  "type": "maj", "numeral": "III" },
+      { "degree": 10, "type": "maj", "numeral": "VII" }
+    ]
+  },
+  {
+    "id": "afrobeat-5",
+    "genre": "afrobeat",
+    "key": "major",
+    "label": "Afrobeats major",
+    "numeral": "I – V – vi – IV",
+    "examples": "Davido · contemporary Afrobeats major feel",
+    "chords": [
+      { "degree": 0, "type": "maj", "numeral": "I" },
+      { "degree": 7, "type": "maj", "numeral": "V" },
+      { "degree": 9, "type": "min", "numeral": "vi" },
+      { "degree": 5, "type": "maj", "numeral": "IV" }
+    ]
   }
 ]

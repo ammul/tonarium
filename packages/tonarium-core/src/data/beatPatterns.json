@@ -819,5 +819,49 @@
         "steps": [0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1]
       }
     ]
+  },
+  {
+    "name": "Samba",
+    "genre": "Latin / Samba",
+    "bpm": 100,
+    "desc": "Surdo-inspired kick with 16th hi-hats and rim-shot snare on the 'a' of each beat.",
+    "rows": [
+      { "name": "Kick",   "steps": [1,0,0,1,0,0,1,0,1,0,0,1,0,0,1,0] },
+      { "name": "Snare",  "steps": [0,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0] },
+      { "name": "Hi-Hat", "steps": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] }
+    ]
+  },
+  {
+    "name": "Jazz swing",
+    "genre": "Jazz",
+    "bpm": 160,
+    "desc": "Ride-cymbal swing pattern with hi-hat on 2 and 4, ghost snare on beat 3, sparse kick.",
+    "rows": [
+      { "name": "Kick",   "steps": [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+      { "name": "Snare",  "steps": [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0] },
+      { "name": "Hi-Hat", "steps": [1,0,0,1,1,0,0,1,1,0,0,1,1,0,0,1] }
+    ]
+  },
+  {
+    "name": "Dembow",
+    "genre": "Reggaeton / Latin",
+    "bpm": 95,
+    "desc": "The defining snare on beat 2 and the offbeat 'and-2' create the signature reggaeton bounce.",
+    "rows": [
+      { "name": "Kick",   "steps": [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0] },
+      { "name": "Snare",  "steps": [0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,0] },
+      { "name": "Hi-Hat", "steps": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0] }
+    ]
+  },
+  {
+    "name": "Lo-fi chill",
+    "genre": "Lo-fi / Hip-hop",
+    "bpm": 75,
+    "desc": "Displaced kick and sparse hi-hats with breathing gaps give a tape-saturated, head-nodding feel.",
+    "rows": [
+      { "name": "Kick",   "steps": [1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0] },
+      { "name": "Snare",  "steps": [0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,0] },
+      { "name": "Hi-Hat", "steps": [1,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1] }
+    ]
   }
 ]
