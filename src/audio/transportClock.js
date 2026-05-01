@@ -6,6 +6,7 @@ import { pattern, currentStep, isPlaying as drumIsPlaying, INSTRUMENTS, triggerD
 import { startNote, stopNote } from '@/audio/audioEngine.js'
 import { CHORD_TYPES } from '@tonarium/core'
 import { chordOn, chordOff } from '@/audio/midiManager.js'
+import { getCompHit } from '@/utils/compPatterns.js'
 
 const LOOKAHEAD = 0.1
 const TICK_MS   = 25
@@ -51,29 +52,10 @@ function _updateChordMidis() {
   _chordMidis = CHORD_TYPES[chord.type].map(i => aMidi + chord._rootIdx + i)
 }
 
-// Returns the subset of _chordMidis to play at this 16th-note step within the chord.
 function _getCompHit(stepInChord, beatsPerChord) {
   if (!_chordMidis.length) return []
-  const pat = sessionCompPattern.value
-
-  if (pat === 'offbeat') {
-    if (beatsPerChord === 1) return stepInChord === 0 ? _chordMidis : []
-    const beat = Math.floor(stepInChord / 4)
-    return stepInChord % 4 === 0 && beat % 2 === 1 ? _chordMidis : []
-  }
-  if (pat === 'arp') {
-    if (stepInChord % 4 !== 0) return []
-    const beat = Math.floor(stepInChord / 4)
-    return [_chordMidis[beat % _chordMidis.length]]
-  }
-  if (pat === 'waltz') {
-    if (beatsPerChord < 2) return stepInChord === 0 ? _chordMidis : []
-    if (stepInChord === 0) return [_chordMidis[0]]
-    const upper = _chordMidis.slice(1)
-    return stepInChord % 4 === 0 ? (upper.length ? upper : _chordMidis) : []
-  }
-  // block: hit on step 0 only
-  return stepInChord === 0 ? _chordMidis : []
+  const indices = getCompHit(sessionCompPattern.value, stepInChord, beatsPerChord, _chordMidis.length)
+  return indices.map(i => _chordMidis[i])
 }
 
 function _hitDuration(beatsPerChord) {

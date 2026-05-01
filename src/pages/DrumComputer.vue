@@ -1,9 +1,10 @@
 <script setup>
 import { ref } from 'vue'
-import { pattern, isPlaying, currentStep, clearPattern, toggleCell, INSTRUMENTS } from '@/audio/drumEngine.js'
+import { pattern, isPlaying, clearPattern } from '@/audio/drumEngine.js'
 import { BEAT_PATTERNS } from '@tonarium/core'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import PickerRow from '@/components/ui/PickerRow.vue'
+import DrumSequencerGrid from '@/components/sequencer/DrumSequencerGrid.vue'
 import { sessionBeatIdx, sessionBpm } from '@/state/sessionState.js'
 import { startTransport, stopTransport } from '@/audio/transportClock.js'
 import { buildPatternFromBeat } from '@/utils/beatUtils.js'
@@ -61,35 +62,7 @@ function useInJam() {
       </div>
     </div>
 
-    <div class="tc-drum-grid-wrap">
-      <div class="tc-drum-step-header">
-        <div class="tc-drum-inst-spacer"></div>
-        <div
-          v-for="s in 16"
-          :key="s"
-          class="tc-drum-step-num"
-          :class="{
-            active:     isPlaying && currentStep === s - 1,
-            'beat-start': (s - 1) % 4 === 0,
-          }"
-        >{{ s }}</div>
-      </div>
-
-      <div v-for="(inst, i) in INSTRUMENTS" :key="inst" class="tc-drum-inst-row">
-        <div class="tc-drum-inst-name">{{ inst }}</div>
-        <button
-          v-for="s in 16"
-          :key="s"
-          class="tc-drum-step-btn"
-          :class="{
-            on:           pattern[i][s - 1],
-            playing:      isPlaying && currentStep === s - 1,
-            'beat-start': (s - 1) % 4 === 0,
-          }"
-          @click="toggleCell(i, s - 1)"
-        ></button>
-      </div>
-    </div>
+    <DrumSequencerGrid />
   </div>
 </template>
 
@@ -149,96 +122,11 @@ function useInJam() {
 
 .tc-drum-bpm-input:focus { outline: none; border-color: var(--accent); }
 
-.tc-drum-grid-wrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 0.5rem;
-}
-
-.tc-drum-step-header,
-.tc-drum-inst-row {
-  display: grid;
-  grid-template-columns: 7rem repeat(16, minmax(1.6rem, 1fr));
-  gap: 0.2rem;
-  margin-bottom: 0.2rem;
-  min-width: 560px;
-}
-
-.tc-drum-step-num {
-  text-align: center;
-  font-size: 0.65rem;
-  color: var(--text5);
-  padding: 0.15rem 0;
-  border-radius: 3px;
-  transition: color 0.1s, background 0.1s;
-}
-
-.tc-drum-step-num.beat-start {
-  color: var(--text4);
-  border-left: 1px solid var(--border2);
-}
-
-.tc-drum-step-num.active {
-  color: var(--accent);
-  background: var(--accent-bg);
-}
-
-.tc-drum-inst-name {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text3);
-  display: flex;
-  align-items: center;
-  padding-right: 0.4rem;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.tc-drum-step-btn {
-  height: 2rem;
-  border-radius: 4px;
-  border: 1px solid var(--border2);
-  background: var(--raised);
-  cursor: pointer;
-  transition: background 0.1s, border-color 0.1s;
-  padding: 0;
-}
-
-.tc-drum-step-btn.beat-start {
-  border-left: 2px solid var(--border2);
-}
-
-.tc-drum-step-btn:hover { background: var(--border); }
-
-.tc-drum-step-btn.on {
-  background: var(--accent-bg);
-  border-color: var(--accent-mid);
-}
-
-.tc-drum-step-btn.on.beat-start {
-  border-left-color: var(--accent-mid);
-}
-
-.tc-drum-step-btn.on.playing {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.tc-drum-step-btn.playing:not(.on) {
-  background: var(--border3);
-}
-
 @media (max-width: 600px) {
   .tc-drum { padding: 1.25rem 0.75rem; }
-  .tc-drum-step-header, .tc-drum-inst-row { grid-template-columns: 4.5rem repeat(16, minmax(1.4rem, 1fr)); min-width: 460px; }
-  .tc-drum-inst-name { font-size: 0.68rem; padding-right: 0.25rem; }
-  .tc-drum-step-btn { height: 1.75rem; }
-  .tc-drum-step-num { font-size: 0.6rem; }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
   .tc-drum-transport { margin: 0.5rem 0; }
-  .tc-drum-step-btn { height: 1.6rem; }
 }
 </style>

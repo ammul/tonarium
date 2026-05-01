@@ -55,21 +55,21 @@ beforeEach(() => {
 describe('DrumComputer', () => {
   it('renders 9 instrument rows', () => {
     const wrapper = mount(DrumComputer)
-    const rows = wrapper.findAll('.tc-drum-inst-row')
+    const rows = wrapper.findAll('.seq-drum-inst-row')
     expect(rows).toHaveLength(9)
   })
 
   it('renders 16 step buttons per instrument row', () => {
     const wrapper = mount(DrumComputer)
-    const rows = wrapper.findAll('.tc-drum-inst-row')
+    const rows = wrapper.findAll('.seq-drum-inst-row')
     for (const row of rows) {
-      expect(row.findAll('.tc-drum-step-btn')).toHaveLength(16)
+      expect(row.findAll('.seq-drum-step-btn')).toHaveLength(16)
     }
   })
 
   it('renders instrument names', () => {
     const wrapper = mount(DrumComputer)
-    const names = wrapper.findAll('.tc-drum-inst-name').map(el => el.text())
+    const names = wrapper.findAll('.seq-drum-inst-name').map(el => el.text())
     for (const inst of INSTRUMENTS) {
       expect(names).toContain(inst)
     }
@@ -77,7 +77,7 @@ describe('DrumComputer', () => {
 
   it('all step buttons start as off', () => {
     const wrapper = mount(DrumComputer)
-    const onButtons = wrapper.findAll('.tc-drum-step-btn.on')
+    const onButtons = wrapper.findAll('.seq-drum-step-btn.on')
     expect(onButtons).toHaveLength(0)
   })
 
@@ -103,8 +103,8 @@ describe('DrumComputer', () => {
     toggleCell(0, 0)
     const wrapper = mount(DrumComputer)
     await nextTick()
-    const firstRow = wrapper.findAll('.tc-drum-inst-row')[0]
-    const firstBtn = firstRow.findAll('.tc-drum-step-btn')[0]
+    const firstRow = wrapper.findAll('.seq-drum-inst-row')[0]
+    const firstBtn = firstRow.findAll('.seq-drum-step-btn')[0]
     expect(firstBtn.classes()).toContain('on')
   })
 
