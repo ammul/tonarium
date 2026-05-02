@@ -12,6 +12,7 @@ import LearnBeats from './LearnBeats.vue'
 import LearnSongStructure from './LearnSongStructure.vue'
 import LearnJamSession from './LearnJamSession.vue'
 import LearnStepFooter from './LearnStepFooter.vue'
+import { LEARN_LESSON_IDS, completedLessons, learnPercentage } from '../state/learnProgress.js'
 
 const emit = defineEmits(['navigate'])
 
@@ -59,7 +60,15 @@ watch(step, (newStep, oldStep) => {
 <template>
   <div class="tc-learn">
 
-    <LearnStepNav :steps="STEPS" :model-value="step" :visited-steps="visitedSteps" @update:model-value="step = $event" />
+    <LearnStepNav
+      :steps="STEPS"
+      :model-value="step"
+      :visited-steps="visitedSteps"
+      :completed-lesson-ids="[...completedLessons]"
+      :lesson-ids="LEARN_LESSON_IDS"
+      :percentage="learnPercentage"
+      @update:model-value="step = $event"
+    />
 
     <LearnRootNotes     v-if="step === 0" />
     <LearnIntervals     v-else-if="step === 1" />

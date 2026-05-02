@@ -21,11 +21,24 @@ Vue 3 Composition API (`<script setup>`). No Vuex/Pinia - shared state via expor
 - `src/state/displayMode.js` - global display mode ref (`'pad' | 'guitar' | 'piano'`)
 - `src/state/padSize.js` - pad grid size ref (`'4x3' | '4x4'`)
 - `src/state/sessionState.js` - jam session state (sessionKey, sessionProgression, sessionBeatIdx, sessionBpm, sessionBeatsPerChord, sessionPlaying, sessionCurrentChordIdx). Persists key settings to localStorage.
-- `src/state/landingState.js` - `requestedLandingView` and `activeLandingView` refs for coordinating sub-view navigation between App.vue and LandingPage. Set `requestedLandingView` to `'jam'`, `'learn'`, or `'hero'` to drive LandingPage navigation from outside.
+- `src/state/landingState.js` - `requestedLandingView` and `activeLandingView` refs for coordinating sub-view navigation between App.vue and LandingPage. Set `requestedLandingView` to `'jam'`, `'learn'`, or `'hero'` to drive LandingPage navigation from outside. Also `requestedKbTerm` — set this then navigate to the `kb` tab to open KnowledgeBase on a specific term.
+
+### Learn mode framework (`packages/tonarium-learn/`)
+- `src/components/lesson/LearnLesson.vue` - canonical lesson container. Wrap every new lesson in `<LearnLesson id="...">`; the id must be in `LEARN_LESSON_IDS`. An IntersectionObserver on a sentinel at the bottom marks the lesson complete the first time the reader reaches the end.
+- `src/components/lesson/LessonIntro.vue`, `LessonSection.vue`, `LessonFactCard.vue` - reusable building blocks. Compose these instead of writing fresh scoped CSS for layout in each lesson.
+- `src/components/lesson/LessonText.vue` - prose wrapper that auto-detects KB terms (uses the same regex tokenizer as `KbText`) and opens `KbPopover` on tap.
+- `src/state/learnProgress.js` - `completedLessons` (ref Set), `markLessonComplete(id)`, `learnPercentage` (computed). Persists to `localStorage` under `learnCompleted`.
+- `LEARN_LESSON_IDS` is the canonical id list — extend it whenever you add a new lesson.
+- Note: 7 of 9 lessons are still on the legacy structure; only Root Notes and Intervals have been migrated. Migrate the rest incrementally as you touch them.
+
+### Knowledge base (`src/pages/knowledge/`)
+- `termMap.js` - `TERM_MAP`, `findTerm`, `getTermRegex`. Adding a term: add an entry here, create `terms/Kb<Name>.vue`, register it in `KnowledgeBase.vue`'s `TERM_COMPONENTS`.
+- `KbText.vue` - inline term-link renderer used inside KB term pages (clicks navigate within KB).
+- `KbPopover.vue` + `popoverState.js` - universal popover (mounted once at App root) for term lookups from outside KB pages (e.g. inside lessons). Reads `popoverTerm` / `popoverAnchor`; "Read more" sets `requestedKbTerm` and emits `navigate('kb')`.
 
 ### Audio modules
 - `src/audio/audioContext.js` - shared AudioContext singleton with compressor. Both audioEngine and drumEngine import from here to prevent clock drift.
-- `src/audio/audioEngine.js` - note synth (4 styles: bell, piano, pluck, synth). startNote/stopNote/playNote/playChord.
+- `src/audio/audioEngine.js` - note synth (12 styles: synth, piano, bell, pluck, marimba, glass, pulse, organ, brass, kalimba, rhodes, strings). startNote/stopNote/playNote/playChord.
 - `src/audio/drumEngine.js` - 9-instrument drum synthesis, 16-step pattern state, play/pause/triggerDrumHit. Does NOT self-schedule when used via transportClock.
 - `src/audio/transportClock.js` - master clock for synchronized playback. Drives both drum hits and chord advancement using lookahead scheduling. Reads from sessionState.
 - `src/audio/midiManager.js` - MIDI I/O, device selection, note/chord on/off.

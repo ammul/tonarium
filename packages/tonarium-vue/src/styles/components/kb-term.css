@@ -1,0 +1,64 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   KNOWLEDGE BASE TERM LAYOUT
+   Shared across all Kb*.vue term pages and the KbPopover.
+   ───────────────────────────────────────────────────────────────────────────── */
+.kb-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.kb-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 0.82rem;
+  color: var(--text3);
+}
+
+.kb-fact-num {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.kb-related {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.kb-related-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text5);
+}
+
+.kb-rel-btn {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: var(--input);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.kb-rel-btn:hover { border-color: var(--accent); background: var(--accent-bg); }
+
+@media (max-width: 480px) {
+  .kb-facts { grid-template-columns: 1fr; }
+}

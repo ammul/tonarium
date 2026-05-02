@@ -35,7 +35,8 @@ Pick a key, pick a scale, and see which notes are safe. Anchor notes (root, 3rd,
 | Tool | What it does |
 |------|-------------|
 | **Quick Jam** | Unified performance surface: key, scale, progression, beat, BPM and improv in one place |
-| **Learn** | 9-step interactive course: root notes through full jam sessions |
+| **Learn** | 9-step interactive course with progress tracking and KB-linked prose |
+| **Knowledge Base** | 23 musical terms, searchable, cross-linked, reachable from inside any lesson |
 | **Drum Computer** | 16-step sequencer, 9 instruments, 10 groove presets |
 | **Chord Progressions** | 69 presets across 10 genres with playback |
 | **Scale Visualizer** | See any scale across all 12 notes |
@@ -46,6 +47,19 @@ Pick a key, pick a scale, and see which notes are safe. Anchor notes (root, 3rd,
 ## Learn Mode
 
 A 9-step hands-on course that takes you from "what's a root note?" to jamming over a chord progression with a drum beat. Each step has interactive audio examples. The final step sets up a full jam session and drops you into Jam Mode.
+
+Lessons are built on a small framework so they stay consistent and easy to extend:
+
+- **`LearnLesson`** — wraps each lesson and uses an IntersectionObserver on a sentinel at the bottom to mark the lesson complete the first time the reader reaches the end.
+- **`LessonIntro` / `LessonSection` / `LessonFactCard`** — reusable building blocks every lesson composes from.
+- **`LessonText`** — auto-detects Knowledge Base terms in lesson prose and renders them as buttons. Tapping one (on mobile or desktop) opens a popover with a one-line definition and a "Read more →" link that jumps to the full Knowledge Base entry.
+- **`learnProgress`** — completed lessons persist to `localStorage` (`learnCompleted`). The step nav shows a "X% complete" chip, and the Learn tile on the home screen carries a percentage badge once any lesson is finished.
+
+Adding a new lesson is three steps: register its id in `LEARN_LESSON_IDS`, create `LearnX.vue` that wraps content in `<LearnLesson id="x">`, and slot it into `LearnMode.vue`.
+
+## Knowledge Base
+
+23 musical terms with short interactive pages: notes, intervals, scales, chords, beats, plus more specific concepts like pentatonic, voicing, off-beat, syncopation, and comping. Searchable index, term-to-term cross-links, reachable from any lesson via the popover.
 
 ## Audio
 
@@ -74,7 +88,7 @@ npm install && npm run dev
 ```
 
 ```bash
-npm test          # 467 unit + component tests (Vitest)
+npm test          # unit + component tests (Vitest)
 npm run test:e2e  # end-to-end tests (Playwright)
 npm run build     # production build
 ```

@@ -3,6 +3,7 @@ import { ref, watch, onMounted, onUnmounted } from 'vue'
 import StartPage from '@/pages/StartPage.vue'
 import LearnMode from '@/pages/LearnMode.vue'
 import { requestedLandingView, activeLandingView } from '@/state/landingState.js'
+import { learnPercentage } from '@tonarium/learn'
 import { Zap, BookOpen, Disc3, Music, BarChart2, ScanSearch, Layers, Settings, Library } from 'lucide-vue-next'
 
 const emit = defineEmits(['navigate'])
@@ -76,6 +77,7 @@ onUnmounted(() => {
           <BookOpen :size="28" class="tc-landing-btn-icon" />
           <span class="tc-landing-btn-label">Learn</span>
           <span class="tc-landing-btn-desc">Root notes to full jams</span>
+          <span v-if="learnPercentage > 0" class="tc-landing-btn-badge">{{ learnPercentage }}%</span>
         </button>
 
         <button class="tc-landing-btn tc-landing-btn--jam" @click="goTo('jam')">
@@ -167,6 +169,21 @@ onUnmounted(() => {
   font-family: inherit;
   text-align: left;
   transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  position: relative;
+}
+
+.tc-landing-btn-badge {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--accent-mid);
+  border-radius: 12px;
+  background: var(--accent-bg);
 }
 
 .tc-landing-btn:hover { transform: translateY(-2px); }

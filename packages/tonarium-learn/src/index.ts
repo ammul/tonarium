@@ -4,6 +4,23 @@ export { CHORD_TYPES, IMPROV_CHORD_TYPES, IMPROV_EXAMPLES } from './constants/ch
 export { BEAT_TIPS } from './constants/beatPatterns.js'
 export { LEARN_PROGS } from './constants/progressions.js'
 
+// State
+export {
+  LEARN_LESSON_IDS,
+  completedLessons,
+  markLessonComplete,
+  resetLearnProgress,
+  isLessonComplete,
+  learnPercentage,
+} from './state/learnProgress.js'
+
+// Lesson framework
+export { default as LearnLesson }    from './components/lesson/LearnLesson.vue'
+export { default as LessonIntro }    from './components/lesson/LessonIntro.vue'
+export { default as LessonSection }  from './components/lesson/LessonSection.vue'
+export { default as LessonFactCard } from './components/lesson/LessonFactCard.vue'
+export { default as LessonText }     from './components/lesson/LessonText.vue'
+
 // Components
 export { default as LearnMode } from './components/LearnMode.vue'
 export { default as LearnStepNav } from './components/LearnStepNav.vue'

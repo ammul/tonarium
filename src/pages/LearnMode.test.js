@@ -45,14 +45,15 @@ describe('step navigation', () => {
     expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('active')
   })
 
-  it('clicking a step marks it active; only visited steps get the done class', async () => {
+  it('clicking a step marks it active; visited (uncompleted) steps get the visited class', async () => {
     const wrapper = mount(LearnMode)
     // Navigate sequentially: 0 → 1 → 2
     await wrapper.find('.tc-step-footer-nav-btn:last-child').trigger('click')
     await wrapper.find('.tc-step-footer-nav-btn:last-child').trigger('click')
     expect(wrapper.findAll('.tc-step-nav-btn')[2].classes()).toContain('active')
-    expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('done')
-    expect(wrapper.findAll('.tc-step-nav-btn')[1].classes()).toContain('done')
+    // Without the IntersectionObserver firing, navigated-through steps are visited, not done
+    expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('visited')
+    expect(wrapper.findAll('.tc-step-nav-btn')[1].classes()).toContain('visited')
   })
 
   it('Next button advances the step', async () => {

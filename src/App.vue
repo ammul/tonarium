@@ -18,6 +18,7 @@ import AboutPage from '@/pages/AboutPage.vue'
 import QuickJam2 from '@/pages/QuickJam2.vue'
 import SequencerJam from '@/pages/SequencerJam.vue'
 import KnowledgeBase from '@/pages/KnowledgeBase.vue'
+import KbPopover from '@/pages/knowledge/KbPopover.vue'
 import ChordLibrary from '@/pages/ChordLibrary.vue'
 import { Home, Zap, BookOpen, Disc3, Music, BarChart2, ScanSearch, Layers, Info, Settings, Menu, X, Play, Pause, Square, RefreshCw, BookMarked, Library, LayoutGrid } from 'lucide-vue-next'
 
@@ -177,6 +178,8 @@ onUnmounted(() => {
         @close="closeSettings"
       />
     </main>
+
+    <KbPopover @navigate="selectTab" />
   </div>
 </template>
 

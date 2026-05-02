@@ -3,6 +3,11 @@ import { ref } from 'vue'
 import { playNote } from '@/audio/audioEngine.js'
 import { NOTES, NOTE_TO_SEMI } from '@tonarium/core'
 import { NoteStripPicker } from '@tonarium/vue'
+import LearnLesson from './lesson/LearnLesson.vue'
+import LessonIntro from './lesson/LessonIntro.vue'
+import LessonSection from './lesson/LessonSection.vue'
+import LessonFactCard from './lesson/LessonFactCard.vue'
+import LessonText from './lesson/LessonText.vue'
 
 const rootNoteIdx = ref(null)
 
@@ -19,55 +24,53 @@ function playRootOctave() {
 </script>
 
 <template>
-  <div class="step-content">
-    <p class="step-intro">Pick a note — that's your root. Everything else in music is named from here.</p>
+  <LearnLesson id="root-notes">
+    <LessonIntro>
+      <LessonText text="Pick a note — that's your root. Everything else in music is named from here." />
+    </LessonIntro>
 
-    <div class="tc-learn-roots-picker">
-      <NoteStripPicker
-        :from-index="rootNoteIdx"
-        @note-down="pickRootNote"
-      />
-    </div>
+    <LessonSection title="Try it">
+      <div class="tc-learn-roots-picker">
+        <NoteStripPicker :from-index="rootNoteIdx" @note-down="pickRootNote" />
+      </div>
 
-    <div class="tc-learn-roots-result">
-      <template v-if="rootNoteIdx !== null">
-        <div class="tc-learn-roots-rr-main">
-          <div>
-            <div class="tc-learn-roots-rr-name">{{ NOTES[rootNoteIdx] }}</div>
-            <div class="tc-learn-roots-rr-label">your root note</div>
+      <div class="tc-learn-roots-result">
+        <template v-if="rootNoteIdx !== null">
+          <div class="tc-learn-roots-rr-main">
+            <div>
+              <div class="tc-learn-roots-rr-name">{{ NOTES[rootNoteIdx] }}</div>
+              <div class="tc-learn-roots-rr-label">your root note</div>
+            </div>
+            <button class="btn btn-sm btn-accent tc-learn-roots-rr-octave-btn" @click="playRootOctave">Hear it one octave up</button>
           </div>
-          <button class="btn btn-sm btn-accent tc-learn-roots-rr-octave-btn" @click="playRootOctave">Hear it one octave up</button>
-        </div>
-      </template>
-      <template v-else>
-        <div class="tc-learn-roots-rr-hint">Tap any note to set your root</div>
-      </template>
-    </div>
+        </template>
+        <template v-else>
+          <div class="tc-learn-roots-rr-hint">Tap any note to set your root</div>
+        </template>
+      </div>
+    </LessonSection>
 
-    <div class="tc-learn-roots-facts">
-      <div class="card card-sm tc-learn-roots-rf-item">
-        <span class="tc-learn-roots-rf-heading">12 notes</span>
-        <span class="tc-learn-roots-rf-body">Western music uses 12 pitches before the pattern repeats — 7 naturals plus 5 sharps.</span>
+    <LessonSection title="Anatomy">
+      <div class="tc-learn-roots-facts">
+        <LessonFactCard heading="12 notes">
+          <LessonText text="Western music uses 12 pitches before the pattern repeats — 7 naturals plus 5 sharps." />
+        </LessonFactCard>
+        <LessonFactCard heading="Octaves">
+          <LessonText text="The same note at double the frequency — same name, higher pitch." />
+        </LessonFactCard>
+        <LessonFactCard heading="Keys">
+          <LessonText text="When a song is in C major, C is the root — the note everything wants to return to." />
+        </LessonFactCard>
       </div>
-      <div class="card card-sm tc-learn-roots-rf-item">
-        <span class="tc-learn-roots-rf-heading">Octaves</span>
-        <span class="tc-learn-roots-rf-body">The same note at double the frequency — same name, higher pitch.</span>
-      </div>
-      <div class="card card-sm tc-learn-roots-rf-item">
-        <span class="tc-learn-roots-rf-heading">Keys</span>
-        <span class="tc-learn-roots-rf-body">When a song is in C major, C is the root — the note everything wants to return to.</span>
-      </div>
-    </div>
+    </LessonSection>
 
     <div class="step-bridge">
-      Try picking the same note in different spots on the strip. Notice it sounds the same but sits higher or lower — that's an <strong>octave</strong>. Once you have a root, you can measure the <strong>distance</strong> to any other note. That distance is called an <strong>interval</strong>.
+      <LessonText text="Try picking the same note in different spots on the strip. Notice it sounds the same but sits higher or lower — that's an octave. Once you have a root, you can measure the distance to any other note. That distance is called an interval." />
     </div>
-  </div>
+  </LearnLesson>
 </template>
 
 <style scoped>
-/* step-content, step-intro, step-bridge — from learn.css */
-
 .tc-learn-roots-picker {
   display: flex;
   flex-direction: column;
@@ -121,26 +124,6 @@ function playRootOctave() {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
-}
-
-/* unique properties not covered by .card + .card-sm */
-.tc-learn-roots-rf-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.tc-learn-roots-rf-heading {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--accent);
-  letter-spacing: 0.02em;
-}
-
-.tc-learn-roots-rf-body {
-  font-size: 0.78rem;
-  color: var(--text3);
-  line-height: 1.5;
 }
 
 @media (max-width: 480px) {

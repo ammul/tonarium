@@ -4,6 +4,10 @@ import { playNote, playChord } from '@/audio/audioEngine.js'
 import { NOTE_TO_SEMI } from '@tonarium/core'
 import { NoteStripPicker } from '@tonarium/vue'
 import { INTERVALS } from '../constants/intervals.js'
+import LearnLesson from './lesson/LearnLesson.vue'
+import LessonIntro from './lesson/LessonIntro.vue'
+import LessonSection from './lesson/LessonSection.vue'
+import LessonText from './lesson/LessonText.vue'
 
 const CHROMATIC = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 
@@ -51,35 +55,38 @@ const intervalInfo = computed(() => {
 </script>
 
 <template>
-  <div class="step-content">
-    <p class="step-intro">Pick any two notes to hear the interval between them.</p>
+  <LearnLesson id="intervals">
+    <LessonIntro>
+      <LessonText text="Pick any two notes to hear the interval between them." />
+    </LessonIntro>
 
-    <NoteStripPicker
-      :from-index="fromIdx"
-      :to-index="toIdx"
-      @note-down="pickNote"
-    />
+    <LessonSection title="Pick two notes">
+      <NoteStripPicker
+        :from-index="fromIdx"
+        :to-index="toIdx"
+        @note-down="pickNote"
+      />
 
-    <div class="tc-learn-intervals-result">
-      <template v-if="intervalInfo">
-        <div class="tc-learn-intervals-iv-name">{{ intervalInfo.name }}</div>
-        <div class="tc-learn-intervals-iv-semi">{{ intervalInfo.semi }} semitone{{ intervalInfo.semi !== 1 ? 's' : '' }}</div>
-        <div class="tc-learn-intervals-iv-feel">{{ intervalInfo.feel }}</div>
-        <div v-if="fromIdx !== null && toIdx !== null" class="tc-learn-intervals-iv-path">
-          {{ CHROMATIC[fromIdx] }} → {{ CHROMATIC[toIdx] }}
-        </div>
-      </template>
-      <template v-else-if="fromIdx !== null">
-        <div class="tc-learn-intervals-iv-hint">Now pick a second note</div>
-        <div class="tc-learn-intervals-iv-hint-sub">{{ CHROMATIC[fromIdx] }} selected</div>
-      </template>
-      <template v-else>
-        <div class="tc-learn-intervals-iv-hint">Pick a starting note</div>
-      </template>
-    </div>
+      <div class="tc-learn-intervals-result">
+        <template v-if="intervalInfo">
+          <div class="tc-learn-intervals-iv-name">{{ intervalInfo.name }}</div>
+          <div class="tc-learn-intervals-iv-semi">{{ intervalInfo.semi }} semitone{{ intervalInfo.semi !== 1 ? 's' : '' }}</div>
+          <div class="tc-learn-intervals-iv-feel">{{ intervalInfo.feel }}</div>
+          <div v-if="fromIdx !== null && toIdx !== null" class="tc-learn-intervals-iv-path">
+            {{ CHROMATIC[fromIdx] }} → {{ CHROMATIC[toIdx] }}
+          </div>
+        </template>
+        <template v-else-if="fromIdx !== null">
+          <div class="tc-learn-intervals-iv-hint">Now pick a second note</div>
+          <div class="tc-learn-intervals-iv-hint-sub">{{ CHROMATIC[fromIdx] }} selected</div>
+        </template>
+        <template v-else>
+          <div class="tc-learn-intervals-iv-hint">Pick a starting note</div>
+        </template>
+      </div>
+    </LessonSection>
 
-    <div class="tc-learn-intervals-reference">
-      <div class="tc-learn-intervals-ref-label">All intervals from root (tap to hear)</div>
+    <LessonSection title="All intervals from root (tap to hear)">
       <div class="tc-learn-intervals-ref-grid">
         <div v-for="iv in INTERVALS" :key="iv.semi" class="tc-learn-intervals-ref-item"
           :class="[iv.category, { highlight: intervalInfo && intervalInfo.semi === iv.semi }]"
@@ -89,17 +96,15 @@ const intervalInfo = computed(() => {
           <span class="tc-learn-intervals-ref-feel">{{ iv.feel.split(',')[0] }}</span>
         </div>
       </div>
-    </div>
+    </LessonSection>
 
     <div class="step-bridge">
-      Find the most tense interval (tritone, 6 semitones) and the most resolved one (perfect 5th, 7 semitones) — those are your two poles. Stack a 3rd and a 5th above any root and you have a <strong>chord</strong>.
+      <LessonText text="Find the most tense interval (tritone, 6 semitones) and the most resolved one (perfect fifth, 7 semitones) — those are your two poles. Stack a third and a fifth above any root and you have a chord." />
     </div>
-  </div>
+  </LearnLesson>
 </template>
 
 <style scoped>
-/* step-content, step-intro, step-bridge — from learn.css */
-
 .tc-learn-intervals-result {
   min-height: 7rem;
   display: flex;
@@ -151,20 +156,6 @@ const intervalInfo = computed(() => {
   color: var(--accent-mid);
 }
 
-.tc-learn-intervals-reference {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.tc-learn-intervals-ref-label {
-  font-size: 0.72rem;
-  color: var(--text4);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  font-weight: 600;
-}
-
 .tc-learn-intervals-ref-grid {
   display: flex;
   flex-wrap: wrap;
@@ -209,7 +200,6 @@ const intervalInfo = computed(() => {
   font-style: italic;
 }
 
-/* Category border-left accent colors */
 .tc-learn-intervals-ref-item.consonant { border-left: 2px solid color-mix(in srgb, var(--good) 50%, transparent); }
 .tc-learn-intervals-ref-item.bright    { border-left: 2px solid color-mix(in srgb, var(--accent-hi) 50%, transparent); }
 .tc-learn-intervals-ref-item.dark      { border-left: 2px solid color-mix(in srgb, var(--accent-lo) 60%, transparent); }
@@ -218,6 +208,4 @@ const intervalInfo = computed(() => {
 .tc-learn-intervals-ref-item.highlight .tc-learn-intervals-ref-semi { color: var(--accent); }
 .tc-learn-intervals-ref-item.highlight .tc-learn-intervals-ref-name { color: var(--text2); }
 .tc-learn-intervals-ref-item.highlight .tc-learn-intervals-ref-feel { color: var(--accent-mid); }
-
-/* step-bridge — from learn.css */
 </style>

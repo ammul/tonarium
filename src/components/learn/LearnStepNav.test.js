@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import LearnStepNav from './LearnStepNav.vue'
 
 const STEPS = ['Root Notes', 'Intervals', 'Scales', 'Progressions', 'Chords', 'Improvising', 'Beats']
+const LESSON_IDS = ['root-notes', 'intervals', 'scales', 'progressions', 'chords', 'improvising', 'beats']
 
 describe('LearnStepNav', () => {
   it('renders the correct number of step buttons', () => {
@@ -22,19 +23,53 @@ describe('LearnStepNav', () => {
     expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).not.toContain('active')
   })
 
-  it('marks visited steps (excluding current) with the done class', () => {
-    const wrapper = mount(LearnStepNav, { props: { steps: STEPS, modelValue: 3, visitedSteps: [0, 1, 2, 3] } })
+  it('marks completed lessons (excluding current) with the done class', () => {
+    const wrapper = mount(LearnStepNav, {
+      props: {
+        steps: STEPS,
+        modelValue: 3,
+        lessonIds: LESSON_IDS,
+        completedLessonIds: ['root-notes', 'intervals', 'scales', 'progressions'],
+      },
+    })
     expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('done')
     expect(wrapper.findAll('.tc-step-nav-btn')[1].classes()).toContain('done')
     expect(wrapper.findAll('.tc-step-nav-btn')[2].classes()).toContain('done')
-    expect(wrapper.findAll('.tc-step-nav-btn')[3].classes()).not.toContain('done') // active, not done
+    expect(wrapper.findAll('.tc-step-nav-btn')[3].classes()).not.toContain('done')
   })
 
-  it('only marks actually visited steps as done, not skipped steps', () => {
-    const wrapper = mount(LearnStepNav, { props: { steps: STEPS, modelValue: 3, visitedSteps: [0, 3] } })
+  it('only marks actually completed steps as done, not skipped steps', () => {
+    const wrapper = mount(LearnStepNav, {
+      props: {
+        steps: STEPS,
+        modelValue: 3,
+        lessonIds: LESSON_IDS,
+        completedLessonIds: ['root-notes', 'progressions'],
+      },
+    })
     expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('done')
     expect(wrapper.findAll('.tc-step-nav-btn')[1].classes()).not.toContain('done')
     expect(wrapper.findAll('.tc-step-nav-btn')[2].classes()).not.toContain('done')
+  })
+
+  it('marks visited but not completed steps with the visited class', () => {
+    const wrapper = mount(LearnStepNav, {
+      props: {
+        steps: STEPS,
+        modelValue: 3,
+        lessonIds: LESSON_IDS,
+        visitedSteps: [0, 1, 2, 3],
+        completedLessonIds: ['root-notes'],
+      },
+    })
+    expect(wrapper.findAll('.tc-step-nav-btn')[0].classes()).toContain('done')
+    expect(wrapper.findAll('.tc-step-nav-btn')[1].classes()).toContain('visited')
+    expect(wrapper.findAll('.tc-step-nav-btn')[2].classes()).toContain('visited')
+  })
+
+  it('renders the percentage label', () => {
+    const wrapper = mount(LearnStepNav, { props: { steps: STEPS, modelValue: 0, percentage: 42 } })
+    expect(wrapper.find('.tc-step-nav-pct').text()).toBe('42% complete')
   })
 
   it('emits update:modelValue with the clicked step index', async () => {

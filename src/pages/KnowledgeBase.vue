@@ -11,6 +11,20 @@ import KbKey         from './knowledge/terms/KbKey.vue'
 import KbProgression from './knowledge/terms/KbProgression.vue'
 import KbBeat        from './knowledge/terms/KbBeat.vue'
 import KbBpm         from './knowledge/terms/KbBpm.vue'
+import KbPentatonic  from './knowledge/terms/KbPentatonic.vue'
+import KbVoicing     from './knowledge/terms/KbVoicing.vue'
+import KbDownbeat    from './knowledge/terms/KbDownbeat.vue'
+import KbOffbeat     from './knowledge/terms/KbOffbeat.vue'
+import KbKick        from './knowledge/terms/KbKick.vue'
+import KbSnare       from './knowledge/terms/KbSnare.vue'
+import KbHihat       from './knowledge/terms/KbHihat.vue'
+import KbFifth       from './knowledge/terms/KbFifth.vue'
+import KbThird       from './knowledge/terms/KbThird.vue'
+import KbTriad       from './knowledge/terms/KbTriad.vue'
+import KbComp        from './knowledge/terms/KbComp.vue'
+import KbArpeggio    from './knowledge/terms/KbArpeggio.vue'
+import KbSyncopation from './knowledge/terms/KbSyncopation.vue'
+import { requestedKbTerm } from '@/state/landingState.js'
 
 const TERM_COMPONENTS = {
   note:        KbNote,
@@ -23,6 +37,19 @@ const TERM_COMPONENTS = {
   progression: KbProgression,
   beat:        KbBeat,
   bpm:         KbBpm,
+  pentatonic:  KbPentatonic,
+  voicing:     KbVoicing,
+  downbeat:    KbDownbeat,
+  offbeat:     KbOffbeat,
+  kick:        KbKick,
+  snare:       KbSnare,
+  hihat:       KbHihat,
+  fifth:       KbFifth,
+  third:       KbThird,
+  triad:       KbTriad,
+  comp:        KbComp,
+  arpeggio:    KbArpeggio,
+  syncopation: KbSyncopation,
 }
 
 const activeTerm  = ref(null)
@@ -58,6 +85,10 @@ function onPopState(e) {
 onMounted(() => {
   window.addEventListener('popstate', onPopState)
   history.replaceState({ kb: null }, '')
+  if (requestedKbTerm.value) {
+    goToTerm(requestedKbTerm.value)
+    requestedKbTerm.value = null
+  }
 })
 onUnmounted(() => window.removeEventListener('popstate', onPopState))
 </script>
